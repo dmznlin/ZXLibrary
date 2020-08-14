@@ -30,6 +30,12 @@ type
   end;
   //系统表项
 
+  TNameAndValue = record
+    FName: string;      //数据名称
+    FDesc: string;      //数据描述
+    FValue: string;     //数据取值
+  end;
+
 var
   gSysTableList: TList = nil;                        //系统表数组
   gSysDBType: TSysDatabaseType = dtSQLServer;        //系统数据类型
@@ -51,7 +57,30 @@ const
   //日期相关
   sField_SQLServer_Now           = 'getDate()';
 
-ResourceString     
+const
+  sFlag_Base_Lanuage             = 'lanuage';        //基础档案: 语言
+  sFlag_Base_Author              = 'author';         //基础档案: 作者
+  sFlag_Base_Publish             = 'publish';        //基础档案: 出版社
+  sFlag_Base_Provide             = 'provide';        //基础档案: 供货商
+  sFlag_Base_Age                 = 'age';            //基础档案: 年龄段
+
+  sFlag_Base_MemLevel            = 'memlevel';       //基础档案: 会员等级
+  sFlag_Member_Level_VIP         = 'VIP会员';
+  sFlag_Member_Level_Common      = '普通会员';
+  sFlag_Member_Levels            = sFlag_Member_Level_VIP + '|' +
+                                   sFlag_Member_Level_Common;
+  //会员等级列表
+
+  cBaseData: array[0..5] of TNameAndValue = (
+    (FName: sFlag_Base_Lanuage;  FDesc: '语言';     FValue: ''),
+    (FName: sFlag_Base_Author;   FDesc: '作者';     FValue: ''),
+    (FName: sFlag_Base_Publish;  FDesc: '出版社';   FValue: ''),
+    (FName: sFlag_Base_Provide;  FDesc: '供应商';   FValue: ''),
+    (FName: sFlag_Base_Age;      FDesc: '年龄段';   FValue: ''),
+    (FName: sFlag_Base_MemLevel; FDesc: '会员等级'; FValue: sFlag_Member_Levels)
+  ); //基础项列表
+
+ResourceString
   {*权限项*}
   sPopedom_Read       = 'A';                         //浏览
   sPopedom_Add        = 'B';                         //添加
@@ -131,8 +160,8 @@ ResourceString
   -----------------------------------------------------------------------------}
 
   sSQL_NewBaseInfo = 'Create Table $Table(B_ID $Inc, B_Group varChar(15),' +
-       'B_Text varChar(100), B_Py varChar(25), B_Memo varChar(50),' +
-       'B_PID Integer, B_Index Float)';
+       'B_GroupName varChar(50), B_Text varChar(100), B_Py varChar(25),' +
+       'B_Memo varChar(50), B_PID Integer, B_Index Float)';
   {-----------------------------------------------------------------------------
    基本信息表: BaseInfo
    *.B_ID: 编号
@@ -164,11 +193,8 @@ begin
   gSysTableList := TList.Create;
 
   AddSysTableItem(sTable_SysDict, sSQL_NewSysDict);
-
   AddSysTableItem(sTable_ExtInfo, sSQL_NewExtInfo);
-
   AddSysTableItem(sTable_SysLog, sSQL_NewSysLog);
-
   AddSysTableItem(sTable_BaseInfo, sSQL_NewBaseInfo);
 end;
 

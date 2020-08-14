@@ -19,11 +19,14 @@ const
   {*Frame ID*}
   cFI_FrameSysLog       = $0001;                     //系统日志
   cFI_FrameViewLog      = $0002;                     //本地日志
+  cFI_FrameBaseInfo     = $0003;                     //基础信息
 
   cFI_FormBackup        = $1001;                     //数据备份
   cFI_FormRestore       = $1002;                     //数据恢复
   cFI_FormIncInfo       = $1003;                     //公司信息
   cFI_FormChangePwd     = $1005;                     //修改密码
+
+  cFI_FormBaseInfo      = $1010;                     //基础档案
 
   {*Command*}
   cCmd_RefreshData      = $0002;                     //刷新数据
@@ -139,6 +142,8 @@ begin
   AddMenuModuleItem('MAIN_A03', cFI_FormBackup, mtForm);
   AddMenuModuleItem('MAIN_A04', cFI_FormRestore, mtForm);
   AddMenuModuleItem('MAIN_A05', cFI_FormChangePwd, mtForm);
+
+  AddMenuModuleItem('MAIN_B01', cFI_FrameBaseInfo);
 end;
 
 //Desc: 清理模块列表
