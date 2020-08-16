@@ -123,8 +123,8 @@ begin
   if nWhere <> '' then
   begin
     if Result = '' then
-         Result := ' Where ' + nWhere
-    else Result := Result + ' And ' + nWhere;
+         Result := ' Where (' + nWhere + ')'
+    else Result := Result + ' And (' + nWhere + ')';
   end;
 
   Result := 'Select * From ' + sTable_BaseInfo + Result;

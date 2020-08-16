@@ -44,12 +44,14 @@ inherited fFrameBaseInfo: TfFrameBaseInfo
       Left = 279
       Top = 93
       Hint = 'T.B_Text'
+      ParentFont = False
       TabOrder = 3
       Width = 135
     end
     object EditName: TcxButtonEdit [3]
       Left = 279
       Top = 36
+      ParentFont = False
       Properties.Buttons = <
         item
           Default = True
@@ -64,6 +66,7 @@ inherited fFrameBaseInfo: TfFrameBaseInfo
       Left = 477
       Top = 93
       Hint = 'T.B_Memo'
+      ParentFont = False
       TabOrder = 4
       Width = 200
     end

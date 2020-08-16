@@ -44,6 +44,7 @@ inherited fFormBaseInfo: TfFormBaseInfo
       ParentFont = False
       Properties.DropDownRows = 20
       Properties.ItemHeight = 20
+      Properties.MaxLength = 100
       TabOrder = 1
       Width = 121
     end

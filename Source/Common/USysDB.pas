@@ -63,7 +63,8 @@ const
   sFlag_Base_Publish             = 'publish';        //基础档案: 出版社
   sFlag_Base_Provide             = 'provide';        //基础档案: 供货商
   sFlag_Base_Age                 = 'age';            //基础档案: 年龄段
-
+  sFlag_Base_Payment             = 'payment';        //基础档案: 付款方式
+  
   sFlag_Base_MemLevel            = 'memlevel';       //基础档案: 会员等级
   sFlag_Member_Level_VIP         = 'VIP会员';
   sFlag_Member_Level_Common      = '普通会员';
@@ -71,13 +72,14 @@ const
                                    sFlag_Member_Level_Common;
   //会员等级列表
 
-  cBaseData: array[0..5] of TNameAndValue = (
+  cBaseData: array[0..6] of TNameAndValue = (
     (FName: sFlag_Base_Lanuage;  FDesc: '语言';     FValue: ''),
     (FName: sFlag_Base_Author;   FDesc: '作者';     FValue: ''),
     (FName: sFlag_Base_Publish;  FDesc: '出版社';   FValue: ''),
     (FName: sFlag_Base_Provide;  FDesc: '供应商';   FValue: ''),
     (FName: sFlag_Base_Age;      FDesc: '年龄段';   FValue: ''),
-    (FName: sFlag_Base_MemLevel; FDesc: '会员等级'; FValue: sFlag_Member_Levels)
+    (FName: sFlag_Base_MemLevel; FDesc: '会员等级'; FValue: sFlag_Member_Levels),
+    (FName: sFlag_Base_Payment;  FDesc: '付款方式'; FValue: '')
   ); //基础项列表
 
 ResourceString
@@ -99,6 +101,12 @@ ResourceString
   sFlag_Integer       = 'I';                         //整数
   sFlag_Decimal       = 'D';                         //小数
 
+  sFlag_Male          = 'M';                         //性别: 男
+  sFlag_Female        = 'W';                         //性别: 女
+
+  sFlag_ID_BusGroup   = 'BusFunction';               //业务编码组
+  sFlag_ID_Member     = 'Bus_Member';                //会员编号
+
   {*数据表*}
   sTable_Group        = 'Sys_Group';                 //用户组
   sTable_User         = 'Sys_User';                  //用户表
@@ -111,7 +119,10 @@ ResourceString
   sTable_SysDict      = 'Sys_Dict';                  //系统字典
   sTable_ExtInfo      = 'Sys_ExtInfo';               //附加信息
   sTable_SysLog       = 'Sys_EventLog';              //系统日志
+  sTable_SerialBase   = 'Sys_SerialBase';            //编码种子
   sTable_BaseInfo     = 'Sys_BaseInfo';              //基础信息
+  sTable_Members      = 'M_Members';                 //会员档案
+  sTable_InOutMoney   = 'M_InOutMoney';              //资金明细
 
   {*新建表*}
   sSQL_NewSysDict = 'Create Table $Table(D_ID $Inc, D_Name varChar(15),' +
@@ -159,6 +170,20 @@ ResourceString
    *.L_Event: 事件
   -----------------------------------------------------------------------------}
 
+  sSQL_NewSerialBase = 'Create Table $Table(R_ID $Inc, B_Group varChar(15),' +
+       'B_Object varChar(32), B_Prefix varChar(25), B_IDLen Integer,' +
+       'B_Base Integer, B_Date DateTime)';
+  {-----------------------------------------------------------------------------
+   串行编号基数表: SerialBase
+   *.R_ID: 编号
+   *.B_Group: 分组
+   *.B_Object: 对象
+   *.B_Prefix: 前缀
+   *.B_IDLen: 编号长
+   *.B_Base: 基数
+   *.B_Date: 参考日期
+  -----------------------------------------------------------------------------}
+
   sSQL_NewBaseInfo = 'Create Table $Table(B_ID $Inc, B_Group varChar(15),' +
        'B_GroupName varChar(50), B_Text varChar(100), B_Py varChar(25),' +
        'B_Memo varChar(50), B_PID Integer, B_Index Float)';
@@ -171,6 +196,46 @@ ResourceString
    *.B_Memo: 备注信息
    *.B_PID: 上级节点
    *.B_Index: 创建顺序
+  -----------------------------------------------------------------------------}
+
+  sSQL_NewMembers = 'Create Table $Table(R_ID $Inc, M_ID varChar(15),' +
+       'M_Name varChar(32), M_Py varChar(25), M_Card varChar(32),' +
+       'M_Phone varChar(32), M_Sex Char(1), M_Level varChar(100),' +
+       'M_JoinDate DateTime, M_ValidDate DateTime, M_Valid Char(1),' +
+       'M_BorrowNum Integer, M_BorrowBooks Integer,' +
+       'M_BuyNum Integer, M_BuyBooks Integer, M_Memo varChar(50))';
+  {-----------------------------------------------------------------------------
+   基本信息表: BaseInfo
+   *.R_ID: 记录编号
+   *.M_ID: 会员编号
+   *.M_Name,M_Py: 会员名称
+   *.M_Card: 会员卡号
+   *.M_Phone: 手机号
+   *.M_Sex: 性别
+   *.M_Level: 会员等级
+   *.M_JoinDate: 入会时间
+   *.M_ValidDate: 有效时间
+   *.M_Valid: 是否有效
+   *.M_BorrowNum: 借阅次数
+   *.M_BorrowBooks: 书本数
+   *.M_BuyNum: 购买次数
+   *.M_BuyBooks: 购买本数
+   *.M_Memo: 备注信息
+  -----------------------------------------------------------------------------}
+
+  sSQL_NewInOutMoney = 'Create Table $Table(R_ID $Inc, M_MemID varChar(15),' +
+       'M_MemName varChar(80), M_Type Char(1), M_Payment varChar(100),' +
+       'M_Money Decimal(15,5), M_Man varChar(32), M_Date DateTime, M_Memo varChar(200))';
+  {-----------------------------------------------------------------------------
+   出入金明细: InOutMoney
+   *.M_MemID: 会员编号
+   *.M_MemName:会员姓名
+   *.M_Type: 入金,出金
+   *.M_Payment:付款方式
+   *.M_Money:缴纳金额
+   *.M_Date:操作日期
+   *.M_Man:操作人
+   *.M_Memo:描述
   -----------------------------------------------------------------------------}
 
 implementation
@@ -195,7 +260,10 @@ begin
   AddSysTableItem(sTable_SysDict, sSQL_NewSysDict);
   AddSysTableItem(sTable_ExtInfo, sSQL_NewExtInfo);
   AddSysTableItem(sTable_SysLog, sSQL_NewSysLog);
+  AddSysTableItem(sTable_SerialBase, sSQL_NewSerialBase);
   AddSysTableItem(sTable_BaseInfo, sSQL_NewBaseInfo);
+  AddSysTableItem(sTable_Members, sSQL_NewMembers);
+  AddSysTableItem(sTable_InOutMoney, sSQL_NewInOutMoney);
 end;
 
 //Desc: 清理系统表
