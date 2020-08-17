@@ -10,7 +10,8 @@ interface
 
 uses
   UFrameLog, UFrameSysLog, UFormIncInfo, UFormBackupSQL, UFormRestoreSQL,
-  UFormPassword, UFrameBaseInfo, UFormBaseInfo, UFrameMembers, UFormMembers;
+  UFormPassword, UFrameBaseInfo, UFormBaseInfo, UFrameMembers, UFormMembers,
+  UFormIOMoney;
 
 procedure InitSystemObject;
 procedure RunSystemObject;

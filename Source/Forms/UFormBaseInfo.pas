@@ -23,6 +23,11 @@ type
     dxLayout1Item6: TdxLayoutItem;
     Check1: TcxCheckBox;
     dxLayout1Item4: TdxLayoutItem;
+    EditParam: TcxTextEdit;
+    dxLayout1Item7: TdxLayoutItem;
+    CheckDef: TcxCheckBox;
+    dxLayout1Item8: TdxLayoutItem;
+    dxLayout1Group2: TdxLayoutGroup;
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure BtnOKClick(Sender: TObject);
@@ -130,8 +135,10 @@ begin
 
       EditName.Text := FieldByName('B_Text').AsString;
       EditMemo.Text := FieldByName('B_Memo').AsString;
+      EditParam.Text := FieldByName('B_Params').AsString;
+      CheckDef.Checked := FieldByName('B_Default').AsString = sFlag_Yes;
+
       nStr := FieldByName('B_Group').AsString;
-      
       for nIdx:=Low(cBaseData) to High(cBaseData) do
       if cBaseData[nIdx].FName = nStr then
       begin
@@ -164,6 +171,7 @@ procedure TfFormBaseInfo.ResetFormData;
 begin
   EditName.Clear;
   EditMemo.Clear;
+  CheckDef.Checked := False;
 end;
 
 procedure TfFormBaseInfo.EditTypesPropertiesEditValueChanged(Sender: TObject);
@@ -212,9 +220,23 @@ begin
       SF('B_GroupName', cBaseData[FBaseData].FDesc),
       SF('B_Text', EditName.Text),
       SF('B_Py', GetPinYinOfStr(EditName.Text)),
+      SF('B_Params', EditParam.Text),
+
+      SF_IF([SF('B_Default', sFlag_Yes),
+             SF('B_Default', '')], CheckDef.Checked),
       SF('B_Memo', EditMemo.Text)], sTable_BaseInfo,
       SF('B_ID', FRecordID, sfVal), FRecordID = '');
   FDM.ExecuteSQL(nStr);
+
+  if CheckDef.Checked then
+  begin
+    nStr := 'Update %s Set B_Default=''%s'' ' +
+            'Where B_Group=''%s'' And B_Text<>''%s''';
+    nStr := Format(nStr, [sTable_BaseInfo, '',
+            cBaseData[FBaseData].FName, EditName.Text]);
+    //关闭其它默认项
+    FDM.ExecuteSQL(nStr);
+  end;
   
   FSaveResult := mrOk;
   if Check1.Checked then

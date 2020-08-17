@@ -30,6 +30,7 @@ type
   end;
   //系统表项
 
+  PNameAndValue = ^TNameAndValue;
   TNameAndValue = record
     FName: string;      //数据名称
     FDesc: string;      //数据描述
@@ -103,6 +104,9 @@ ResourceString
 
   sFlag_Male          = 'M';                         //性别: 男
   sFlag_Female        = 'W';                         //性别: 女
+
+  sFlag_InMoney       = 'I';                         //出入金: 入金
+  sFlag_OutMoney      = 'O';                         //出入金: 出金
 
   sFlag_ID_BusGroup   = 'BusFunction';               //业务编码组
   sFlag_ID_Member     = 'Bus_Member';                //会员编号
@@ -186,6 +190,7 @@ ResourceString
 
   sSQL_NewBaseInfo = 'Create Table $Table(B_ID $Inc, B_Group varChar(15),' +
        'B_GroupName varChar(50), B_Text varChar(100), B_Py varChar(25),' +
+       'B_Params varChar(200), B_Default Char(1),' +
        'B_Memo varChar(50), B_PID Integer, B_Index Float)';
   {-----------------------------------------------------------------------------
    基本信息表: BaseInfo
@@ -193,6 +198,8 @@ ResourceString
    *.B_Group: 分组
    *.B_Text: 内容
    *.B_Py: 拼音简写
+   *.B_Params: 附加参数
+   *.B_Default: 默认
    *.B_Memo: 备注信息
    *.B_PID: 上级节点
    *.B_Index: 创建顺序
@@ -201,11 +208,11 @@ ResourceString
   sSQL_NewMembers = 'Create Table $Table(R_ID $Inc, M_ID varChar(15),' +
        'M_Name varChar(32), M_Py varChar(25), M_Card varChar(32),' +
        'M_Phone varChar(32), M_Sex Char(1), M_Level varChar(100),' +
-       'M_JoinDate DateTime, M_ValidDate DateTime, M_Valid Char(1),' +
+       'M_JoinDate DateTime, M_ValidDate DateTime, ' +
        'M_BorrowNum Integer, M_BorrowBooks Integer,' +
        'M_BuyNum Integer, M_BuyBooks Integer, M_Memo varChar(50))';
   {-----------------------------------------------------------------------------
-   基本信息表: BaseInfo
+   会员档案: Members
    *.R_ID: 记录编号
    *.M_ID: 会员编号
    *.M_Name,M_Py: 会员名称
@@ -215,7 +222,6 @@ ResourceString
    *.M_Level: 会员等级
    *.M_JoinDate: 入会时间
    *.M_ValidDate: 有效时间
-   *.M_Valid: 是否有效
    *.M_BorrowNum: 借阅次数
    *.M_BorrowBooks: 书本数
    *.M_BuyNum: 购买次数
@@ -225,7 +231,8 @@ ResourceString
 
   sSQL_NewInOutMoney = 'Create Table $Table(R_ID $Inc, M_MemID varChar(15),' +
        'M_MemName varChar(80), M_Type Char(1), M_Payment varChar(100),' +
-       'M_Money Decimal(15,5), M_Man varChar(32), M_Date DateTime, M_Memo varChar(200))';
+       'M_Money Decimal(15,5), M_Man varChar(32),' +
+       'M_Date DateTime, M_Memo varChar(200))';
   {-----------------------------------------------------------------------------
    出入金明细: InOutMoney
    *.M_MemID: 会员编号

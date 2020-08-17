@@ -35,6 +35,8 @@ type
     EditDate: TcxButtonEdit;
     dxLayout1Item8: TdxLayoutItem;
     cxTextEdit4: TcxTextEdit;
+    PMenu1: TPopupMenu;
+    N1: TMenuItem;
     procedure EditNamePropertiesButtonClick(Sender: TObject;
       AButtonIndex: Integer);
     procedure BtnAddClick(Sender: TObject);
@@ -43,6 +45,7 @@ type
     procedure EditDatePropertiesButtonClick(Sender: TObject;
       AButtonIndex: Integer);
     procedure BtnRefreshClick(Sender: TObject);
+    procedure N1Click(Sender: TObject);
   private
     { Private declarations }
     FStart,FEnd: TDate;
@@ -74,7 +77,6 @@ begin
 end;
 
 procedure TfFrameMembers.OnCreateFrame;
-var nIdx: Integer;
 begin
   inherited;
   FFilteDate := False;
@@ -105,7 +107,12 @@ begin
     else Result := Result + ' And (' + nWhere + ')';
   end;
 
-  Result := 'Select * From ' + sTable_Members + Result;
+  Result := 'Select *,(Case When M_ValidDate > $Now then ''$Yes'' ' +
+            'Else ''$No'' End) as M_Valid From $Mem ' + Result;
+  Result := MacroValue(Result, [MI('$Now', sField_SQLServer_Now),
+            MI('$Yes', sFlag_Yes), MI('$No', sFlag_No),
+            MI('$Mem', sTable_Members)]);
+  //xxxxx
 end;
 
 procedure TfFrameMembers.AfterInitFormData;
@@ -183,7 +190,7 @@ var nParam: TFormCommandParam;
 begin
   if cxView1.DataController.GetSelectedCount < 1 then
   begin
-    ShowMsg('请选择要编辑的记录', sHint); Exit;
+    ShowMsg('请选择要编辑的会员', sHint); Exit;
   end;
 
   nParam.FCommand := cCmd_EditData;
@@ -202,7 +209,7 @@ var nStr,nAsk: string;
 begin
   if cxView1.DataController.GetSelectedCount < 1 then
   begin
-    ShowMsg('请选择要删除的档案', sHint); Exit;
+    ShowMsg('请选择要删除的会员', sHint); Exit;
   end;
 
   nAsk := '';
@@ -231,11 +238,30 @@ begin
   if not QueryDlg(nAsk, sAsk) then Exit;
 
   nStr := SQLQuery.FieldByName('R_ID').AsString;
-  nStr := Format('Delete From %s Where B_ID=%s', [sTable_Members, nStr]);
+  nStr := Format('Delete From %s Where R_ID=%s', [sTable_Members, nStr]);
   FDM.ExecuteSQL(nStr);
   
   InitFormData(FWhere);
   ShowMsg('删除成功', sHint);
+end;
+
+//Desc: 会员交费
+procedure TfFrameMembers.N1Click(Sender: TObject);
+var nParam: TFormCommandParam;
+begin
+  if cxView1.DataController.GetSelectedCount < 1 then
+  begin
+    ShowMsg('请选择要交费的会员', sHint); Exit;
+  end;
+
+  nParam.FCommand := cCmd_AddData;
+  nParam.FParamA := SQLQuery.FieldByName('M_ID').AsString;
+  CreateBaseFormItem(cFI_FormInOutMoney, PopedomItem, @nParam);
+
+  if (nParam.FCommand = cCmd_ModalResult) and (nParam.FParamA = mrOK) then
+  begin
+    InitFormData(FWhere);
+  end;
 end;
 
 initialization

@@ -16,6 +16,17 @@ const
   cRecMenuMax           = 5;                         //最近使用导航区最大条目数
 
 const
+  {*Command*}
+  cCmd_RefreshData      = $0002;                     //刷新数据
+  cCmd_ViewSysLog       = $0003;                     //系统日志
+
+  cCmd_ModalResult      = $1001;                     //Modal窗体
+  cCmd_FormClose        = $1002;                     //关闭窗口
+  cCmd_AddData          = $1003;                     //添加数据
+  cCmd_EditData         = $1005;                     //修改数据
+  cCmd_ViewData         = $1006;                     //查看数据
+  cCmd_DeleteData       = $1007;                     //删除数据
+
   {*Frame ID*}
   cFI_FrameSysLog       = $0001;                     //系统日志
   cFI_FrameViewLog      = $0002;                     //本地日志
@@ -29,16 +40,7 @@ const
 
   cFI_FormBaseInfo      = $1010;                     //基础档案
   cFI_FormMembers       = $1011;                     //会员管理
-
-  {*Command*}
-  cCmd_RefreshData      = $0002;                     //刷新数据
-  cCmd_ViewSysLog       = $0003;                     //系统日志
-
-  cCmd_ModalResult      = $1001;                     //Modal窗体
-  cCmd_FormClose        = $1002;                     //关闭窗口
-  cCmd_AddData          = $1003;                     //添加数据
-  cCmd_EditData         = $1005;                     //修改数据
-  cCmd_ViewData         = $1006;                     //查看数据
+  cFI_FormInOutMoney    = $1012;                     //出入金管理
 
 type
   TSysParam = record

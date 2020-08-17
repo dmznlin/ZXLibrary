@@ -76,6 +76,8 @@ type
     procedure InitFormData(const nID: string);
     procedure ResetFormData;
     {*界面数据*}
+    function DoMemberPayment(const nID: string): Boolean;
+    {*会员付费*}
   public
     { Public declarations }
     class function CreateForm(const nPopedom: string = '';
@@ -151,23 +153,12 @@ end;
 
 procedure TfFormMembers.InitFormData(const nID: string);
 var nStr: string;
+    nLevel: TNameAndValue;
 begin
-  with EditLevel.Properties do
-  if Items.Count < 1 then
+  if EditLevel.Properties.Items.Count < 1 then
   begin
-    nStr := 'Select B_Text From %s Where B_Group=''%s''';
-    nStr := Format(nStr, [sTable_BaseInfo, sFlag_Base_MemLevel]);
-
-    with FDM.QueryTemp(nStr) do
-    if RecordCount > 0 then
-    begin
-      First;
-      while not Eof do
-      begin
-        Items.Add(Fields[0].AsString);
-        Next;
-      end;
-    end;
+    LoadBaseDataList(EditLevel.Properties.Items, sFlag_Base_MemLevel, @nLevel);
+    EditLevel.Text := nLevel.FName;
   end;
 
   if nID = '' then //添加
@@ -218,6 +209,17 @@ begin
   EditPhone.Text := '';
   EditMemo.Text := '';
   ActiveControl := EditCard;
+end;
+
+//Desc: 会员付费
+function TfFormMembers.DoMemberPayment(const nID: string): Boolean;
+var nParam: TFormCommandParam;
+begin
+  nParam.FCommand := cCmd_AddData;
+  nParam.FParamA := nID;
+  
+  CreateBaseFormItem(cFI_FormInOutMoney, PopedomItem, @nParam);
+  Result := (nParam.FCommand = cCmd_ModalResult) and (nParam.FParamA = mrOK);
 end;
 
 procedure TfFormMembers.BtnOKClick(Sender: TObject);
@@ -291,8 +293,8 @@ begin
       SF_IF([SF('M_ID', nID), ''], nIsNew),
       SF_IF([SF('M_JoinDate', DateTime2Str(EditJoin.Date)), ''], nIsNew),
       SF_IF([SF('M_ValidDate', DateTime2Str(EditValid.Date)), ''], nIsNew),
-      SF_IF([SF('M_Valid', sFlag_No), SF('M_Valid', sFlag_Yes)], EditValid.Date <= Now()),
-      SF_IF([SF('M_Sex', sFlag_Male), SF('M_Sex', sFlag_Female)], RadioMan.Checked),
+      SF_IF([SF('M_Sex', sFlag_Male),
+             SF('M_Sex', sFlag_Female)], RadioMan.Checked),
 
       SF_IF([SF('M_BorrowNum', 0, sfVal), ''], nIsNew),
       SF_IF([SF('M_BorrowBooks', 0, sfVal), ''], nIsNew),
@@ -305,8 +307,15 @@ begin
   if Check1.Checked then
   begin
     ResetFormData;
-    ShowMsg('保存成功', sHint);
-  end else ModalResult := mrOk;
+    if not DoMemberPayment(nID) then
+      ShowMsg('保存成功', sHint);
+    //xxxxx
+  end else
+  begin
+    if nIsNew then
+      DoMemberPayment(nID);
+    ModalResult := mrOk;
+  end;
 end;
 
 initialization
