@@ -65,6 +65,7 @@ const
   sFlag_Base_Provide             = 'provide';        //基础档案: 供货商
   sFlag_Base_Age                 = 'age';            //基础档案: 年龄段
   sFlag_Base_Payment             = 'payment';        //基础档案: 付款方式
+  sFlag_Base_BookClass           = 'bookclass';      //基础档案: 图书分类
   
   sFlag_Base_MemLevel            = 'memlevel';       //基础档案: 会员等级
   sFlag_Member_Level_VIP         = 'VIP会员';
@@ -73,14 +74,15 @@ const
                                    sFlag_Member_Level_Common;
   //会员等级列表
 
-  cBaseData: array[0..6] of TNameAndValue = (
+  cBaseData: array[0..7] of TNameAndValue = (
     (FName: sFlag_Base_Lanuage;  FDesc: '语言';     FValue: ''),
     (FName: sFlag_Base_Author;   FDesc: '作者';     FValue: ''),
     (FName: sFlag_Base_Publish;  FDesc: '出版社';   FValue: ''),
     (FName: sFlag_Base_Provide;  FDesc: '供应商';   FValue: ''),
     (FName: sFlag_Base_Age;      FDesc: '年龄段';   FValue: ''),
     (FName: sFlag_Base_MemLevel; FDesc: '会员等级'; FValue: sFlag_Member_Levels),
-    (FName: sFlag_Base_Payment;  FDesc: '付款方式'; FValue: '')
+    (FName: sFlag_Base_Payment;  FDesc: '付款方式'; FValue: ''),
+    (FName: sFlag_Base_BookClass;FDesc: '图书分类'; FValue: '')
   ); //基础项列表
 
 ResourceString
@@ -103,13 +105,15 @@ ResourceString
   sFlag_Decimal       = 'D';                         //小数
 
   sFlag_Male          = 'M';                         //性别: 男
-  sFlag_Female        = 'W';                         //性别: 女
+  sFlag_Female        = 'F';                         //性别: 女
 
   sFlag_InMoney       = 'I';                         //出入金: 入金
   sFlag_OutMoney      = 'O';                         //出入金: 出金
 
   sFlag_ID_BusGroup   = 'BusFunction';               //业务编码组
   sFlag_ID_Member     = 'Bus_Member';                //会员编号
+  sFlag_ID_Books      = 'Bus_Books';                 //图书档案编号
+  sFlag_ID_BookDtl    = 'Bus_BookDtl';               //图书明细编号
 
   {*数据表*}
   sTable_Group        = 'Sys_Group';                 //用户组
@@ -127,6 +131,8 @@ ResourceString
   sTable_BaseInfo     = 'Sys_BaseInfo';              //基础信息
   sTable_Members      = 'M_Members';                 //会员档案
   sTable_InOutMoney   = 'M_InOutMoney';              //资金明细
+  sTable_Books        = 'B_Books';                   //图书
+  sTable_BookDetail   = 'B_BookDtl';                 //图书明细(丛书)
 
   {*新建表*}
   sSQL_NewSysDict = 'Create Table $Table(D_ID $Inc, D_Name varChar(15),' +
@@ -245,6 +251,58 @@ ResourceString
    *.M_Memo:描述
   -----------------------------------------------------------------------------}
 
+  sSQL_NewBooks = 'Create Table $Table(R_ID $Inc, B_ID varChar(15),' +
+       'B_ISBN varChar(32), B_Name varChar(100), B_Py varChar(100),' +
+       'B_Author varChar(80), B_Lang varChar(80), B_Class varChar(80),' +
+       'B_NumAll Integer, B_NumIn Integer, B_NumOut Integer,' +
+       'B_Valid Char(1),' +
+       'B_Man varChar(32), B_Date DateTime, B_Memo varChar(200))';
+  {-----------------------------------------------------------------------------
+   图书档案: Books
+   *.B_ID: 图书编号
+   *.B_ISBN: isbn
+   *.B_Name,B_Py: 图书名称
+   *.B_Author:作者
+   *.B_Lang:语种
+   *.B_Class:分类
+   *.B_NumAll: 总数量
+   *.B_NumIn: 未出借
+   *.B_NumOut: 已出借
+   *.B_Valid: 有效(Y/N)
+   *.B_Date:建档日期
+   *.B_Man:建档人
+   *.B_Memo:备注
+  -----------------------------------------------------------------------------}
+
+  sSQL_NewBookDtl = 'Create Table $Table(R_ID $Inc, D_ID varChar(15),' +
+       'D_Book varChar(15), D_ISBN varChar(32),' +
+       'D_Name varChar(100), D_Py varChar(100),' +
+       'D_Publisher varChar(80), D_PubTime varChar(80), D_Provider varChar(80),' +
+       'D_PubPrice $Float, D_GetPrice $Float, D_SalePrice $Float,' +
+       'D_NumAll Integer, D_NumIn Integer, D_NumOut Integer,' +
+       'D_Valid Char(1),' +
+       'D_Man varChar(32), D_Date DateTime, D_Memo varChar(200))';
+  {-----------------------------------------------------------------------------
+   图书明细: BookDtl
+   *.D_ID: 图书编号
+   *.D_Book: 图书档案
+   *.D_ISBN: isbn
+   *.D_Name,D_Py: 图书名称
+   *.D_Publisher:出版商
+   *.D_PubTime:版次
+   *.D_Provider:供应商
+   *.D_PubPrice:定价
+   *.D_GetPrice: 采购价
+   *.D_SalePrice: 销售价
+   *.D_NumAll: 总数量
+   *.D_NumIn: 未出借
+   *.D_NumOut: 已出借
+   *.D_Valid: 有效(Y/N)
+   *.D_Man:入库人
+   *.D_Date:入库日期
+   *.D_Memo: 备注
+  -----------------------------------------------------------------------------}
+
 implementation
 
 //------------------------------------------------------------------------------
@@ -269,8 +327,11 @@ begin
   AddSysTableItem(sTable_SysLog, sSQL_NewSysLog);
   AddSysTableItem(sTable_SerialBase, sSQL_NewSerialBase);
   AddSysTableItem(sTable_BaseInfo, sSQL_NewBaseInfo);
+
   AddSysTableItem(sTable_Members, sSQL_NewMembers);
   AddSysTableItem(sTable_InOutMoney, sSQL_NewInOutMoney);
+  AddSysTableItem(sTable_Books, sSQL_NewBooks);
+  AddSysTableItem(sTable_BookDetail, sSQL_NewBookDtl);
 end;
 
 //Desc: 清理系统表

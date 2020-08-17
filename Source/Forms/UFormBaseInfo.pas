@@ -32,6 +32,7 @@ type
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure BtnOKClick(Sender: TObject);
     procedure EditTypesPropertiesEditValueChanged(Sender: TObject);
+    procedure EditNameKeyPress(Sender: TObject; var Key: Char);
   private
     { Private declarations }
     FRecordID: string;
@@ -186,6 +187,15 @@ begin
     if cBaseData[nIdx].FValue <> '' then
       SplitStr(cBaseData[nIdx].FValue, Items, 0, '|');
     //xxxxx
+  end;
+end;
+
+procedure TfFormBaseInfo.EditNameKeyPress(Sender: TObject; var Key: Char);
+begin
+  if Key = #13 then
+  begin
+    Key := #0;
+    BtnOK.Click();
   end;
 end;
 

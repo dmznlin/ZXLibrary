@@ -46,6 +46,7 @@ type
       AButtonIndex: Integer);
     procedure BtnRefreshClick(Sender: TObject);
     procedure N1Click(Sender: TObject);
+    procedure cxView1DblClick(Sender: TObject);
   private
     { Private declarations }
     FStart,FEnd: TDate;
@@ -261,6 +262,17 @@ begin
   if (nParam.FCommand = cCmd_ModalResult) and (nParam.FParamA = mrOK) then
   begin
     InitFormData(FWhere);
+  end;
+end;
+
+procedure TfFrameMembers.cxView1DblClick(Sender: TObject);
+var nParam: TFormCommandParam;
+begin
+  if cxView1.DataController.GetSelectedCount > 0 then
+  begin
+    nParam.FCommand := cCmd_ViewData;
+    nParam.FParamA := SQLQuery.FieldByName('R_ID').AsString;
+    CreateBaseFormItem(cFI_FormMembers, PopedomItem, @nParam);
   end;
 end;
 

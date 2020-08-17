@@ -1,4 +1,4 @@
-inherited fFrameMembers: TfFrameMembers
+inherited fFrameBooks: TfFrameBooks
   Width = 856
   Height = 555
   inherited ToolBar1: TToolBar
@@ -17,29 +17,45 @@ inherited fFrameMembers: TfFrameMembers
     Top = 202
     Width = 856
     Height = 353
+    LevelTabs.Slants.Kind = skCutCorner
+    LevelTabs.Style = 9
+    RootLevelOptions.DetailTabsPosition = dtpTop
     inherited cxView1: TcxGridDBTableView
       PopupMenu = PMenu1
-      OnDblClick = cxView1DblClick
+    end
+    object cxView2: TcxGridDBTableView [1]
+      NavigatorButtons.ConfirmDelete = False
+      DataController.DataSource = DataSource2
+      DataController.Summary.DefaultGroupSummaryItems = <>
+      DataController.Summary.FooterSummaryItems = <>
+      DataController.Summary.SummaryGroups = <>
+    end
+    inherited cxLevel1: TcxGridLevel
+      Caption = #22270#20070#26723#26696
+    end
+    object cxLevel2: TcxGridLevel
+      Caption = #22270#20070#26126#32454
+      GridView = cxView2
     end
   end
   inherited dxLayout1: TdxLayoutControl
     Width = 856
     Height = 135
-    object cxTextEdit1: TcxTextEdit [0]
+    object Edit1: TcxTextEdit [0]
       Left = 81
       Top = 93
-      Hint = 'T.M_Name'
+      Hint = 'T.B_Name'
       ParentFont = False
       TabOrder = 4
-      Width = 125
+      Width = 112
     end
-    object cxTextEdit2: TcxTextEdit [1]
-      Left = 269
+    object Edit2: TcxTextEdit [1]
+      Left = 256
       Top = 93
-      Hint = 'T.M_Card'
+      Hint = 'T.B_Author'
       ParentFont = False
       TabOrder = 5
-      Width = 125
+      Width = 112
     end
     object EditName: TcxButtonEdit [2]
       Left = 81
@@ -53,18 +69,18 @@ inherited fFrameMembers: TfFrameMembers
       Properties.OnButtonClick = EditNamePropertiesButtonClick
       TabOrder = 0
       OnKeyPress = OnCtrlKeyPress
-      Width = 125
+      Width = 112
     end
-    object cxTextEdit3: TcxTextEdit [3]
-      Left = 645
+    object Edit4: TcxTextEdit [3]
+      Left = 594
       Top = 93
       Hint = 'T.B_Memo'
       ParentFont = False
       TabOrder = 7
       Width = 185
     end
-    object EditPhone: TcxButtonEdit [4]
-      Left = 457
+    object EditPublisher: TcxButtonEdit [4]
+      Left = 419
       Top = 36
       ParentFont = False
       Properties.Buttons = <
@@ -75,10 +91,10 @@ inherited fFrameMembers: TfFrameMembers
       Properties.OnButtonClick = EditNamePropertiesButtonClick
       TabOrder = 2
       OnKeyPress = OnCtrlKeyPress
-      Width = 125
+      Width = 112
     end
-    object EditCard: TcxButtonEdit [5]
-      Left = 269
+    object EditAuthor: TcxButtonEdit [5]
+      Left = 256
       Top = 36
       ParentFont = False
       Properties.Buttons = <
@@ -89,10 +105,10 @@ inherited fFrameMembers: TfFrameMembers
       Properties.OnButtonClick = EditNamePropertiesButtonClick
       TabOrder = 1
       OnKeyPress = OnCtrlKeyPress
-      Width = 125
+      Width = 112
     end
     object EditDate: TcxButtonEdit [6]
-      Left = 645
+      Left = 594
       Top = 36
       ParentFont = False
       Properties.Buttons = <
@@ -105,29 +121,29 @@ inherited fFrameMembers: TfFrameMembers
       TabOrder = 3
       Width = 185
     end
-    object cxTextEdit4: TcxTextEdit [7]
-      Left = 457
+    object Edit3: TcxTextEdit [7]
+      Left = 419
       Top = 93
-      Hint = 'T.M_Phone'
+      Hint = 'T.B_ISBN'
       ParentFont = False
       TabOrder = 6
-      Width = 125
+      Width = 112
     end
     inherited dxGroup1: TdxLayoutGroup
       inherited GroupSearch1: TdxLayoutGroup
         object dxLayout1Item4: TdxLayoutItem
-          Caption = #20250#21592#22995#21517':'
+          Caption = #22270#20070#21517#31216':'
           Control = EditName
           ControlOptions.ShowBorder = False
         end
         object dxLayout1Item6: TdxLayoutItem
-          Caption = #20250#21592#21345#21495':'
-          Control = EditCard
+          Caption = #22270#20070#20316#32773':'
+          Control = EditAuthor
           ControlOptions.ShowBorder = False
         end
         object dxLayout1Item1: TdxLayoutItem
-          Caption = #25163#26426#21495#30721':'
-          Control = EditPhone
+          Caption = #20986#29256#21830':'
+          Control = EditPublisher
           ControlOptions.ShowBorder = False
         end
         object dxLayout1Item7: TdxLayoutItem
@@ -138,23 +154,23 @@ inherited fFrameMembers: TfFrameMembers
       end
       inherited GroupDetail1: TdxLayoutGroup
         object dxLayout1Item2: TdxLayoutItem
-          Caption = #20250#21592#22995#21517':'
-          Control = cxTextEdit1
+          Caption = #22270#20070#21517#31216':'
+          Control = Edit1
           ControlOptions.ShowBorder = False
         end
         object dxLayout1Item3: TdxLayoutItem
-          Caption = #20250#21592#21345#21495':'
-          Control = cxTextEdit2
+          Caption = #22270#20070#20316#32773':'
+          Control = Edit2
           ControlOptions.ShowBorder = False
         end
         object dxLayout1Item8: TdxLayoutItem
-          Caption = #25163#26426#21495#30721':'
-          Control = cxTextEdit4
+          Caption = 'ISBN'#30721':'
+          Control = Edit3
           ControlOptions.ShowBorder = False
         end
         object dxLayout1Item5: TdxLayoutItem
           Caption = #22791#27880#20449#24687':'
-          Control = cxTextEdit3
+          Control = Edit4
           ControlOptions.ShowBorder = False
         end
       end
@@ -167,7 +183,7 @@ inherited fFrameMembers: TfFrameMembers
   inherited TitlePanel1: TZnBitmapPanel
     Width = 856
     inherited TitleBar: TcxLabel
-      Caption = #20250#21592#20449#24687#31649#29702
+      Caption = #22270#20070#20449#24687#31649#29702
       Style.IsFontAssigned = True
       Width = 856
       AnchorX = 428
@@ -180,13 +196,29 @@ inherited fFrameMembers: TfFrameMembers
   inherited DataSource1: TDataSource
     Top = 298
   end
+  object QueryDtl: TADOQuery
+    Connection = FDM.ADOConn
+    Parameters = <>
+    Left = 6
+    Top = 270
+  end
+  object DataSource2: TDataSource
+    DataSet = QueryDtl
+    Left = 34
+    Top = 270
+  end
   object PMenu1: TPopupMenu
     AutoHotkeys = maManual
     Left = 62
     Top = 298
     object N1: TMenuItem
-      Caption = #20250#21592#20132#36153
-      OnClick = N1Click
+      Caption = #22270#20070#20837#24211
+    end
+    object N2: TMenuItem
+      Caption = '-'
+    end
+    object N3: TMenuItem
+      Caption = #26597#30475#26126#32454
     end
   end
 end

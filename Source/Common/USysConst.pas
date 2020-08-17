@@ -32,6 +32,7 @@ const
   cFI_FrameViewLog      = $0002;                     //本地日志
   cFI_FrameBaseInfo     = $0010;                     //基础信息
   cFI_FrameMembers      = $0011;                     //会员管理
+  cFI_FrameBooks        = $0012;                     //图书管理
 
   cFI_FormBackup        = $1001;                     //数据备份
   cFI_FormRestore       = $1002;                     //数据恢复
@@ -40,7 +41,9 @@ const
 
   cFI_FormBaseInfo      = $1010;                     //基础档案
   cFI_FormMembers       = $1011;                     //会员管理
-  cFI_FormInOutMoney    = $1012;                     //出入金管理
+  cFI_FormBooks         = $1012;                     //图书管理
+  cFI_FormBookDetail    = $1013;                     //图书明细
+  cFI_FormInOutMoney    = $1015;                     //出入金管理
 
 type
   TSysParam = record
@@ -149,6 +152,7 @@ begin
 
   AddMenuModuleItem('MAIN_B01', cFI_FrameBaseInfo);
   AddMenuModuleItem('MAIN_B02', cFI_FrameMembers);
+  AddMenuModuleItem('MAIN_B03', cFI_FrameBooks);
 end;
 
 //Desc: 清理模块列表

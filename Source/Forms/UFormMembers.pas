@@ -125,6 +125,17 @@ begin
       nP.FParamA := FSaveResult;
       Free;
     end;
+   cCmd_ViewData:
+    with TfFormMembers.Create(Application) do
+    begin
+      Caption := '会员信息';
+      BtnOK.Enabled := False;
+      FRecordID := nP.FParamA;
+      
+      InitFormData(FRecordID);
+      ShowModal;
+      Free;
+    end;
   end;
 end;
 
@@ -306,10 +317,9 @@ begin
   FSaveResult := mrOk;
   if Check1.Checked then
   begin
-    ResetFormData;
     if not DoMemberPayment(nID) then
-      ShowMsg('保存成功', sHint);
-    //xxxxx
+      ShowMsg('会员添加成功', sHint);
+    ResetFormData;
   end else
   begin
     if nIsNew then

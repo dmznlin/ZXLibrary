@@ -48,6 +48,7 @@ inherited fFormBaseInfo: TfFormBaseInfo
       Properties.ItemHeight = 20
       Properties.MaxLength = 100
       TabOrder = 1
+      OnKeyPress = EditNameKeyPress
       Width = 121
     end
     object Check1: TcxCheckBox [5]
@@ -62,6 +63,7 @@ inherited fFormBaseInfo: TfFormBaseInfo
     object EditParam: TcxTextEdit [6]
       Left = 81
       Top = 86
+      ParentFont = False
       TabOrder = 2
       Width = 200
     end
