@@ -12,9 +12,29 @@ uses
   cxLookAndFeelPainters, dxSkinsCore, dxSkinsDefaultPainters,
   dxLayoutControl, StdCtrls, cxContainer, cxEdit, cxMemo, cxTextEdit,
   cxMaskEdit, cxDropDownEdit, cxCheckBox, cxLabel, cxRadioGroup, cxCalendar,
-  cxGroupBox, cxLookupEdit, cxDBLookupEdit, cxDBLookupComboBox;
+  cxGroupBox, cxLookupEdit, cxDBLookupEdit, cxDBLookupComboBox, ComCtrls,
+  cxListView, Menus, cxButtons, ImgList;
 
 type
+  TBookStatus = (bsNone, bsNew, bsEdit, bsDel);
+  //图书状态
+
+  TBookItem = record
+    FRecord      : string;
+    FISBN        : string;
+    FName        : string;
+    FPublisher   : string;
+    FProvider    : string;
+    FPubPrice    : Double;
+    FGetPrice    : Double;
+    FSalePrice   : Double;
+    FNumAll      : Integer;
+    FNumIn       : Integer;
+    FNumOut      : Integer;
+    FValid       : string;
+    FStatus      : TBookStatus;
+  end;
+
   TfFormBooks = class(TfFormNormal)
     EditISBN: TcxTextEdit;
     dxLayout1Item4: TdxLayoutItem;
@@ -28,26 +48,76 @@ type
     EditLang: TcxComboBox;
     dxLayout1Item8: TdxLayoutItem;
     EditMemo: TcxMemo;
-    cxLabel1: TcxLabel;
-    dxLayout1Item9: TdxLayoutItem;
-    RadioNormal: TcxRadioButton;
-    dxLayout1Item10: TdxLayoutItem;
-    RadioForbid: TcxRadioButton;
-    dxLayout1Item11: TdxLayoutItem;
-    dxLayout1Group2: TdxLayoutGroup;
     EditAuthor: TcxLookupComboBox;
     dxLayout1Item12: TdxLayoutItem;
     dxLayout1Group3: TdxLayoutGroup;
+    dxGroup2: TdxLayoutGroup;
+    EditDISBN: TcxTextEdit;
+    dxLayout1Item3: TdxLayoutItem;
+    EditDName: TcxTextEdit;
+    dxLayout1Item13: TdxLayoutItem;
+    dxLayout1Group2: TdxLayoutGroup;
+    dxLayout1Group5: TdxLayoutGroup;
+    EditPubPrice: TcxTextEdit;
+    dxLayout1Item16: TdxLayoutItem;
+    EditGetPrice: TcxTextEdit;
+    dxLayout1Item18: TdxLayoutItem;
+    EditSalePrice: TcxTextEdit;
+    dxLayout1Item19: TdxLayoutItem;
+    dxLayout1Group7: TdxLayoutGroup;
+    cxLabel2: TcxLabel;
+    dxLayout1Item20: TdxLayoutItem;
+    dxLayout1Item21: TdxLayoutItem;
+    EditNumOut: TcxTextEdit;
+    dxLayout1Item22: TdxLayoutItem;
+    EditNumAll: TcxTextEdit;
+    dxLayout1Item23: TdxLayoutItem;
+    EditNumIn: TcxTextEdit;
+    dxLayout1Group9: TdxLayoutGroup;
+    dxLayout1Group10: TdxLayoutGroup;
+    ListDetail: TcxListView;
+    dxLayout1Item24: TdxLayoutItem;
+    dxLayout1Item25: TdxLayoutItem;
+    EditProvider: TcxLookupComboBox;
+    dxLayout1Item26: TdxLayoutItem;
+    EditPublisher: TcxLookupComboBox;
+    dxLayout1Group11: TdxLayoutGroup;
+    dxLayout1Group6: TdxLayoutGroup;
+    dxLayout1Item14: TdxLayoutItem;
+    cxLabel3: TcxLabel;
+    dxLayout1Item15: TdxLayoutItem;
+    RadioNormal: TcxRadioButton;
+    dxLayout1Item27: TdxLayoutItem;
+    RadioForbid: TcxRadioButton;
+    dxLayout1Group8: TdxLayoutGroup;
+    dxLayout1Group12: TdxLayoutGroup;
+    BtnDel: TcxButton;
+    dxLayout1Item29: TdxLayoutItem;
+    dxLayout1Item30: TdxLayoutItem;
+    cxLabel4: TcxLabel;
+    dxLayout1Group13: TdxLayoutGroup;
+    cxImageList1: TcxImageList;
+    dxLayout1Item9: TdxLayoutItem;
+    BtnAdd: TcxButton;
+    PMenu1: TPopupMenu;
+    MenuEdit: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure BtnOKClick(Sender: TObject);
+    procedure BtnAddClick(Sender: TObject);
+    procedure BtnDelClick(Sender: TObject);
+    procedure ListDetailDblClick(Sender: TObject);
+    procedure EditDNameKeyPress(Sender: TObject; var Key: Char);
   private
     { Private declarations }
     FBookID: string;
     {*图书编号*}
+    FBooks: array of TBookItem;
+    {*图书明细*}
     FSaveResult: Integer;
-    procedure InitFormData(const nID: string);
     procedure ResetFormData;
+    procedure InitFormData(const nID: string);
+    procedure LoadBookDetail;
     {*界面数据*}
   public
     { Public declarations }
@@ -62,7 +132,7 @@ implementation
 {$R *.dfm}
 uses
   ULibFun, UFormCtrl, UFormBase, UMgrControl, UMgrLookupAdapter, UDataModule,
-  USysBusiness, USysDB, USysConst;
+  USysBusiness, USysGrid, USysDB, USysConst;
 
 class function TfFormBooks.CreateForm(const nPopedom: string;
   const nParam: Pointer): TWinControl;
@@ -121,22 +191,28 @@ procedure TfFormBooks.FormCreate(Sender: TObject);
 begin
   inherited;
   LoadFormConfig(Self);
+  LoadcxListViewConfig(Name, ListDetail);
 end;
 
 procedure TfFormBooks.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   gLookupComboBoxAdapter.DeleteGroup(Name);
   SaveFormConfig(Self);
+  SavecxListViewConfig(Name, ListDetail);
   inherited;
 end;
 
 procedure TfFormBooks.InitFormData(const nID: string);
 var nStr,nTmp: string;
+    nIdx: Integer;
     nDefault: TNameAndValue;
     nDStr: TDynamicStrArray;
     nItem: TLookupComboBoxItem;
 begin
-  ActiveControl := EditISBN;
+  ResetFormData;
+  dxGroup1.AlignVert := avTop;
+  dxGroup2.AlignVert := avClient;
+  
   if EditClass.Properties.Items.Count < 1 then
   begin
     LoadBaseDataList(EditClass.Properties.Items, sFlag_Base_BookClass, @nDefault);
@@ -148,7 +224,7 @@ begin
     LoadBaseDataList(EditLang.Properties.Items, sFlag_Base_Lanuage, @nDefault);
     EditLang.ItemIndex := EditLang.Properties.Items.IndexOf(nDefault.FName);
   end;
-       
+
   if not Assigned(gLookupComboBoxAdapter) then
     gLookupComboBoxAdapter := TLookupComboBoxAdapter.Create(FDM.ADOConn);
   //xxxxx
@@ -167,7 +243,38 @@ begin
     gLookupComboBoxAdapter.AddItem(nItem);
     gLookupComboBoxAdapter.BindItem(nTmp, EditAuthor);
   end;
-  
+
+  if not Assigned(EditPublisher.Properties.ListSource) then
+  begin
+    nStr := 'Select B_Text,B_Py From %s Where B_Group=''%s''';
+    nStr := Format(nStr, [sTable_BaseInfo, sFlag_Base_Publish]);
+
+    nTmp := Name + 'PB';
+    SetLength(nDStr, 1);
+    nDStr[0] := 'B_Py';
+
+    nItem := gLookupComboBoxAdapter.MakeItem(Name, nTmp, nStr, 'B_Text', 0,
+             [MI('B_Text', '名称'), MI('B_Py', '助记码')], nDStr);
+    gLookupComboBoxAdapter.AddItem(nItem);
+    gLookupComboBoxAdapter.BindItem(nTmp, EditPublisher);
+  end;
+
+  if not Assigned(EditProvider.Properties.ListSource) then
+  begin
+    nStr := 'Select B_Text,B_Py From %s Where B_Group=''%s''';
+    nStr := Format(nStr, [sTable_BaseInfo, sFlag_Base_Provide]);
+
+    nTmp := Name + 'PV';
+    SetLength(nDStr, 1);
+    nDStr[0] := 'B_Py';
+
+    nItem := gLookupComboBoxAdapter.MakeItem(Name, nTmp, nStr, 'B_Text', 0,
+             [MI('B_Text', '名称'), MI('B_Py', '助记码')], nDStr);
+    gLookupComboBoxAdapter.AddItem(nItem);
+    gLookupComboBoxAdapter.BindItem(nTmp, EditProvider);
+  end;
+
+  //---------------------------------------------------------------------------
   if nID <> '' then
   begin
     Check1.Checked := False;
@@ -193,7 +300,49 @@ begin
       if FieldByName('B_Valid').AsString = sFlag_Yes then
            RadioNormal.Checked := True
       else RadioForbid.Checked := True;
+
+      nTmp := FieldByName('B_ID').AsString;
+      //档案编号
     end;
+
+    //-------------------------------------------------------------------------
+    SetLength(FBooks, 0);
+    nStr := 'Select * From %s Where D_Book=''%s''';
+    nStr := Format(nStr, [sTable_BookDetail, nTmp]);
+
+    with FDM.QueryTemp(nStr) do
+    if RecordCount > 0 then
+    begin
+      SetLength(FBooks, RecordCount);
+      nIdx := 0;
+      First;
+
+      while not Eof do
+      begin
+        with FBooks[nIdx] do
+        begin
+          FRecord      := FieldByName('R_ID').AsString;
+          FISBN        := FieldByName('D_ISBN').AsString;
+          FName        := FieldByName('D_Name').AsString;
+          FPublisher   := FieldByName('D_Publisher').AsString;
+          FProvider    := FieldByName('D_Provider').AsString;
+          FPubPrice    := FieldByName('D_PubPrice').AsFloat;
+          FGetPrice    := FieldByName('D_GetPrice').AsFloat;
+          FSalePrice   := FieldByName('D_SalePrice').AsFloat;
+          FNumAll      := FieldByName('D_NumAll').AsInteger;
+          FNumIn       := FieldByName('D_NumIn').AsInteger;
+          FNumOut      := FieldByName('D_NumOut').AsInteger;
+          FValid       := FieldByName('D_Valid').AsString;
+          FStatus      := bsNone;
+        end;
+
+        Inc(nIdx);
+        Next;
+      end;
+    end;
+
+    LoadBookDetail;
+    //载入明细
   end;
 end;
 
@@ -202,6 +351,218 @@ begin
   EditISBN.Text := '';
   EditName.Text := '';
   ActiveControl := EditISBN;
+
+  EditDISBN.Text := '';
+  EditDName.Text := '';
+  EditPubPrice.Text := '0';
+  EditGetPrice.Text := '0';
+  EditSalePrice.Text := '0';
+  EditNumAll.Text := '0';
+  EditNumIn.Text := '0';
+  EditNumOut.Text := '0';
+
+  RadioNormal.Checked := True;
+  SetLength(FBooks, 0);
+  LoadBookDetail;
+end;
+
+procedure TfFormBooks.LoadBookDetail;
+var nStr: string;
+    nIdx,nSelected: Integer;
+begin
+  with ListDetail do
+  try
+    if Assigned(Selected) then
+         nSelected := Integer(Selected.Data)
+    else nSelected := -1;
+
+    Items.BeginUpdate;
+    Items.Clear;
+
+    for nIdx:=Low(FBooks) to High(FBooks) do
+     if FBooks[nIdx].FStatus <> bsDel then
+      with Items.Add, FBooks[nIdx] do
+      begin
+        Caption := FISBN;
+        SubItems.Add(FName);
+        SubItems.Add(FPublisher);
+        SubItems.Add(FProvider);
+        SubItems.Add(Format('%.2f', [FGetPrice]));
+        SubItems.Add(IntToStr(FNumAll));
+
+        if FValid = sFlag_Yes then
+             SubItems.Add('正常')
+        else SubItems.Add('禁止');
+
+        Data := Pointer(nIdx);
+        if nIdx = nSelected then
+          Selected := True;
+        //xxxxx
+      end;
+  finally
+    ListDetail.Items.EndUpdate;
+  end;
+end;
+
+//Desc: 添加明细
+procedure TfFormBooks.BtnAddClick(Sender: TObject);
+var nIdx: Integer;
+begin
+  if (Sender = MenuEdit) and (not Assigned(ListDetail.Selected)) then
+  begin
+    ShowMsg('请选择要覆盖的记录', sHint);
+    Exit;
+  end;
+
+  EditDISBN.Text := Trim(EditDISBN.Text);
+  if EditDISBN.Text = '' then
+  begin
+    ActiveControl := EditDISBN;
+    ShowMsg('请填写ISBN码', sHint); Exit;
+  end;
+
+  EditDName.Text := Trim(EditDName.Text);
+  if EditDName.Text = '' then
+  begin
+    ActiveControl := EditDName;
+    ShowMsg('请填写图书名称', sHint); Exit;
+  end;
+
+  if (not IsNumber(EditPubPrice.Text, True)) or
+     (StrToFloat(EditPubPrice.Text) < 0) then
+  begin
+    ActiveControl := EditPubPrice;
+    ShowMsg('请填写正确价格', sHint); Exit;
+  end;
+
+  if (not IsNumber(EditGetPrice.Text, True)) or
+     (StrToFloat(EditGetPrice.Text) < 0) then
+  begin
+    ActiveControl := EditGetPrice;
+    ShowMsg('请填写正确价格', sHint); Exit;
+  end;
+
+  if (not IsNumber(EditSalePrice.Text, True)) or
+     (StrToFloat(EditSalePrice.Text) < 0) then
+  begin
+    ActiveControl := EditSalePrice;
+    ShowMsg('请填写正确价格', sHint); Exit;
+  end;
+
+  if (not IsNumber(EditNumAll.Text, False)) or
+     (StrToFloat(EditNumAll.Text) < 0) then
+  begin
+    ActiveControl := EditNumAll;
+    ShowMsg('请填写正确数量', sHint); Exit;
+  end;
+
+  if (not IsNumber(EditNumIn.Text, False)) or
+     (StrToFloat(EditNumIn.Text) < 0) then
+  begin
+    ActiveControl := EditNumIn;
+    ShowMsg('请填写正确数量', sHint); Exit;
+  end;
+
+  if (not IsNumber(EditNumOut.Text, False)) or
+     (StrToFloat(EditNumOut.Text) < 0) then
+  begin
+    ActiveControl := EditNumOut;
+    ShowMsg('请填写正确数量', sHint); Exit;
+  end;
+
+  if Sender = MenuEdit then //修改
+  begin
+    nIdx := Integer(ListDetail.Selected.Data);
+  end else
+  begin
+    nIdx := Length(FBooks);
+    SetLength(FBooks, nIdx + 1);
+  end;
+  
+  with FBooks[nIdx] do
+  begin
+    FRecord      := '';
+    FISBN        := EditDISBN.Text;
+    FName        := EditDName.Text;
+    FPublisher   := EditPublisher.Text;
+    FProvider    := EditProvider.Text;
+
+    FPubPrice    := StrToFloat(EditPubPrice.Text);
+    FGetPrice    := StrToFloat(EditGetPrice.Text);
+    FSalePrice   := StrToFloat(EditSalePrice.Text);
+    FNumAll      := StrToInt(EditNumAll.Text);
+    FNumIn       := StrToInt(EditNumIn.Text);
+    FNumOut      := StrToInt(EditNumOut.Text);
+    FStatus      := bsNew;
+
+    if RadioNormal.Checked then
+         FValid := sFlag_Yes
+    else FValid := sFlag_No;
+  end;
+
+  ActiveControl := EditDName;
+  if Sender = BtnAdd then
+    EditDName.Text := '';
+  LoadBookDetail;
+end;
+
+//Desc: 删除明细
+procedure TfFormBooks.BtnDelClick(Sender: TObject);
+var nIdx,nInt: Integer;
+begin
+  if not Assigned(ListDetail.Selected) then
+  begin
+    ShowMsg('请选择要删除的记录', sHint);
+    Exit;
+  end;
+
+  nInt := Integer(ListDetail.Selected.Data);
+  FBooks[nInt].FStatus := bsDel;
+  nIdx := ListDetail.ItemIndex;
+
+  LoadBookDetail;
+  if ListDetail.Items.Count > 0 then
+  begin
+    if ListDetail.Items.Count > nIdx then
+         ListDetail.ItemIndex := nIdx
+    else ListDetail.ItemIndex := ListDetail.Items.Count-1;
+  end;
+end;
+
+//Desc: 加载明细到界面
+procedure TfFormBooks.ListDetailDblClick(Sender: TObject);
+var nIdx: Integer;
+begin
+  if not Assigned(ListDetail.Selected) then Exit;
+  nIdx := Integer(ListDetail.Selected.Data);
+
+  with FBooks[nIdx] do
+  begin
+    EditDISBN.Text := FISBN;
+    EditDName.Text := FName;
+    EditPublisher.Text := FPublisher;
+    EditProvider.Text := FProvider;
+
+    EditPubPrice.Text := FloatToStr(FPubPrice);
+    EditGetPrice.Text := FloatToStr(FGetPrice);
+    EditSalePrice.Text := FloatToStr(FSalePrice);
+    EditNumAll.Text := IntToStr(FNumAll);
+    EditNumIn.Text := IntToStr(FNumIn);
+    EditNumOut.Text := IntToStr(FNumOut);
+
+    if FValid = sFlag_Yes then
+         RadioNormal.Checked := True
+    else RadioForbid.Checked := True;
+  end;
+end;
+
+procedure TfFormBooks.EditDNameKeyPress(Sender: TObject; var Key: Char);
+begin
+  if Key = #13 then
+  begin
+    Key := #0;
+    BtnAdd.Click();
+  end;
 end;
 
 function TfFormBooks.OnVerifyCtrl(Sender: TObject; var nHint: string): Boolean;
@@ -293,8 +654,7 @@ begin
       SF_IF([SF('B_ID', nID), ''], nIsNew),
       SF_IF([SF('B_Date', sField_SQLServer_Now, sfVal), ''], nIsNew),
       SF_IF([SF('B_Man', gSysParam.FUserID), ''], nIsNew),
-      SF_IF([SF('B_Valid', sFlag_Yes),
-             SF('B_Valid', sFlag_No)], RadioNormal.Checked),
+      SF_IF([SF('B_Valid', sFlag_Yes), ''], nIsNew),
 
       SF_IF([SF('B_NumAll', 0), ''], nIsNew),
       SF_IF([SF('B_NumIn', 0), ''], nIsNew),

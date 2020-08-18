@@ -35,7 +35,6 @@ type
     dxLayout1Item11: TdxLayoutItem;
     RadioTui: TcxRadioButton;
     dxLayout1Item12: TdxLayoutItem;
-    dxLayout1Group3: TdxLayoutGroup;
     cxLabel1: TcxLabel;
     dxLayout1Item13: TdxLayoutItem;
     EditValid: TcxDateEdit;
@@ -48,6 +47,8 @@ type
     cxLabel3: TcxLabel;
     dxLayout1Item16: TdxLayoutItem;
     dxLayout1Group6: TdxLayoutGroup;
+    dxLayout1Group5: TdxLayoutGroup;
+    dxLayout1Group3: TdxLayoutGroup;
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure BtnOKClick(Sender: TObject);
