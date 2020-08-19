@@ -33,6 +33,7 @@ const
   cFI_FrameBaseInfo     = $0010;                     //基础信息
   cFI_FrameMembers      = $0011;                     //会员管理
   cFI_FrameBooks        = $0012;                     //图书管理
+  cFI_FrameBookInOut    = $0016;                     //图书入库
 
   cFI_FormBackup        = $1001;                     //数据备份
   cFI_FormRestore       = $1002;                     //数据恢复
@@ -44,6 +45,7 @@ const
   cFI_FormBooks         = $1012;                     //图书管理
   cFI_FormBookDetail    = $1013;                     //图书明细
   cFI_FormInOutMoney    = $1015;                     //出入金管理
+  cFI_FormBookInOut     = $1016;                     //图书入库
 
 type
   TSysParam = record
@@ -92,7 +94,7 @@ ResourceString
   sHint               = '提示';                      //对话框标题
   sWarn               = '警告';                      //==
   sAsk                = '询问';                      //询问对话框
-  sError              = '未知错误';                  //错误对话框
+  sError              = '错误';                      //错误对话框
 
   sDate               = '日期:【%s】';               //任务栏日期
   sTime               = '时间:【%s】';               //任务栏时间
@@ -153,6 +155,7 @@ begin
   AddMenuModuleItem('MAIN_B01', cFI_FrameBaseInfo);
   AddMenuModuleItem('MAIN_B02', cFI_FrameMembers);
   AddMenuModuleItem('MAIN_B03', cFI_FrameBooks);
+  AddMenuModuleItem('MAIN_B06', cFI_FrameBookInOut);
 end;
 
 //Desc: 清理模块列表

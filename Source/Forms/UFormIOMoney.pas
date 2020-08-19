@@ -186,9 +186,13 @@ begin
 
   if Sender = EditMoney then
   begin
-    Result := IsNumber(EditMoney.Text, True) and
-              (StrToFloat(EditMoney.Text) >= 0);
     nHint := '请填写正确的金额';
+    Result := IsNumber(EditMoney.Text, True);
+    if not Result then Exit;
+
+    if RadioPay.Checked then
+         Result := StrToFloat(EditMoney.Text) >= 0
+    else Result := StrToFloat(EditMoney.Text) <= 0;
   end;
 end;
 
@@ -206,8 +210,8 @@ begin
 
     nStr := MakeSQLByStr([SF('M_MemID', FMember),
       SF('M_MemName', EditName.Text),
-      SF_IF([SF('M_Type', sFlag_InMoney),
-             SF('M_Type', sFlag_OutMoney)], RadioPay.Checked),
+      SF_IF([SF('M_Type', sFlag_In),
+             SF('M_Type', sFlag_Out)], RadioPay.Checked),
       //xxxxx
 
       SF('M_Payment', EditPayment.Text),

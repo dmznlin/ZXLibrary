@@ -32,6 +32,7 @@ type
     FNumIn       : Integer;
     FNumOut      : Integer;
     FValid       : string;
+    FMemo        : string;
     FStatus      : TBookStatus;
   end;
 
@@ -99,8 +100,10 @@ type
     cxImageList1: TcxImageList;
     dxLayout1Item9: TdxLayoutItem;
     BtnAdd: TcxButton;
-    PMenu1: TPopupMenu;
-    MenuEdit: TMenuItem;
+    EditDMemo: TcxTextEdit;
+    dxLayout1Item10: TdxLayoutItem;
+    dxLayout1Item11: TdxLayoutItem;
+    BtnEdit: TcxButton;
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure BtnOKClick(Sender: TObject);
@@ -108,8 +111,11 @@ type
     procedure BtnDelClick(Sender: TObject);
     procedure ListDetailDblClick(Sender: TObject);
     procedure EditDNameKeyPress(Sender: TObject; var Key: Char);
+    procedure EditDISBNKeyPress(Sender: TObject; var Key: Char);
+    procedure EditISBNKeyPress(Sender: TObject; var Key: Char);
   private
     { Private declarations }
+    FRecordID: string;
     FBookID: string;
     {*图书编号*}
     FBooks: array of TBookItem;
@@ -119,6 +125,9 @@ type
     procedure InitFormData(const nID: string);
     procedure LoadBookDetail;
     {*界面数据*}
+    function SaveBook(var nBookID: string): Boolean;
+    function SaveBookDetail(const nBookID: string): Boolean;
+    {*保存数据*}
   public
     { Public declarations }
     class function CreateForm(const nPopedom: string = '';
@@ -148,10 +157,9 @@ begin
     with TfFormBooks.Create(Application) do
     begin
       Caption := '添加图书';
-      FBookID := '';
       InitFormData('');
-      
       ShowModal;
+      
       nP.FCommand := cCmd_ModalResult;
       nP.FParamA := FSaveResult;
       Free;
@@ -160,8 +168,8 @@ begin
     with TfFormBooks.Create(Application) do
     begin
       Caption := '修改图书';
-      FBookID := nP.FParamA;
-      InitFormData(FBookID);
+      FRecordID := nP.FParamA;
+      InitFormData(FRecordID);
 
       ShowModal;
       nP.FCommand := cCmd_ModalResult;
@@ -173,9 +181,9 @@ begin
     begin
       Caption := '图书信息';
       BtnOK.Enabled := False;
-      FBookID := nP.FParamA;
+      FRecordID := nP.FParamA;
       
-      InitFormData(FBookID);
+      InitFormData(FRecordID);
       ShowModal;
       Free;
     end;
@@ -190,6 +198,9 @@ end;
 procedure TfFormBooks.FormCreate(Sender: TObject);
 begin
   inherited;
+  FBookID := '';
+  FRecordID := '';
+  
   LoadFormConfig(Self);
   LoadcxListViewConfig(Name, ListDetail);
 end;
@@ -279,6 +290,7 @@ begin
   begin
     Check1.Checked := False;
     Check1.Visible := False;
+    //关闭连续操作
 
     nStr :='Select * From %s Where R_ID=''%s''';
     nStr := Format(nStr, [sTable_Books, nID]);
@@ -301,14 +313,14 @@ begin
            RadioNormal.Checked := True
       else RadioForbid.Checked := True;
 
-      nTmp := FieldByName('B_ID').AsString;
+      FBookID := FieldByName('B_ID').AsString;
       //档案编号
     end;
 
     //-------------------------------------------------------------------------
     SetLength(FBooks, 0);
     nStr := 'Select * From %s Where D_Book=''%s''';
-    nStr := Format(nStr, [sTable_BookDetail, nTmp]);
+    nStr := Format(nStr, [sTable_BookDetail, FBookID]);
 
     with FDM.QueryTemp(nStr) do
     if RecordCount > 0 then
@@ -333,6 +345,7 @@ begin
           FNumIn       := FieldByName('D_NumIn').AsInteger;
           FNumOut      := FieldByName('D_NumOut').AsInteger;
           FValid       := FieldByName('D_Valid').AsString;
+          FMemo        := FieldByName('D_Memo').AsString;
           FStatus      := bsNone;
         end;
 
@@ -367,8 +380,7 @@ begin
 end;
 
 procedure TfFormBooks.LoadBookDetail;
-var nStr: string;
-    nIdx,nSelected: Integer;
+var nIdx,nSelected: Integer;
 begin
   with ListDetail do
   try
@@ -407,8 +419,10 @@ end;
 //Desc: 添加明细
 procedure TfFormBooks.BtnAddClick(Sender: TObject);
 var nIdx: Integer;
+    nIsEdit: Boolean;
 begin
-  if (Sender = MenuEdit) and (not Assigned(ListDetail.Selected)) then
+  nIsEdit := Sender = BtnEdit;
+  if nIsEdit and (not Assigned(ListDetail.Selected)) then
   begin
     ShowMsg('请选择要覆盖的记录', sHint);
     Exit;
@@ -470,7 +484,7 @@ begin
     ShowMsg('请填写正确数量', sHint); Exit;
   end;
 
-  if Sender = MenuEdit then //修改
+  if nIsEdit then //修改
   begin
     nIdx := Integer(ListDetail.Selected.Data);
   end else
@@ -481,11 +495,20 @@ begin
   
   with FBooks[nIdx] do
   begin
-    FRecord      := '';
+    if nIsEdit then
+    begin
+      FStatus := bsEdit;
+    end else
+    begin
+      FRecord := '';
+      FStatus := bsNew;
+    end;
+
     FISBN        := EditDISBN.Text;
     FName        := EditDName.Text;
     FPublisher   := EditPublisher.Text;
     FProvider    := EditProvider.Text;
+    FMemo        := EditDMemo.Text;
 
     FPubPrice    := StrToFloat(EditPubPrice.Text);
     FGetPrice    := StrToFloat(EditGetPrice.Text);
@@ -493,7 +516,6 @@ begin
     FNumAll      := StrToInt(EditNumAll.Text);
     FNumIn       := StrToInt(EditNumIn.Text);
     FNumOut      := StrToInt(EditNumOut.Text);
-    FStatus      := bsNew;
 
     if RadioNormal.Checked then
          FValid := sFlag_Yes
@@ -502,8 +524,15 @@ begin
 
   ActiveControl := EditDName;
   if Sender = BtnAdd then
+  begin
     EditDName.Text := '';
+    EditNumAll.Text := '0';
+    EditNumIn.Text := '0';
+    EditNumOut.Text := '0';
+  end;
+
   LoadBookDetail;
+  //载入明细
 end;
 
 //Desc: 删除明细
@@ -542,6 +571,7 @@ begin
     EditDName.Text := FName;
     EditPublisher.Text := FPublisher;
     EditProvider.Text := FProvider;
+    EditDMemo.Text := FMemo;
 
     EditPubPrice.Text := FloatToStr(FPubPrice);
     EditGetPrice.Text := FloatToStr(FGetPrice);
@@ -586,7 +616,7 @@ begin
       while not Eof do
       begin
         nStr := FieldByName('R_ID').AsString;
-        if (FBookID = '') or (FBookID <> nStr) then
+        if (FRecordID = '') or (FRecordID <> nStr) then
         begin
           Result := False;
           nHint := '该 ISBN 已存在';
@@ -625,21 +655,23 @@ begin
   end;
 end;
 
-procedure TfFormBooks.BtnOKClick(Sender: TObject);
-var nStr,nID: string;
+//Date: 2020-08-19
+//Parm: 档案标识
+//Desc: 保存图书档案
+function TfFormBooks.SaveBook(var nBookID: string): Boolean;
+var nStr: string;
     nIsNew: Boolean;
 begin
-  if not IsDataValid then Exit;
-  //verify data
-
-  nIsNew := FBookID = '';
-  //添加模式
-
-  if nIsNew and (not GetSerailID(nID, sFlag_ID_BusGroup, sFlag_ID_Books)) then
+  Result := False;
+  nIsNew := FRecordID = '';
+  if nIsNew then
   begin
-    ShowMsg(nID, sHint);
-    Exit;
-  end;
+    if not GetSerailID(nBookID, sFlag_ID_BusGroup, sFlag_ID_Books) then
+    begin
+      ShowMsg(nBookID, sHint);
+      Exit;
+    end;
+  end else nBookID := FBookID;
 
   nStr := MakeSQLByStr([
       SF('B_ISBN', EditISBN.Text),
@@ -651,7 +683,7 @@ begin
       SF('B_Class', EditClass.Text),
       SF('B_Memo', EditMemo.Text),
 
-      SF_IF([SF('B_ID', nID), ''], nIsNew),
+      SF_IF([SF('B_ID', nBookID), ''], nIsNew),
       SF_IF([SF('B_Date', sField_SQLServer_Now, sfVal), ''], nIsNew),
       SF_IF([SF('B_Man', gSysParam.FUserID), ''], nIsNew),
       SF_IF([SF('B_Valid', sFlag_Yes), ''], nIsNew),
@@ -659,8 +691,95 @@ begin
       SF_IF([SF('B_NumAll', 0), ''], nIsNew),
       SF_IF([SF('B_NumIn', 0), ''], nIsNew),
       SF_IF([SF('B_NumOut', 0), ''], nIsNew)
-    ], sTable_Books, SF('R_ID', FBookID, sfVal), nIsNew);
+    ], sTable_Books, SF('R_ID', FRecordID, sfVal), nIsNew);
+  //xxxxx
+  
   FDM.ExecuteSQL(nStr);
+  Result := True;
+end;
+
+//Date: 2020-08-19
+//Parm: 档案标识
+//Desc: 保存图书明细
+function TfFormBooks.SaveBookDetail(const nBookID: string): Boolean;
+var nStr,nID: string;
+    nIsNew: Boolean;
+    nIdx,nInt: Integer;
+begin
+  Result := False;
+  //default
+  nInt := 0;
+
+  for nIdx:=Low(FBooks) to High(FBooks) do
+  with FBooks[nIdx] do
+  begin
+    if (FStatus = bsDel) or (FStatus = bsNone) then Continue;
+    //invalid
+
+    nIsNew := FRecord = '';
+    if nIsNew and (not GetSerailID(nID, sFlag_ID_BusGroup, sFlag_ID_BookDtl)) then
+    begin
+      ShowMsg(nID, sHint);
+      Exit;
+    end;
+
+    nStr := MakeSQLByStr([SF('D_Book', nBookID),
+        SF('D_ISBN', FISBN),
+        SF('D_Name', FName),
+        SF('D_Py', GetPinYinOfStr(FName)),
+        SF('D_Publisher', FPublisher),
+        SF('D_Provider', FProvider),
+        SF('D_PubPrice', FloatToStr(FPubPrice), sfVal),
+        SF('D_GetPrice', FloatToStr(FGetPrice), sfVal),
+        SF('D_SalePrice', FloatToStr(FSalePrice), sfVal),
+        SF('D_NumAll', IntToStr(FNumAll), sfVal),
+        SF('D_NumIn', IntToStr(FNumIn), sfVal),
+        SF('D_NumOut', IntToStr(FNumOut), sfVal),
+        SF('D_Valid', FValid),
+        SF('D_Memo', FMemo),
+
+        SF_IF([SF('D_ID', nID), ''], nIsNew),
+        SF_IF([SF('D_Man', gSysParam.FUserID), ''], nIsNew),
+        SF_IF([SF('D_Date', sField_SQLServer_Now, sfVal), ''], nIsNew)
+      ], sTable_BookDetail, SF('R_ID', FRecord), nIsNew);
+    //xxxxx
+
+    FDM.ExecuteSQL(nStr);
+    Inc(nInt);
+  end;
+
+  if nInt > 0 then
+    SyncBookNumber(nBookID);
+  //同步库存
+  
+  Result := True;
+  //save done
+end;
+
+procedure TfFormBooks.BtnOKClick(Sender: TObject);
+var nID: string;
+begin
+  if not IsDataValid then Exit;
+  //verify data
+
+  FDM.ADOConn.BeginTrans;
+  try
+    if SaveBook(nID) and SaveBookDetail(nID) then
+    begin
+      FDM.ADOConn.CommitTrans;
+      //apply save
+    end else
+    begin
+      FDM.ADOConn.RollbackTrans;
+      Exit;
+    end;
+  except
+    on nErr: Exception do
+    begin
+      FDM.ADOConn.RollbackTrans;
+      ShowDlg(nErr.Message, sError); Exit;
+    end;
+  end;   
   
   FSaveResult := mrOk;
   if Check1.Checked then
@@ -668,6 +787,32 @@ begin
     ShowMsg('图书添加成功', sHint);
     ResetFormData;
   end else ModalResult := mrOk;
+end;
+
+procedure TfFormBooks.EditDISBNKeyPress(Sender: TObject; var Key: Char);
+begin
+  if Key = #13 then
+  begin
+    Key := #0;
+    ActiveControl := EditDName;
+
+    if IsNumber(EditNumAll.Text, False) then
+         EditNumAll.Text := IntToStr(StrToInt(EditNumAll.Text) + 1)
+    else EditNumAll.Text := '1';
+
+    if IsNumber(EditNumIn.Text, False) then
+         EditNumIn.Text := IntToStr(StrToInt(EditNumIn.Text) + 1)
+    else EditNumIn.Text := '1';
+  end;
+end;
+
+procedure TfFormBooks.EditISBNKeyPress(Sender: TObject; var Key: Char);
+begin
+  if Key = #13 then
+  begin
+    Key := #0;
+    ActiveControl := EditName;
+  end;
 end;
 
 initialization

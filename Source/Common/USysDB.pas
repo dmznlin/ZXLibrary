@@ -107,8 +107,8 @@ ResourceString
   sFlag_Male          = 'M';                         //性别: 男
   sFlag_Female        = 'F';                         //性别: 女
 
-  sFlag_InMoney       = 'I';                         //出入金: 入金
-  sFlag_OutMoney      = 'O';                         //出入金: 出金
+  sFlag_In            = 'I';                         //方向: 进系统
+  sFlag_Out           = 'O';                         //方向: 出系统
 
   sFlag_ID_BusGroup   = 'BusFunction';               //业务编码组
   sFlag_ID_Member     = 'Bus_Member';                //会员编号
@@ -133,6 +133,7 @@ ResourceString
   sTable_InOutMoney   = 'M_InOutMoney';              //资金明细
   sTable_Books        = 'B_Books';                   //图书
   sTable_BookDetail   = 'B_BookDtl';                 //图书明细(丛书)
+  sTable_BookInOut    = 'B_BookInOut';               //出入库记录
 
   {*新建表*}
   sSQL_NewSysDict = 'Create Table $Table(D_ID $Inc, D_Name varChar(15),' +
@@ -303,6 +304,20 @@ ResourceString
    *.D_Memo: 备注
   -----------------------------------------------------------------------------}
 
+  sSQL_NewBookInOut = 'Create Table $Table(R_ID $Inc, I_Book varChar(15),' +
+       'I_BookDtl varChar(15), I_Type Char(1), I_Num Integer, I_NumBefore Integer,' +
+       'I_Man varChar(32), I_Date DateTime, I_Memo varChar(200))';
+  {-----------------------------------------------------------------------------
+   图书明细: BookDtl
+   *.I_Book,I_BookDtl: 图书编号
+   *.I_Type: 入库/出库
+   *.I_Num: 图书数量
+   *.I_NumBefore: 未入库前库存
+   *.I_Man:入库人
+   *.I_Date:入库日期
+   *.I_Memo: 备注
+  -----------------------------------------------------------------------------}
+
 implementation
 
 //------------------------------------------------------------------------------
@@ -332,6 +347,7 @@ begin
   AddSysTableItem(sTable_InOutMoney, sSQL_NewInOutMoney);
   AddSysTableItem(sTable_Books, sSQL_NewBooks);
   AddSysTableItem(sTable_BookDetail, sSQL_NewBookDtl);
+  AddSysTableItem(sTable_BookInOut, sSQL_NewBookInOut);
 end;
 
 //Desc: 清理系统表

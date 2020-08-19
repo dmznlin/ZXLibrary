@@ -40,9 +40,10 @@ type
     cxLevel2: TcxGridLevel;
     cxView2: TcxGridDBTableView;
     PMenu1: TPopupMenu;
-    N1: TMenuItem;
-    N2: TMenuItem;
     N3: TMenuItem;
+    N4: TMenuItem;
+    N5: TMenuItem;
+    N6: TMenuItem;
     procedure EditNamePropertiesButtonClick(Sender: TObject;
       AButtonIndex: Integer);
     procedure BtnAddClick(Sender: TObject);
@@ -51,6 +52,9 @@ type
     procedure EditDatePropertiesButtonClick(Sender: TObject;
       AButtonIndex: Integer);
     procedure BtnRefreshClick(Sender: TObject);
+    procedure N3Click(Sender: TObject);
+    procedure N5Click(Sender: TObject);
+    procedure PMenu1Popup(Sender: TObject);
   private
     { Private declarations }
     FStart,FEnd: TDate;
@@ -58,6 +62,7 @@ type
     FFilteDate: Boolean;
     //筛选日期
     FWhereDtl: string;
+    FQueryDtl: Boolean;
     //查询条件
   public
     { Public declarations }
@@ -70,6 +75,7 @@ type
     procedure QueryDetail(const nWhere: string);
     procedure OnInitFormData(var nDefault: Boolean; const nWhere: string = '';
      const nQuery: TADOQuery = nil); override;
+     procedure AfterInitFormData; override;
     {*查询SQL*}
   end;
 
@@ -91,7 +97,8 @@ begin
   inherited;
   FWhere := '';
   FWhereDtl := '';
-  
+
+  FQueryDtl := True;  
   FFilteDate := False;
   InitDateRange(Name, FStart, FEnd);
 end;
@@ -150,7 +157,9 @@ begin
   end;
 
   FDM.QueryData(SQLQuery, nSQL);
-  QueryDetail(FWhereDtl);
+  if FQueryDtl then
+    QueryDetail(FWhereDtl);
+  //xxxxx
 end;
 
 //Desc: 查询明细
@@ -177,6 +186,11 @@ begin
   end;
 
   FDM.QueryData(QueryDtl, nSQL)
+end;
+
+procedure TfFrameBooks.AfterInitFormData;
+begin
+  FQueryDtl := True;
 end;
 
 procedure TfFrameBooks.EditNamePropertiesButtonClick(Sender: TObject;
@@ -238,10 +252,8 @@ procedure TfFrameBooks.BtnRefreshClick(Sender: TObject);
 begin
   FWhere := '';
   FWhereDtl := '';
-
   FFilteDate := False;
-  InitFormData;
-  inherited;         
+  inherited;
 end;
 
 //------------------------------------------------------------------------------
@@ -296,6 +308,52 @@ begin
   
   InitFormData(FWhere);
   ShowMsg('删除成功', sHint);
+end;
+
+//------------------------------------------------------------------------------
+procedure TfFrameBooks.PMenu1Popup(Sender: TObject);
+var nIdx: Integer;
+begin
+  for nIdx := PMenu1.Items.Count-1 downto 0 do
+  begin
+    PMenu1.Items[nIdx].Enabled := cxView1.DataController.GetSelectedCount > 0;
+  end;
+end;
+
+//Desc: 查看明细
+procedure TfFrameBooks.N3Click(Sender: TObject);
+begin
+  if cxView1.DataController.GetSelectedCount > 0 then
+  begin
+    FWhereDtl := 'D_Book=''%s''';
+    FWhereDtl := Format(FWhereDtl, [SQLQuery.FieldByName('B_ID').AsString]);
+    FFilteDate := False;
+
+    QueryDetail('');
+    if (QueryDtl.Active) and (QueryDtl.RecordCount > 0) then
+      cxGrid1.ActiveLevel := cxLevel2;
+    //xxxxx
+  end;
+end;
+
+//Desc: 禁止借阅
+procedure TfFrameBooks.N5Click(Sender: TObject);
+var nStr,nValid: string;
+begin
+  if cxView1.DataController.GetSelectedCount > 0 then
+  begin
+    if TComponent(Sender).Tag = 20 then
+         nValid := sFlag_No
+    else nValid := sFlag_Yes;
+
+    nStr := 'Update %s Set B_Valid=''%s'' Where R_ID=%s';
+    nStr := Format(nStr, [sTable_Books, nValid,
+            SQLQuery.FieldByName('R_ID').AsString]);
+    FDM.ExecuteSQL(nStr);
+
+    FQueryDtl := False;
+    InitFormData(FWhere);
+  end;
 end;
 
 initialization

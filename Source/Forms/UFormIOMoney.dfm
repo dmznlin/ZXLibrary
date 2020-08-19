@@ -157,9 +157,9 @@ inherited fFormIOMoney: TfFormIOMoney
       Width = 344
     end
     object cxLabel2: TcxLabel [14]
-      Left = 189
+      Left = 225
       Top = 317
-      Caption = #20803' '#27880':'#20184#27454#12289#36864#27454#37329#39069#37117#20026#27491#20540'.'
+      Caption = #20803' '#27880':'#36864#27454#26102#37329#39069#20026#36127#20540'.'
       ParentFont = False
       Transparent = True
     end

@@ -209,16 +209,25 @@ inherited fFrameBooks: TfFrameBooks
   end
   object PMenu1: TPopupMenu
     AutoHotkeys = maManual
+    OnPopup = PMenu1Popup
     Left = 62
     Top = 298
-    object N1: TMenuItem
-      Caption = #22270#20070#20837#24211
-    end
-    object N2: TMenuItem
-      Caption = '-'
-    end
     object N3: TMenuItem
       Caption = #26597#30475#26126#32454
+      OnClick = N3Click
+    end
+    object N4: TMenuItem
+      Caption = '-'
+    end
+    object N5: TMenuItem
+      Tag = 10
+      Caption = #20801#35768#20511#38405
+      OnClick = N5Click
+    end
+    object N6: TMenuItem
+      Tag = 20
+      Caption = #31105#27490#20511#38405
+      OnClick = N5Click
     end
   end
 end

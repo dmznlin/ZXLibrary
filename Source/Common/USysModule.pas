@@ -11,7 +11,7 @@ interface
 uses
   UFrameLog, UFrameSysLog, UFormIncInfo, UFormBackupSQL, UFormRestoreSQL,
   UFormPassword, UFrameBaseInfo, UFormBaseInfo, UFrameMembers, UFormMembers,
-  UFormIOMoney, UFrameBooks, UFormBooks;
+  UFormIOMoney, UFrameBooks, UFormBooks, UFrameBookInOut, UFormIOBook;
 
 procedure InitSystemObject;
 procedure RunSystemObject;
