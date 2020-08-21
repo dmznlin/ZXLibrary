@@ -197,7 +197,7 @@ ResourceString
 
   sSQL_NewBaseInfo = 'Create Table $Table(B_ID $Inc, B_Group varChar(15),' +
        'B_GroupName varChar(50), B_Text varChar(100), B_Py varChar(25),' +
-       'B_Params varChar(200), B_Default Char(1),' +
+       'B_ParamA varChar(100), B_ParamB varChar(100), B_Default Char(1),' +
        'B_Memo varChar(50), B_PID Integer, B_Index Float)';
   {-----------------------------------------------------------------------------
    基本信息表: BaseInfo
@@ -205,7 +205,7 @@ ResourceString
    *.B_Group: 分组
    *.B_Text: 内容
    *.B_Py: 拼音简写
-   *.B_Params: 附加参数
+   *.B_ParamA,B_ParamB:参数
    *.B_Default: 默认
    *.B_Memo: 备注信息
    *.B_PID: 上级节点

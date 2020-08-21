@@ -23,11 +23,13 @@ type
     dxLayout1Item6: TdxLayoutItem;
     Check1: TcxCheckBox;
     dxLayout1Item4: TdxLayoutItem;
-    EditParam: TcxTextEdit;
+    EditParamA: TcxTextEdit;
     dxLayout1Item7: TdxLayoutItem;
     CheckDef: TcxCheckBox;
     dxLayout1Item8: TdxLayoutItem;
-    dxLayout1Group2: TdxLayoutGroup;
+    dxGroup2: TdxLayoutGroup;
+    dxLayout1Item9: TdxLayoutItem;
+    EditParamB: TcxTextEdit;
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure BtnOKClick(Sender: TObject);
@@ -136,7 +138,8 @@ begin
 
       EditName.Text := FieldByName('B_Text').AsString;
       EditMemo.Text := FieldByName('B_Memo').AsString;
-      EditParam.Text := FieldByName('B_Params').AsString;
+      EditParamA.Text := FieldByName('B_ParamA').AsString;
+      EditParamB.Text := FieldByName('B_ParamB').AsString;
       CheckDef.Checked := FieldByName('B_Default').AsString = sFlag_Yes;
 
       nStr := FieldByName('B_Group').AsString;
@@ -230,7 +233,8 @@ begin
       SF('B_GroupName', cBaseData[FBaseData].FDesc),
       SF('B_Text', EditName.Text),
       SF('B_Py', GetPinYinOfStr(EditName.Text)),
-      SF('B_Params', EditParam.Text),
+      SF('B_ParamA', EditParamA.Text),
+      SF('B_ParamB', EditParamB.Text),
 
       SF_IF([SF('B_Default', sFlag_Yes),
              SF('B_Default', '')], CheckDef.Checked),
