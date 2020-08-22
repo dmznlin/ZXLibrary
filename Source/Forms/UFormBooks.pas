@@ -216,7 +216,7 @@ end;
 procedure TfFormBooks.InitFormData(const nID: string);
 var nStr,nTmp: string;
     nIdx: Integer;
-    nDefault: TNameAndValue;
+    nDefault: TBaseDataItem;
     nDStr: TDynamicStrArray;
     nItem: TLookupComboBoxItem;
 begin

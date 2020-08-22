@@ -34,6 +34,8 @@ const
   cFI_FrameMembers      = $0011;                     //会员管理
   cFI_FrameBooks        = $0012;                     //图书管理
   cFI_FrameBookInOut    = $0016;                     //图书入库
+  cFI_FrameBookBorrow   = $0017;                     //图书借阅
+  cFI_FrameBookReturn   = $0018;                     //图书归还
 
   cFI_FormBackup        = $1001;                     //数据备份
   cFI_FormRestore       = $1002;                     //数据恢复
@@ -155,6 +157,8 @@ begin
   AddMenuModuleItem('MAIN_B01', cFI_FrameBaseInfo);
   AddMenuModuleItem('MAIN_B02', cFI_FrameMembers);
   AddMenuModuleItem('MAIN_B03', cFI_FrameBooks);
+  AddMenuModuleItem('MAIN_B04', cFI_FrameBookBorrow);
+  AddMenuModuleItem('MAIN_B05', cFI_FrameBookReturn);
   AddMenuModuleItem('MAIN_B06', cFI_FrameBookInOut);
 end;
 

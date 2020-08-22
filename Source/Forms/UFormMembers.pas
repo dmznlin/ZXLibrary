@@ -164,7 +164,7 @@ end;
 
 procedure TfFormMembers.InitFormData(const nID: string);
 var nStr: string;
-    nLevel: TNameAndValue;
+    nLevel: TBaseDataItem;
 begin
   if EditLevel.Properties.Items.Count < 1 then
   begin

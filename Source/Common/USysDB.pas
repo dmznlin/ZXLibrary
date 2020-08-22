@@ -37,6 +37,16 @@ type
     FValue: string;     //数据取值
   end;
 
+  //基础档案
+  PBaseDataItem = ^TBaseDataItem;
+  TBaseDataItem = record
+    FGroup: string;     //分组
+    FName: string;      //名称
+    FParamA: string;    //参数A
+    FParamB: string;    //参数B
+    FDefault: Boolean;  //默认值
+  end;
+
 var
   gSysTableList: TList = nil;                        //系统表数组
   gSysDBType: TSysDatabaseType = dtSQLServer;        //系统数据类型

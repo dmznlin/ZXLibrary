@@ -118,7 +118,7 @@ end;
 
 procedure TfFormIOMoney.InitFormData(const nID: string);
 var nStr: string;
-    nPayment: TNameAndValue;
+    nPayment: TBaseDataItem;
 begin
   ActiveControl := EditMoney;
   EditValid.Enabled := False;
