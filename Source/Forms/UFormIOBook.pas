@@ -113,10 +113,12 @@ type
     function LoadBookData(const nISDN: string): Boolean;
     procedure LoadBookDataToForm;
     function SaveBookData: Boolean;
-    procedure ApplySavedBook(const nBookIdx: Integer);
+    procedure ApplySavedBook(const nBookIdx: Integer;
+      const nColor: TColor = $00408000);
     {*读写数据*}
     procedure SetLableCaption(const nHint,nText: string);
-    procedure ClearLabelCaption;
+    procedure ClearLabelCaption(const nHint: string = '';
+      const nCaption: string = '');
     {*标签标题*}
   public
     { Public declarations }
@@ -206,6 +208,14 @@ begin
       if Length(FBooks) = 1 then
            BtnOK.Visible := not SaveBookData()
       else BtnOK.Visible := True;
+
+      if BtnOK.Visible then
+      begin 
+        ApplySavedBook(-1, clRed);
+        if FInOut = sFlag_Out then
+             ClearLabelCaption('D_NumAll', '请在下面选择待出库的图书')
+        else ClearLabelCaption('D_NumAll', '请在下面选择待入库的图书');
+      end;
     end;
   end;
 end;
@@ -229,8 +239,10 @@ begin
   begin
     if RecordCount < 1 then
     begin
-      ShowMsg('该条码没有图书档案', sHint);
-      ClearLabelCaption();
+      ApplySavedBook(-1, clRed);
+      ClearLabelCaption('D_NumAll', '该条码没有图书档案');
+      
+      LoadBookDataToForm();
       Exit;
     end;
 
@@ -288,7 +300,9 @@ begin
     end;
   finally
     ListDetail.Items.EndUpdate;
-    ListDetail.ItemIndex := 0;
+    if ListDetail.Items.Count > 0 then
+      ListDetail.ItemIndex := 0;
+    //xxxxx
   end;   
 end;
 
@@ -320,23 +334,9 @@ begin
     FNumAfter := FNumAll + nInt;
     if (nInt < 0) and (FNumAfter < 0) then
     begin
-      with LabelKuCun.Style do
-      begin
-        TextColor := clRed;
-        TextStyle := TextStyle + [fsBold];
-      end;
-
-      ApplySavedBook(nIdx);
+      ApplySavedBook(nIdx, clRed);
       SetLableCaption('D_NumAll', '库存不足');
-      ShowMsg('库存不足', sHint);
       Exit;
-    end else
-    begin
-      with LabelKuCun.Style do
-      begin
-        TextColor := $00408000;
-        TextStyle := TextStyle - [fsBold];
-      end;
     end;
 
     FDM.ADOConn.BeginTrans;
@@ -393,8 +393,25 @@ begin
   end;
 end;
 
-procedure TfFormIOBook.ApplySavedBook(const nBookIdx: Integer);
+//Desc: 将当前选中的图书加载到标签
+procedure TfFormIOBook.ApplySavedBook(const nBookIdx: Integer; const nColor: TColor);
 begin
+  with LabelKuCun.Style do
+  begin
+    if nColor = $00408000 then
+    begin
+      TextColor := nColor;
+      TextStyle := TextStyle - [fsBold];
+    end else
+    begin
+      TextColor := nColor;
+      TextStyle := TextStyle + [fsBold];
+    end;
+  end;
+
+  if nBookIdx < 0 then Exit;
+  //no book
+
   with FBooks[nBookIdx] do
   begin
     SetLableCaption('D_Name', FName);
@@ -409,15 +426,20 @@ begin
   end;
 end;
 
-procedure TfFormIOBook.ClearLabelCaption;
-var nIdx: Integer;
+//Desc: 清理标签标题
+procedure TfFormIOBook.ClearLabelCaption(const nHint,nCaption: string);
+var nStr: string;
+    nIdx: Integer;
 begin
-  with dxLayout1 do
-  for nIdx:=ControlCount-1 downto 0 do
-   if (Controls[nIdx] is TcxLabel) and
-      ((Controls[nIdx] as TcxLabel).Hint <> '') then
+  for nIdx:=dxLayout1.ControlCount-1 downto 0 do
   begin
-    (Controls[nIdx] as TcxLabel).Caption := '';
+    if not (dxLayout1.Controls[nIdx] is TcxLabel) then Continue;
+    nStr := (dxLayout1.Controls[nIdx] as TcxLabel).Hint;
+    if nStr = '' then Continue;
+
+    if nStr = nHint then
+         (dxLayout1.Controls[nIdx] as TcxLabel).Caption := nCaption
+    else (dxLayout1.Controls[nIdx] as TcxLabel).Caption := '';
   end;
 end;
 

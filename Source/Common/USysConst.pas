@@ -158,7 +158,7 @@ begin
   AddMenuModuleItem('MAIN_B02', cFI_FrameMembers);
   AddMenuModuleItem('MAIN_B03', cFI_FrameBooks);
   AddMenuModuleItem('MAIN_B04', cFI_FrameBookBorrow);
-  AddMenuModuleItem('MAIN_B05', cFI_FrameBookReturn);
+  AddMenuModuleItem('MAIN_B05', cFI_FrameBookBorrow);
   AddMenuModuleItem('MAIN_B06', cFI_FrameBookInOut);
 end;
 
