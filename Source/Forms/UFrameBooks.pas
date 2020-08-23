@@ -266,7 +266,7 @@ begin
   if (nParam.FCommand = cCmd_ModalResult) and (nParam.FParamA = mrOK) then
   begin
     if FFilteDate then
-      FFilteDate := Date() >= FStart;
+      FFilteDate := (Date() >= FStart) and (Date() < FEnd + 1);
     InitFormData('');
   end;
 end;

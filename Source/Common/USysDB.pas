@@ -144,6 +144,7 @@ ResourceString
   sTable_Books        = 'B_Books';                   //图书
   sTable_BookDetail   = 'B_BookDtl';                 //图书明细(丛书)
   sTable_BookInOut    = 'B_BookInOut';               //出入库记录
+  sTable_BookBorrow   = 'B_BookBorrow';              //图书借阅
 
   {*新建表*}
   sSQL_NewSysDict = 'Create Table $Table(D_ID $Inc, D_Name varChar(15),' +
@@ -318,7 +319,7 @@ ResourceString
        'I_BookDtl varChar(15), I_Type Char(1), I_Num Integer, I_NumBefore Integer,' +
        'I_Man varChar(32), I_Date DateTime, I_Memo varChar(200))';
   {-----------------------------------------------------------------------------
-   图书明细: BookDtl
+   图书出入库: BookInOut
    *.I_Book,I_BookDtl: 图书编号
    *.I_Type: 入库/出库
    *.I_Num: 图书数量
@@ -326,6 +327,22 @@ ResourceString
    *.I_Man:入库人
    *.I_Date:入库日期
    *.I_Memo: 备注
+  -----------------------------------------------------------------------------}
+
+  sSQL_NewBookBorrow = 'Create Table $Table(R_ID $Inc, B_Member varChar(15),' +
+       'B_Book varChar(15), B_BookDtl varChar(15), B_Type Char(1),' +
+       'B_NumBorrow Integer, B_NumReturn Integer,' +
+       'B_Man varChar(32), B_Date DateTime, B_Memo varChar(200))';
+  {-----------------------------------------------------------------------------
+   图书借阅: BookBorrow
+   *.B_Member: 会员编号
+   *.B_Book,B_BookDtl: 图书编号
+   *.B_Type: 借阅/归还
+   *.B_NumBorrow: 借阅数量
+   *.B_NumReturn: 归还数量
+   *.B_Man:操作人
+   *.B_Date:借出日期
+   *.B_Memo: 备注
   -----------------------------------------------------------------------------}
 
 implementation
@@ -358,6 +375,7 @@ begin
   AddSysTableItem(sTable_Books, sSQL_NewBooks);
   AddSysTableItem(sTable_BookDetail, sSQL_NewBookDtl);
   AddSysTableItem(sTable_BookInOut, sSQL_NewBookInOut);
+  AddSysTableItem(sTable_BookBorrow, sSQL_NewBookBorrow);
 end;
 
 //Desc: 清理系统表

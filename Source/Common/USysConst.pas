@@ -48,6 +48,8 @@ const
   cFI_FormBookDetail    = $1013;                     //图书明细
   cFI_FormInOutMoney    = $1015;                     //出入金管理
   cFI_FormBookInOut     = $1016;                     //图书入库
+  cFI_FormBookBorrow    = $1017;                     //图书借阅
+  cFI_FormBookReturn    = $1018;                     //图书归还
 
 type
   TSysParam = record

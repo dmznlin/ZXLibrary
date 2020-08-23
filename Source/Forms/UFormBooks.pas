@@ -120,6 +120,7 @@ type
     {*图书编号*}
     FBooks: array of TBookItem;
     {*图书明细*}
+    FListA: TStrings;
     FSaveResult: Integer;
     procedure ResetFormData;
     procedure InitFormData(const nID: string);
@@ -200,7 +201,8 @@ begin
   inherited;
   FBookID := '';
   FRecordID := '';
-  
+  FListA := TStringList.Create;
+
   LoadFormConfig(Self);
   LoadcxListViewConfig(Name, ListDetail);
 end;
@@ -210,6 +212,8 @@ begin
   gLookupComboBoxAdapter.DeleteGroup(Name);
   SaveFormConfig(Self);
   SavecxListViewConfig(Name, ListDetail);
+
+  FreeAndNil(FListA);
   inherited;
 end;
 
@@ -367,12 +371,14 @@ begin
 
   EditDISBN.Text := '';
   EditDName.Text := '';
-  EditPubPrice.Text := '0';
-  EditGetPrice.Text := '0';
-  EditSalePrice.Text := '0';
+
   EditNumAll.Text := '0';
   EditNumIn.Text := '0';
   EditNumOut.Text := '0';
+
+  if not IsNumber(EditPubPrice.Text, True) then EditPubPrice.Text := '0';
+  if not IsNumber(EditGetPrice.Text, True) then EditGetPrice.Text := '0';
+  if not IsNumber(EditSalePrice.Text, True) then EditSalePrice.Text := '0';
 
   RadioNormal.Checked := True;
   SetLength(FBooks, 0);
@@ -399,7 +405,7 @@ begin
         SubItems.Add(FName);
         SubItems.Add(FPublisher);
         SubItems.Add(FProvider);
-        SubItems.Add(Format('%.2f', [FGetPrice]));
+        SubItems.Add(Format('%.2f', [FPubPrice]));
         SubItems.Add(IntToStr(FNumAll));
 
         if FValid = sFlag_Yes then
@@ -522,7 +528,6 @@ begin
     else FValid := sFlag_No;
   end;
 
-  ActiveControl := EditDName;
   if Sender = BtnAdd then
   begin
     EditDName.Text := '';
@@ -531,8 +536,9 @@ begin
     EditNumOut.Text := '0';
   end;
 
-  LoadBookDetail;
-  //载入明细
+  ActiveControl := EditDISBN;
+  EditDISBN.SelectAll;
+  LoadBookDetail; //载入明细
 end;
 
 //Desc: 删除明细
@@ -695,6 +701,7 @@ begin
   //xxxxx
   
   FDM.ExecuteSQL(nStr);
+  SaveBaseDataItemNoExists(sFlag_Base_Author, EditAuthor.Text);
   Result := True;
 end;
 
@@ -713,10 +720,17 @@ begin
   for nIdx:=Low(FBooks) to High(FBooks) do
   with FBooks[nIdx] do
   begin
-    if (FStatus = bsDel) or (FStatus = bsNone) then Continue;
-    //invalid
-
+    if FStatus = bsNone then Continue; //no change
     nIsNew := FRecord = '';
+
+    if (FStatus = bsDel) and (not nIsNew) then //delete
+    begin
+      nStr := 'Delete From %s Where R_ID=%s';
+      nStr := Format(nStr, [sTable_BookDetail, FRecord]);
+      FDM.ExecuteSQL(nStr);
+      Continue;
+    end;
+        
     if nIsNew and (not GetSerailID(nID, sFlag_ID_BusGroup, sFlag_ID_BookDtl)) then
     begin
       ShowMsg(nID, sHint);
@@ -751,7 +765,27 @@ begin
   if nInt > 0 then
     SyncBookNumber(nBookID);
   //同步库存
-  
+
+  FListA.Clear;
+  for nIdx:=Low(FBooks) to High(FBooks) do
+   with FBooks[nIdx] do
+    if FListA.IndexOf(FPublisher) < 0 then
+    begin
+      FListA.Add(FPublisher);
+      SaveBaseDataItemNoExists(sFlag_Base_Publish, FPublisher);
+    end;
+  //save publisher
+
+  FListA.Clear;
+  for nIdx:=Low(FBooks) to High(FBooks) do
+   with FBooks[nIdx] do
+    if FListA.IndexOf(FProvider) < 0 then
+    begin
+      FListA.Add(FProvider);
+      SaveBaseDataItemNoExists(sFlag_Base_Provide, FProvider);
+    end;
+  //save provider
+
   Result := True;
   //save done
 end;
@@ -796,13 +830,16 @@ begin
     Key := #0;
     ActiveControl := EditDName;
 
-    if IsNumber(EditNumAll.Text, False) then
+    EditNumAll.Text := '1';
+    EditNumIn.Text := '1';
+    
+    {if IsNumber(EditNumAll.Text, False) then
          EditNumAll.Text := IntToStr(StrToInt(EditNumAll.Text) + 1)
     else EditNumAll.Text := '1';
 
     if IsNumber(EditNumIn.Text, False) then
          EditNumIn.Text := IntToStr(StrToInt(EditNumIn.Text) + 1)
-    else EditNumIn.Text := '1';
+    else EditNumIn.Text := '1';}
   end;
 end;
 

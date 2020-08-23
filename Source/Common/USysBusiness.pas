@@ -17,7 +17,10 @@ function LoadBaseDataList(const nList: TStrings; const nGroup: string;
   const nDefault: PBaseDataItem = nil): Boolean;
 function LoadBaseDataItem(const nGroup,nItem: string;
   var nValue: TBaseDataItem): Boolean;
-{*载入基础档案*}
+procedure SaveBaseDataItem(const nValue: PBaseDataItem;
+  const nOverride: Boolean = False);
+procedure SaveBaseDataItemNoExists(const nGroup,nText: string);
+{*基础档案业务*}
 procedure SyncBookNumber(const nBookID: string);
 {*同步图书库存量*}
 
@@ -169,6 +172,59 @@ begin
       FParamB := FieldByName('B_ParamB').AsString;
     end;
   end;
+end;
+
+//Date: 2020-08-23
+//Parm: 档案值;是否覆盖
+//Desc: 保存nGroup.nItem的值nValue
+procedure SaveBaseDataItem(const nValue: PBaseDataItem; const nOverride: Boolean);
+var nStr,nID,nGName: string;
+    nIdx: Integer;
+begin
+  nID := '';
+  nStr := 'Select B_ID From %s Where B_Group=''%s'' And B_Text=''%s''';
+  nStr := Format(nStr, [sTable_BaseInfo, nValue.FGroup, nValue.FName]);
+
+  with FDM.QueryTemp(nStr) do
+   if RecordCount > 0 then
+    nID := Fields[0].AsString;
+  //xxxxx
+
+  if (nID <> '') and (not nOverride) then Exit;
+  nGName := '';
+  //default group
+
+  for nIdx:=Low(cBaseData) to High(cBaseData) do
+   with cBaseData[nIdx] do
+    if CompareText(FName, nValue.FGroup) = 0 then
+     nGName := FDesc;
+  //for group name
+
+  nStr := MakeSQLByStr([SF('B_Group', nValue.FGroup),
+          SF('B_GroupName', nGName),
+          SF('B_Text', nValue.FName),
+          SF('B_Py', GetPinYinOfStr(nValue.FName)),
+          SF('B_ParamA', nValue.FParamA),
+          SF('B_ParamB', nValue.FParamB),
+          
+          SF_IF([SF('B_Default', sFlag_Yes), ''], nValue.FDefault)
+          ], sTable_BaseInfo, SF('B_ID', nID), nID = '');
+  FDM.ExecuteSQL(nStr);
+end;
+
+procedure SaveBaseDataItemNoExists(const nGroup,nText: string);
+var nVal: TBaseDataItem;
+begin
+  with nVal do
+  begin
+    FGroup := nGroup;
+    FName := nText;
+    FParamA := '';
+    FParamB := '';
+    FDefault := False;
+  end;
+
+  SaveBaseDataItem(@nVal, False);
 end;
 
 //Date: 2020-08-19

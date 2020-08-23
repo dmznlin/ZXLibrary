@@ -1357,6 +1357,7 @@ object fMainForm: TfMainForm
     ActiveGroupIndex = 0
     TabOrder = 3
     View = 10
+    OptionsBehavior.Common.DragDropFlags = [fAllowDropLink, fAllowDropGroup]
     OptionsImage.LargeImages = FDM.ImageMid
     OptionsImage.SmallImages = FDM.Imagesmall
     object BarGroup1: TdxNavBarGroup

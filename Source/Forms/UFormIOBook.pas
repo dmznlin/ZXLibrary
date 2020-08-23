@@ -172,9 +172,11 @@ begin
   inherited;
   dxGroup1.AlignVert := avTop;
   dxGroup2.AlignVert := avClient;
-  ClearLabelCaption;
 
+  BtnOK.Visible := False;
+  ClearLabelCaption;
   FSaveResult := mrCancel;
+  
   LoadFormConfig(Self);
   LoadcxListViewConfig(Name, ListDetail);
 end;
@@ -323,6 +325,13 @@ begin
     Exit;
   end;
 
+  if EditNum.Value < 0 then
+  begin
+    ActiveControl := EditNum;
+    ShowMsg('请设置有效的数量', sHint);
+    Exit;
+  end;
+
   nInt := EditNum.Value;
   if FInOut = sFlag_Out then
     nInt := nInt * (-1);
@@ -339,44 +348,47 @@ begin
       Exit;
     end;
 
-    FDM.ADOConn.BeginTrans;
-    try
-      nStr := 'Update %s Set D_NumAll=D_NumAll+%d,D_NumIn=D_NumIn+%d ' +
-              'Where R_ID=%s';
-      nStr := Format(nStr, [sTable_BookDetail, nInt, nInt, FRecord]);
+    if nInt <> 0 then
+    begin
+      FDM.ADOConn.BeginTrans;
+      try
+        nStr := 'Update %s Set D_NumAll=D_NumAll+%d,D_NumIn=D_NumIn+%d ' +
+                'Where R_ID=%s';
+        nStr := Format(nStr, [sTable_BookDetail, nInt, nInt, FRecord]);
 
-      FDM.ExecuteSQL(nStr);
-      SyncBookNumber(FBookID); //同步库存
+        FDM.ExecuteSQL(nStr);
+        SyncBookNumber(FBookID); //同步库存
 
-      nStr := MakeSQLByStr([SF('I_Book', FBookID),
-          SF('I_BookDtl', FDetailID),
-          SF('I_Type', FInOut),
-          SF('I_Num', IntToStr(nInt), sfVal),
-          SF('I_NumBefore', IntToStr(FNumAll), sfVal),
-          SF('I_Man', gSysParam.FUserID),
-          SF('I_Date', sField_SQLServer_Now, sfVal),
-          SF('I_Memo', EditMemo.Text)
-        ], sTable_BookInOut, '', True);
-      FDM.ExecuteSQL(nStr);
+        nStr := MakeSQLByStr([SF('I_Book', FBookID),
+            SF('I_BookDtl', FDetailID),
+            SF('I_Type', FInOut),
+            SF('I_Num', IntToStr(nInt), sfVal),
+            SF('I_NumBefore', IntToStr(FNumAll), sfVal),
+            SF('I_Man', gSysParam.FUserID),
+            SF('I_Date', sField_SQLServer_Now, sfVal),
+            SF('I_Memo', EditMemo.Text)
+          ], sTable_BookInOut, '', True);
+        FDM.ExecuteSQL(nStr);
 
-      FDM.ADOConn.CommitTrans;
-      FSaveResult := mrOk;
-      Result := True;
-    except
-      on nErr: Exception do
-      begin
-        FDM.ADOConn.RollbackTrans;
-        ShowDlg(nErr.Message, sError); Exit;
+        FDM.ADOConn.CommitTrans;
+        FSaveResult := mrOk;
+      except
+        on nErr: Exception do
+        begin
+          FDM.ADOConn.RollbackTrans;
+          ShowDlg(nErr.Message, sError); Exit;
+        end;
       end;
+
+      if FInOut = sFlag_In then
+           ShowMsg('入库成功', sHint)
+      else ShowMsg('出库成功', sHint);
     end;
   end;
 
   BtnOK.Visible := False;
   ApplySavedBook(nIdx);
-  
-  if FInOut = sFlag_In then
-       ShowMsg('入库成功', sHint)
-  else ShowMsg('出库成功', sHint)
+  Result := True;
 end;
 
 //Desc: 根据Hint设置标题

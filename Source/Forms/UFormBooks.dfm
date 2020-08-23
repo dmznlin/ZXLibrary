@@ -186,7 +186,7 @@ inherited fFormBooks: TfFormBooks
           Width = 65
         end
         item
-          Caption = #37319#36141#20215
+          Caption = #20986#29256#23450#20215
           Width = 65
         end
         item
