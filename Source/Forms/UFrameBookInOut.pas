@@ -31,6 +31,8 @@ type
     EditDate: TcxButtonEdit;
     dxLayout1Item8: TdxLayoutItem;
     cxTextEdit4: TcxTextEdit;
+    dxLayout1Item1: TdxLayoutItem;
+    EditISDN: TcxButtonEdit;
     procedure EditNamePropertiesButtonClick(Sender: TObject;
       AButtonIndex: Integer);
     procedure BtnAddClick(Sender: TObject);
@@ -123,6 +125,17 @@ begin
     FWhere := '(B_Name like ''%%$Name%%'' Or B_Py like ''%%$Name%%'') Or ' +
               '(D_Name like ''%%$Name%%'' Or D_Py like ''%%$Name%%'')';
     FWhere := MacroValue(FWhere, [MI('$Name', EditName.Text)]);
+    InitFormData(FWhere);
+  end else
+
+  if Sender = EditISDN then
+  begin
+    EditISDN.Text := Trim(EditISDN.Text);
+    if EditISDN.Text = '' then Exit;
+    FFilteDate := False;
+
+    FWhere := '(D_ISBN like ''%%$ISDN%%'') Or (B_ISBN like ''%%$ISDN%%'')';
+    FWhere := MacroValue(FWhere, [MI('$ISDN', EditISDN.Text)]);
     InitFormData(FWhere);
   end;
 end;

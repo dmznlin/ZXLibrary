@@ -17,12 +17,10 @@ inherited fFrameBooks: TfFrameBooks
     Top = 202
     Width = 856
     Height = 353
+    PopupMenu = PMenu1
     LevelTabs.Slants.Kind = skCutCorner
     LevelTabs.Style = 9
     RootLevelOptions.DetailTabsPosition = dtpTop
-    inherited cxView1: TcxGridDBTableView
-      PopupMenu = PMenu1
-    end
     object cxView2: TcxGridDBTableView [1]
       NavigatorButtons.ConfirmDelete = False
       DataController.DataSource = DataSource2
@@ -79,7 +77,7 @@ inherited fFrameBooks: TfFrameBooks
       TabOrder = 7
       Width = 185
     end
-    object EditPublisher: TcxButtonEdit [4]
+    object EditISBN: TcxButtonEdit [4]
       Left = 419
       Top = 36
       ParentFont = False
@@ -142,8 +140,8 @@ inherited fFrameBooks: TfFrameBooks
           ControlOptions.ShowBorder = False
         end
         object dxLayout1Item1: TdxLayoutItem
-          Caption = #20986#29256#21830':'
-          Control = EditPublisher
+          Caption = 'ISBN'#30721':'
+          Control = EditISBN
           ControlOptions.ShowBorder = False
         end
         object dxLayout1Item7: TdxLayoutItem
@@ -212,9 +210,9 @@ inherited fFrameBooks: TfFrameBooks
     OnPopup = PMenu1Popup
     Left = 62
     Top = 298
-    object N3: TMenuItem
+    object MenuDetail: TMenuItem
       Caption = #26597#30475#26126#32454
-      OnClick = N3Click
+      OnClick = MenuDetailClick
     end
     object N4: TMenuItem
       Caption = '-'

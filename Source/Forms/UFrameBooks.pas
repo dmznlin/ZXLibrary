@@ -28,7 +28,7 @@ type
     Edit4: TcxTextEdit;
     dxLayout1Item5: TdxLayoutItem;
     dxLayout1Item1: TdxLayoutItem;
-    EditPublisher: TcxButtonEdit;
+    EditISBN: TcxButtonEdit;
     dxLayout1Item6: TdxLayoutItem;
     EditAuthor: TcxButtonEdit;
     dxLayout1Item7: TdxLayoutItem;
@@ -40,7 +40,7 @@ type
     cxLevel2: TcxGridLevel;
     cxView2: TcxGridDBTableView;
     PMenu1: TPopupMenu;
-    N3: TMenuItem;
+    MenuDetail: TMenuItem;
     N4: TMenuItem;
     N5: TMenuItem;
     N6: TMenuItem;
@@ -52,7 +52,7 @@ type
     procedure EditDatePropertiesButtonClick(Sender: TObject;
       AButtonIndex: Integer);
     procedure BtnRefreshClick(Sender: TObject);
-    procedure N3Click(Sender: TObject);
+    procedure MenuDetailClick(Sender: TObject);
     procedure N5Click(Sender: TObject);
     procedure PMenu1Popup(Sender: TObject);
   private
@@ -160,6 +160,17 @@ begin
   if FQueryDtl then
     QueryDetail(FWhereDtl);
   //xxxxx
+
+  if (cxGrid1.ActiveLevel = cxLevel1) and (SQLQuery.RecordCount < 1) and
+     (QueryDtl.RecordCount > 0) then
+    cxgrid1.ActiveLevel := cxLevel2;
+  //xxxxx
+
+  if (cxGrid1.ActiveLevel = cxLevel2) and (SQLQuery.RecordCount > 0) and
+     (QueryDtl.RecordCount < 1) then
+    cxgrid1.ActiveLevel := cxLevel1;
+  //xxxxx
+
 end;
 
 //Desc: 查询明细
@@ -223,14 +234,14 @@ begin
     InitFormData;
   end else
 
-  if Sender = EditPublisher then
+  if Sender = EditISBN then
   begin
-    EditPublisher.Text := Trim(EditPublisher.Text);
-    if EditPublisher.Text = '' then Exit;
+    EditISBN.Text := Trim(EditISBN.Text);
+    if EditISBN.Text = '' then Exit;
 
-    FWhere := 'B_ID In (Select D_Book From %s Where D_Publisher like ''%%%s%%'')';
-    FWhere := Format(FWhere, [sTable_BookDetail, EditPublisher.Text]);
-    FWhereDtl := Format('D_Publisher like ''%%%s%%''', [EditPublisher.Text]);
+    FWhere := 'B_ISBN like ''%%%s%%''';
+    FWhere := Format(FWhere, [EditISBN.Text]);
+    FWhereDtl := Format('D_ISBN like ''%%%s%%''', [EditISBN.Text]);
 
     FFilteDate := False;
     InitFormData;
@@ -313,15 +324,19 @@ end;
 //------------------------------------------------------------------------------
 procedure TfFrameBooks.PMenu1Popup(Sender: TObject);
 var nIdx: Integer;
+    nBool: Boolean;
 begin
+  if cxGrid1.ActiveView = cxView1 then
+       nBool := cxView1.DataController.GetSelectedCount > 0
+  else nBool := cxView2.DataController.GetSelectedCount > 0;
+
   for nIdx := PMenu1.Items.Count-1 downto 0 do
-  begin
-    PMenu1.Items[nIdx].Enabled := cxView1.DataController.GetSelectedCount > 0;
-  end;
+    PMenu1.Items[nIdx].Enabled := nBool;
+  MenuDetail.Visible := cxGrid1.ActiveView = cxView1;
 end;
 
 //Desc: 查看明细
-procedure TfFrameBooks.N3Click(Sender: TObject);
+procedure TfFrameBooks.MenuDetailClick(Sender: TObject);
 begin
   if cxView1.DataController.GetSelectedCount > 0 then
   begin
@@ -340,19 +355,29 @@ end;
 procedure TfFrameBooks.N5Click(Sender: TObject);
 var nStr,nValid: string;
 begin
-  if cxView1.DataController.GetSelectedCount > 0 then
-  begin
-    if TComponent(Sender).Tag = 20 then
-         nValid := sFlag_No
-    else nValid := sFlag_Yes;
+  if TComponent(Sender).Tag = 20 then
+       nValid := sFlag_No
+  else nValid := sFlag_Yes;
 
+  if cxGrid1.ActiveView = cxView1 then
+  begin
     nStr := 'Update %s Set B_Valid=''%s'' Where R_ID=%s';
     nStr := Format(nStr, [sTable_Books, nValid,
             SQLQuery.FieldByName('R_ID').AsString]);
-    FDM.ExecuteSQL(nStr);
+    //xxxxx
 
+    FDM.ExecuteSQL(nStr);
     FQueryDtl := False;
     InitFormData(FWhere);
+  end else
+  begin
+    nStr := 'Update %s Set D_Valid=''%s'' Where R_ID=%s';
+    nStr := Format(nStr, [sTable_BookDetail, nValid,
+            QueryDtl.FieldByName('R_ID').AsString]);
+    //xxxxx
+
+    FDM.ExecuteSQL(nStr);
+    QueryDetail(FWhereDtl);
   end;
 end;
 

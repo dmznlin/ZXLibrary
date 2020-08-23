@@ -28,7 +28,7 @@ inherited fFrameBookInOut: TfFrameBookInOut
       Top = 93
       Hint = 'T.D_Name'
       ParentFont = False
-      TabOrder = 2
+      TabOrder = 3
       Width = 125
     end
     object cxTextEdit2: TcxTextEdit [1]
@@ -36,7 +36,7 @@ inherited fFrameBookInOut: TfFrameBookInOut
       Top = 93
       Hint = 'T.D_Publisher'
       ParentFont = False
-      TabOrder = 3
+      TabOrder = 4
       Width = 125
     end
     object EditName: TcxButtonEdit [2]
@@ -58,11 +58,11 @@ inherited fFrameBookInOut: TfFrameBookInOut
       Top = 93
       Hint = 'T.I_Memo'
       ParentFont = False
-      TabOrder = 5
+      TabOrder = 6
       Width = 185
     end
     object EditDate: TcxButtonEdit [4]
-      Left = 269
+      Left = 445
       Top = 36
       ParentFont = False
       Properties.Buttons = <
@@ -72,7 +72,7 @@ inherited fFrameBookInOut: TfFrameBookInOut
         end>
       Properties.ReadOnly = True
       Properties.OnButtonClick = EditDatePropertiesButtonClick
-      TabOrder = 1
+      TabOrder = 2
       Width = 185
     end
     object cxTextEdit4: TcxTextEdit [5]
@@ -80,7 +80,21 @@ inherited fFrameBookInOut: TfFrameBookInOut
       Top = 93
       Hint = 'T.D_Provider'
       ParentFont = False
-      TabOrder = 4
+      TabOrder = 5
+      Width = 125
+    end
+    object EditISDN: TcxButtonEdit [6]
+      Left = 257
+      Top = 36
+      ParentFont = False
+      Properties.Buttons = <
+        item
+          Default = True
+          Kind = bkEllipsis
+        end>
+      Properties.OnButtonClick = EditNamePropertiesButtonClick
+      TabOrder = 1
+      OnKeyPress = OnCtrlKeyPress
       Width = 125
     end
     inherited dxGroup1: TdxLayoutGroup
@@ -88,6 +102,11 @@ inherited fFrameBookInOut: TfFrameBookInOut
         object dxLayout1Item4: TdxLayoutItem
           Caption = #22270#20070#21517#31216':'
           Control = EditName
+          ControlOptions.ShowBorder = False
+        end
+        object dxLayout1Item1: TdxLayoutItem
+          Caption = 'ISDN'#30721':'
+          Control = EditISDN
           ControlOptions.ShowBorder = False
         end
         object dxLayout1Item7: TdxLayoutItem

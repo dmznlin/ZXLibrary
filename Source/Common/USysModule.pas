@@ -12,7 +12,7 @@ uses
   UFrameLog, UFrameSysLog, UFormIncInfo, UFormBackupSQL, UFormRestoreSQL,
   UFormPassword, UFrameBaseInfo, UFormBaseInfo, UFrameMembers, UFormMembers,
   UFormIOMoney, UFrameBooks, UFormBooks, UFrameBookInOut, UFormIOBook,
-  UFrameBookBorrow;
+  UFrameBookBorrow, UFormBookQuery;
 
 procedure InitSystemObject;
 procedure RunSystemObject;

@@ -1,8 +1,8 @@
 {*******************************************************************************
-  作者: dmzn@163.com 2020-08-19
-  描述: 图书出入库
+  作者: dmzn@163.com 2020-08-22
+  描述: 图书查询
 *******************************************************************************}
-unit UFormIOBook;
+unit UFormBookQuery;
 
 interface
 
@@ -31,10 +31,9 @@ type
     FNumAll      : Integer;
     FNumIn       : Integer;
     FNumOut      : Integer;
-    FNumAfter    : Integer;
   end;
 
-  TfFormIOBook = class(TfFormNormal)
+  TfFormBookQuery = class(TfFormNormal)
     EditISDN: TcxTextEdit;
     dxLayout1Item4: TdxLayoutItem;
     dxGroup2: TdxLayoutGroup;
@@ -83,37 +82,24 @@ type
     ListDetail: TcxListView;
     dxLayout1Item22: TdxLayoutItem;
     cxImageList1: TcxImageList;
-    dxLayout1Item21: TdxLayoutItem;
-    cxLabel3: TcxLabel;
-    dxLayout1Item23: TdxLayoutItem;
-    cxLabel18: TcxLabel;
-    EditMemo: TcxTextEdit;
-    dxLayout1Item24: TdxLayoutItem;
-    dxLayout1Group14: TdxLayoutGroup;
-    dxLayout1Group13: TdxLayoutGroup;
     dxLayout1Item25: TdxLayoutItem;
     cxLabel19: TcxLabel;
     dxLayout1Group2: TdxLayoutGroup;
     dxLayout1Item26: TdxLayoutItem;
     LabelKuCun: TcxLabel;
     dxLayout1Group15: TdxLayoutGroup;
-    EditNum: TcxSpinEdit;
-    dxLayout1Item27: TdxLayoutItem;
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure EditISDNKeyPress(Sender: TObject; var Key: Char);
-    procedure BtnOKClick(Sender: TObject);
+    procedure ListDetailSelectItem(Sender: TObject; Item: TListItem;
+      Selected: Boolean);
   private
     { Private declarations }
-    FInOut: string;
-    FSaveResult: Integer;
-    {*执行结果*}
     FBooks: array of TBookItem;
     {*图书列表*}
     function LoadBookData(const nISDN: string): Boolean;
     procedure LoadBookDataToForm;
-    function SaveBookData: Boolean;
-    procedure ApplySavedBook(const nBookIdx: Integer;
+    procedure ApplyBook(const nBookIdx: Integer;
       const nColor: TColor = $00408000);
     {*读写数据*}
     procedure SetLableCaption(const nHint,nText: string);
@@ -134,40 +120,24 @@ uses
   ULibFun, UFormCtrl, UFormBase, UMgrControl, UDataModule, USysBusiness, USysDB,
   USysGrid, USysConst;
 
-class function TfFormIOBook.CreateForm(const nPopedom: string;
+class function TfFormBookQuery.CreateForm(const nPopedom: string;
   const nParam: Pointer): TWinControl;
-var nP: PFormCommandParam;
 begin
   Result := nil;
-  if Assigned(nParam) then
-       nP := nParam
-  else Exit;
-
-  with TfFormIOBook.Create(Application) do
+  with TfFormBookQuery.Create(Application) do
   begin
-    if nP.FCommand = cCmd_DeleteData then
-    begin
-      Caption := '图书 - 出库';
-      FInOut := sFlag_Out;
-    end else
-    begin
-      Caption := '图书 - 入库';
-      FInOut := sFlag_In;
-    end;
-    
+    Caption := '图书 - 查询';    
     ShowModal;
-    nP.FCommand := cCmd_ModalResult;
-    nP.FParamA := FSaveResult;
     Free;
   end;
 end;
 
-class function TfFormIOBook.FormID: integer;
+class function TfFormBookQuery.FormID: integer;
 begin
-  Result := cFI_FormBookInOut;
+  Result := cFI_FormBookQuery;
 end;
 
-procedure TfFormIOBook.FormCreate(Sender: TObject);
+procedure TfFormBookQuery.FormCreate(Sender: TObject);
 begin
   inherited;
   dxGroup1.AlignVert := avTop;
@@ -175,20 +145,18 @@ begin
 
   BtnOK.Visible := False;
   ClearLabelCaption;
-  FSaveResult := mrCancel;
-  
   LoadFormConfig(Self);
   LoadcxListViewConfig(Name, ListDetail);
 end;
 
-procedure TfFormIOBook.FormClose(Sender: TObject; var Action: TCloseAction);
+procedure TfFormBookQuery.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   SavecxListViewConfig(Name, ListDetail);
   SaveFormConfig(Self);
   inherited;
 end;
 
-procedure TfFormIOBook.EditISDNKeyPress(Sender: TObject; var Key: Char);
+procedure TfFormBookQuery.EditISDNKeyPress(Sender: TObject; var Key: Char);
 begin
   if Key = #13 then
   begin
@@ -201,31 +169,18 @@ begin
     end;
 
     EditISDN.SelectAll;
-    BtnOK.Visible := False;
     Application.ProcessMessages;
 
     if LoadBookData(EditISDN.Text) then
-    begin
       LoadBookDataToForm();
-      if Length(FBooks) = 1 then
-           BtnOK.Visible := not SaveBookData()
-      else BtnOK.Visible := True;
-
-      if BtnOK.Visible then
-      begin 
-        ApplySavedBook(-1, clRed);
-        if FInOut = sFlag_Out then
-             ClearLabelCaption('D_NumAll', '请在下面选择待出库的图书')
-        else ClearLabelCaption('D_NumAll', '请在下面选择待入库的图书');
-      end;
-    end;
+    //xxxxx
   end;
 end;
 
 //Date: 2020-08-19
 //Parm: isdn
 //Desc: 载入isdn对应的书目
-function TfFormIOBook.LoadBookData(const nISDN: string): Boolean;
+function TfFormBookQuery.LoadBookData(const nISDN: string): Boolean;
 var nStr: string;
     nIdx: Integer;
 begin
@@ -234,14 +189,14 @@ begin
 
   nStr := 'Select dt.*,B_Name,B_Author From %s dt ' +
           ' Left Join %s On B_ID=D_Book ' +
-          'Where D_ISBN=''%s''';
-  nStr := Format(nStr, [sTable_BookDetail, sTable_Books, nISDN]);
+          'Where D_ISBN=''%s'' Or (D_Name Like ''%%%s%%'' Or D_Py Like ''%%%s%%'')';
+  nStr := Format(nStr, [sTable_BookDetail, sTable_Books, nISDN, nISDN, nISDN]);
 
   with FDM.QueryTemp(nStr) do
   begin
     if RecordCount < 1 then
     begin
-      ApplySavedBook(-1, clRed);
+      ApplyBook(-1, clRed);
       ClearLabelCaption('D_NumAll', '该条码没有图书档案');
       
       LoadBookDataToForm();
@@ -281,7 +236,7 @@ begin
   Result := True;
 end;
 
-procedure TfFormIOBook.LoadBookDataToForm;
+procedure TfFormBookQuery.LoadBookDataToForm;
 var nIdx: Integer;
 begin
   ListDetail.Items.BeginUpdate;
@@ -308,81 +263,8 @@ begin
   end;   
 end;
 
-procedure TfFormIOBook.BtnOKClick(Sender: TObject);
-begin
-  SaveBookData();
-end;
-
-//Desc: 保存数据
-function TfFormIOBook.SaveBookData: Boolean;
-var nStr: string;
-    nIdx,nInt: Integer;
-begin
-  Result := False;
-  if not Assigned(ListDetail.Selected) then
-  begin
-    ShowMsg('请选择待入库的图书', sHint);
-    Exit;
-  end;
-
-  nInt := EditNum.Value;
-  if FInOut = sFlag_Out then
-    nInt := nInt * (-1);
-  //xxxxx
-
-  nIdx := Integer(ListDetail.Selected.Data);
-  with FBooks[nIdx] do
-  begin
-    FNumAfter := FNumAll + nInt;
-    if (nInt < 0) and (FNumAfter < 0) then
-    begin
-      ApplySavedBook(nIdx, clRed);
-      SetLableCaption('D_NumAll', '库存不足');
-      Exit;
-    end;
-
-    FDM.ADOConn.BeginTrans;
-    try
-      nStr := 'Update %s Set D_NumAll=D_NumAll+%d,D_NumIn=D_NumIn+%d ' +
-              'Where R_ID=%s';
-      nStr := Format(nStr, [sTable_BookDetail, nInt, nInt, FRecord]);
-
-      FDM.ExecuteSQL(nStr);
-      SyncBookNumber(FBookID); //同步库存
-
-      nStr := MakeSQLByStr([SF('I_Book', FBookID),
-          SF('I_BookDtl', FDetailID),
-          SF('I_Type', FInOut),
-          SF('I_Num', IntToStr(nInt), sfVal),
-          SF('I_NumBefore', IntToStr(FNumAll), sfVal),
-          SF('I_Man', gSysParam.FUserID),
-          SF('I_Date', sField_SQLServer_Now, sfVal),
-          SF('I_Memo', EditMemo.Text)
-        ], sTable_BookInOut, '', True);
-      FDM.ExecuteSQL(nStr);
-
-      FDM.ADOConn.CommitTrans;
-      FSaveResult := mrOk;
-      Result := True;
-
-      BtnOK.Visible := False;
-      ApplySavedBook(nIdx);
-            
-      if FInOut = sFlag_In then
-           ShowMsg('入库成功', sHint)
-      else ShowMsg('出库成功', sHint);
-    except
-      on nErr: Exception do
-      begin
-        FDM.ADOConn.RollbackTrans;
-        ShowDlg(nErr.Message, sError); Exit;
-      end;
-    end;
-  end;
-end;
-
 //Desc: 根据Hint设置标题
-procedure TfFormIOBook.SetLableCaption(const nHint, nText: string);
+procedure TfFormBookQuery.SetLableCaption(const nHint, nText: string);
 var nIdx: Integer;
 begin
   with dxLayout1 do
@@ -396,7 +278,8 @@ begin
 end;
 
 //Desc: 将当前选中的图书加载到标签
-procedure TfFormIOBook.ApplySavedBook(const nBookIdx: Integer; const nColor: TColor);
+procedure TfFormBookQuery.ApplyBook(const nBookIdx: Integer; const nColor: TColor);
+var nStr: string;
 begin
   with LabelKuCun.Style do
   begin
@@ -424,12 +307,14 @@ begin
     SetLableCaption('D_PubPrice', Format('%.2f 元', [FPubPrice]));
     SetLableCaption('D_GetPrice', Format('%.2f 元', [FGetPrice]));
     SetLableCaption('D_SalePrice', Format('%.2f 元', [FSalePrice]));
-    SetLableCaption('D_NumAll', Format('共计 %d 本', [FNumAfter]));
+
+    nStr := '共 %d 本,在库 %d 本,借出 %d 本';
+    SetLableCaption('D_NumAll', Format(nStr, [FNumAll, FNumIn, FNumOut]));
   end;
 end;
 
 //Desc: 清理标签标题
-procedure TfFormIOBook.ClearLabelCaption(const nHint,nCaption: string);
+procedure TfFormBookQuery.ClearLabelCaption(const nHint,nCaption: string);
 var nStr: string;
     nIdx: Integer;
 begin
@@ -445,6 +330,17 @@ begin
   end;
 end;
 
+procedure TfFormBookQuery.ListDetailSelectItem(Sender: TObject;
+  Item: TListItem; Selected: Boolean);
+var nInt: Integer;
+begin
+  if Selected and Assigned(Item) then
+  begin
+    nInt := Integer(Item.Data);
+    ApplyBook(nInt);
+  end;
+end;
+
 initialization
-  gControlManager.RegCtrl(TfFormIOBook, TfFormIOBook.FormID);
+  gControlManager.RegCtrl(TfFormBookQuery, TfFormBookQuery.FormID);
 end.

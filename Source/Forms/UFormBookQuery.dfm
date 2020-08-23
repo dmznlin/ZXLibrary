@@ -1,4 +1,4 @@
-inherited fFormIOBook: TfFormIOBook
+inherited fFormBookQuery: TfFormBookQuery
   Left = 347
   Top = 364
   Width = 598
@@ -15,13 +15,13 @@ inherited fFormIOBook: TfFormIOBook
     inherited BtnOK: TButton
       Left = 444
       Top = 533
-      TabOrder = 24
+      TabOrder = 20
     end
     inherited BtnExit: TButton
       Left = 514
       Top = 533
       Caption = #20851#38381
-      TabOrder = 25
+      TabOrder = 21
     end
     object EditISDN: TcxTextEdit [2]
       Left = 81
@@ -256,7 +256,7 @@ inherited fFormIOBook: TfFormIOBook
     end
     object ListDetail: TcxListView [19]
       Left = 23
-      Top = 413
+      Top = 327
       Width = 121
       Height = 97
       Columns = <
@@ -297,32 +297,11 @@ inherited fFormIOBook: TfFormIOBook
       ReadOnly = True
       RowSelect = True
       SmallImages = cxImageList1
-      TabOrder = 23
+      TabOrder = 19
       ViewStyle = vsReport
+      OnSelectItem = ListDetailSelectItem
     end
-    object cxLabel3: TcxLabel [20]
-      Left = 166
-      Top = 342
-      Caption = #27880': '#27599#27425#25195#30721#30340#20986#20837#24211#22686#20943#37327', '#35831#22312#25195#30721#21069#35774#32622'.'
-      ParentFont = False
-      Transparent = True
-    end
-    object cxLabel18: TcxLabel [21]
-      Left = 23
-      Top = 392
-      Caption = #24403#22810#26412#22270#20070#20849#29992#19968#20010#26465#30721#26102','#35831#36873#20013#19979#38754#21015#34920#20013#30340#22270#20070','#28982#21518#28857#20987'"'#20445#23384'"'#25353#38062'.'
-      ParentFont = False
-      Transparent = True
-    end
-    object EditMemo: TcxTextEdit [22]
-      Left = 81
-      Top = 367
-      ParentFont = False
-      Properties.MaxLength = 200
-      TabOrder = 21
-      Width = 121
-    end
-    object cxLabel19: TcxLabel [23]
+    object cxLabel19: TcxLabel [20]
       Left = 23
       Top = 270
       Caption = #24403#21069#24211#23384':'
@@ -335,7 +314,7 @@ inherited fFormIOBook: TfFormIOBook
       Style.IsFontAssigned = True
       Transparent = True
     end
-    object LabelKuCun: TcxLabel [24]
+    object LabelKuCun: TcxLabel [21]
       Left = 104
       Top = 270
       Hint = 'D_NumAll'
@@ -348,16 +327,6 @@ inherited fFormIOBook: TfFormIOBook
       Style.Font.Style = []
       Style.IsFontAssigned = True
       Transparent = True
-    end
-    object EditNum: TcxSpinEdit [25]
-      Left = 81
-      Top = 342
-      ParentFont = False
-      Properties.MaxValue = 9999.000000000000000000
-      Properties.MinValue = 1.000000000000000000
-      TabOrder = 19
-      Value = 1
-      Width = 80
     end
     inherited dxLayout1Group_Root: TdxLayoutGroup
       inherited dxGroup1: TdxLayoutGroup
@@ -532,38 +501,7 @@ inherited fFormIOBook: TfFormIOBook
       object dxGroup2: TdxLayoutGroup [1]
         AutoAligns = [aaHorizontal]
         AlignVert = avClient
-        Caption = #25805#20316
-        object dxLayout1Group14: TdxLayoutGroup
-          ShowCaption = False
-          Hidden = True
-          ShowBorder = False
-          object dxLayout1Group13: TdxLayoutGroup
-            ShowCaption = False
-            Hidden = True
-            LayoutDirection = ldHorizontal
-            ShowBorder = False
-            object dxLayout1Item27: TdxLayoutItem
-              Caption = #25968#37327#35774#32622':'
-              Control = EditNum
-              ControlOptions.ShowBorder = False
-            end
-            object dxLayout1Item21: TdxLayoutItem
-              ShowCaption = False
-              Control = cxLabel3
-              ControlOptions.ShowBorder = False
-            end
-          end
-          object dxLayout1Item24: TdxLayoutItem
-            Caption = #22791#27880#20449#24687':'
-            Control = EditMemo
-            ControlOptions.ShowBorder = False
-          end
-        end
-        object dxLayout1Item23: TdxLayoutItem
-          ShowCaption = False
-          Control = cxLabel18
-          ControlOptions.ShowBorder = False
-        end
+        Caption = #22270#20070#21015#34920
         object dxLayout1Item22: TdxLayoutItem
           AutoAligns = [aaHorizontal]
           AlignVert = avClient
@@ -579,7 +517,7 @@ inherited fFormIOBook: TfFormIOBook
     Height = 18
     Width = 18
     FormatVersion = 1
-    DesignInfo = 24117280
+    DesignInfo = 27787296
     ImageInfo = <
       item
         Image.Data = {

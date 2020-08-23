@@ -50,6 +50,7 @@ const
   cFI_FormBookInOut     = $1016;                     //图书入库
   cFI_FormBookBorrow    = $1017;                     //图书借阅
   cFI_FormBookReturn    = $1018;                     //图书归还
+  cFI_FormBookQuery     = $1019;                     //图书查询
 
 type
   TSysParam = record
@@ -162,6 +163,7 @@ begin
   AddMenuModuleItem('MAIN_B04', cFI_FrameBookBorrow);
   AddMenuModuleItem('MAIN_B05', cFI_FrameBookBorrow);
   AddMenuModuleItem('MAIN_B06', cFI_FrameBookInOut);
+  AddMenuModuleItem('MAIN_C04', cFI_FormBookQuery, mtForm);
 end;
 
 //Desc: 清理模块列表
