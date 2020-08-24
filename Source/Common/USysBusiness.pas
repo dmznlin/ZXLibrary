@@ -10,6 +10,8 @@ uses
   Windows, DB, Classes, Controls, SysUtils, UDataModule, UDataReport,
   UFormBase, ULibFun, UFormCtrl, USysConst, USysDB, USysLoger;
 
+function GetCurrentMonth: string;
+{*当前月份*}
 function GetSerailID(var nID: string; const nGroup,nObject: string;
   const nUserDate: Boolean = True): Boolean;
 {*获取串号*}
@@ -30,6 +32,13 @@ implementation
 procedure WriteLog(const nEvent: string);
 begin
   gSysLoger.AddLog(nEvent);
+end;
+
+//Date: 2020-08-24
+//Desc: 当前月份字符串
+function GetCurrentMonth: string;
+begin
+  Result := Copy(DateTime2Str(Now), 1, 7);
 end;
 
 //Date: 2020-08-14
@@ -119,7 +128,7 @@ function LoadBaseDataList(const nList: TStrings; const nGroup: string;
   const nDefault: PBaseDataItem): Boolean;
 var nStr: string;
 begin
-  nStr := 'Select B_Text,B_ParamA,B_ParamB,B_Default From %s Where B_Group=''%s''';
+  nStr := 'Select * From %s Where B_Group=''%s''';
   nStr := Format(nStr, [sTable_BaseInfo, nGroup]);
 
   with FDM.QueryTemp(nStr) do
@@ -135,12 +144,17 @@ begin
 
       if Assigned(nDefault) and
          (FieldByName('B_Default').AsString = sFlag_Yes) then
+      with nDefault^ do
       begin
-        nDefault.FGroup := nGroup;
-        nDefault.FName := nStr;
-        nDefault.FDefault := True;
-        nDefault.FParamA := FieldByName('B_ParamA').AsString;
-        nDefault.FParamB := FieldByName('B_ParamB').AsString;
+        FRecord := FieldByName('B_ID').AsString;
+        FGroup := FieldByName('B_Group').AsString;
+        FGroupName := FieldByName('B_GroupName').AsString;
+        FName := FieldByName('B_Text').AsString;
+
+        FParamA := FieldByName('B_ParamA').AsString;
+        FParamB := FieldByName('B_ParamB').AsString;
+        FMemo := FieldByName('B_Memo').AsString;
+        FDefault := FieldByName('B_Default').AsString = sFlag_Yes;
       end;
       Next;
     end;
@@ -154,8 +168,7 @@ function LoadBaseDataItem(const nGroup,nItem: string;
   var nValue: TBaseDataItem): Boolean;
 var nStr: string;
 begin
-  nStr := 'Select B_Text,B_ParamA,B_ParamB,B_Default From %s ' +
-          'Where B_Group=''%s'' And B_Text=''%s''';
+  nStr := 'Select * From %s Where B_Group=''%s'' And B_Text=''%s''';
   nStr := Format(nStr, [sTable_BaseInfo, nGroup, nItem]);
 
   with FDM.QueryTemp(nStr) do
@@ -165,11 +178,15 @@ begin
 
     with nValue do
     begin
-      FGroup := nGroup;
-      FDefault := True;
+      FRecord := FieldByName('B_ID').AsString;
+      FGroup := FieldByName('B_Group').AsString;
+      FGroupName := FieldByName('B_GroupName').AsString;
       FName := FieldByName('B_Text').AsString;
+
       FParamA := FieldByName('B_ParamA').AsString;
       FParamB := FieldByName('B_ParamB').AsString;
+      FMemo := FieldByName('B_Memo').AsString;
+      FDefault := FieldByName('B_Default').AsString = sFlag_Yes;
     end;
   end;
 end;
@@ -178,49 +195,82 @@ end;
 //Parm: 档案值;是否覆盖
 //Desc: 保存nGroup.nItem的值nValue
 procedure SaveBaseDataItem(const nValue: PBaseDataItem; const nOverride: Boolean);
-var nStr,nID,nGName: string;
+var nStr: string;
     nIdx: Integer;
+    nVal: TBaseDataItem;
+    nLocalTrans: Boolean;
 begin
-  nID := '';
-  nStr := 'Select B_ID From %s Where B_Group=''%s'' And B_Text=''%s''';
-  nStr := Format(nStr, [sTable_BaseInfo, nValue.FGroup, nValue.FName]);
+  if (nValue.FGroup = '') or (nValue.FName = '') then Exit;
+  //invalid data
 
-  with FDM.QueryTemp(nStr) do
-   if RecordCount > 0 then
-    nID := Fields[0].AsString;
-  //xxxxx
+  if (nValue.FRecord = '') and
+     LoadBaseDataItem(nValue.FGroup, nValue.FName, nVal) then
+  begin
+    nValue.FRecord := nVal.FRecord;
+    if nValue.FGroupName = '' then
+      nValue.FGroupName := nVal.FGroupName;
+    //xxxxx
+  end;
 
-  if (nID <> '') and (not nOverride) then Exit;
-  nGName := '';
-  //default group
+  if (nValue.FRecord <> '') and (not nOverride) then Exit;
+  //has exists
 
-  for nIdx:=Low(cBaseData) to High(cBaseData) do
-   with cBaseData[nIdx] do
-    if CompareText(FName, nValue.FGroup) = 0 then
-     nGName := FDesc;
-  //for group name
+  if nValue.FGroupName = '' then
+  begin
+    for nIdx:=Low(cBaseData) to High(cBaseData) do
+    if CompareText(cBaseData[nIdx].FName, nValue.FGroup) = 0 then
+    begin
+       nValue.FGroupName := cBaseData[nIdx].FDesc;
+       Break;
+    end;
+  end;
+  
+  nLocalTrans := not FDM.ADOConn.InTransaction;
+  if nLocalTrans then FDM.ADOConn.BeginTrans;
+  try
+    nStr := MakeSQLByStr([
+      SF('B_Group', nValue.FGroup),
+      SF('B_GroupName', nValue.FGroupName),
+      SF('B_Text', nValue.FName),
+      SF('B_Py', GetPinYinOfStr(nValue.FName)),
+      SF('B_ParamA', nValue.FParamA),
+      SF('B_ParamB', nValue.FParamB),
 
-  nStr := MakeSQLByStr([SF('B_Group', nValue.FGroup),
-          SF('B_GroupName', nGName),
-          SF('B_Text', nValue.FName),
-          SF('B_Py', GetPinYinOfStr(nValue.FName)),
-          SF('B_ParamA', nValue.FParamA),
-          SF('B_ParamB', nValue.FParamB),
-          
-          SF_IF([SF('B_Default', sFlag_Yes), ''], nValue.FDefault)
-          ], sTable_BaseInfo, SF('B_ID', nID), nID = '');
-  FDM.ExecuteSQL(nStr);
+      SF_IF([SF('B_Default', sFlag_Yes),
+             SF('B_Default', '')], nValue.FDefault),
+      SF('B_Memo', nValue.FMemo)
+      ], sTable_BaseInfo, SF('B_ID', nValue.FRecord), nValue.FRecord = '');
+    FDM.ExecuteSQL(nStr);
+
+    if nValue.FDefault then
+    begin
+      nStr := 'Update %s Set B_Default=''%s'' ' +
+              'Where B_Group=''%s'' And B_Text<>''%s''';
+      nStr := Format(nStr, [sTable_BaseInfo, '', nValue.FGroup, nValue.FName]);
+      FDM.ExecuteSQL(nStr); //关闭其它默认项
+    end;
+
+    if nLocalTrans then
+      FDM.ADOConn.CommitTrans;
+    //xxxxx
+  except
+    if nLocalTrans then
+      FDM.ADOConn.RollbackTrans;
+    raise;
+  end;
 end;
 
+//Date: 2020-08-24
+//Parm: 分组标识;内容
+//Desc: 如果不存在,则保存基础档案nGroup.nText
 procedure SaveBaseDataItemNoExists(const nGroup,nText: string);
 var nVal: TBaseDataItem;
 begin
+  FillChar(nVal, SizeOf(nVal), #0);
   with nVal do
   begin
     FGroup := nGroup;
     FName := nText;
-    FParamA := '';
-    FParamB := '';
     FDefault := False;
   end;
 

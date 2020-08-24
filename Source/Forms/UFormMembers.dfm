@@ -14,16 +14,16 @@ inherited fFormMembers: TfFormMembers
   object dxLayout1: TdxLayoutControl
     Left = 0
     Top = 0
-    Width = 681
-    Height = 384
+    Width = 673
+    Height = 372
     Align = alClient
     TabOrder = 0
     TabStop = False
     AutoContentSizes = [acsWidth, acsHeight]
     LookAndFeel = FDM.dxLayoutWeb1
     object BtnOK: TButton
-      Left = 535
-      Top = 351
+      Left = 527
+      Top = 339
       Width = 65
       Height = 22
       Caption = #20445#23384
@@ -31,8 +31,8 @@ inherited fFormMembers: TfFormMembers
       OnClick = BtnOKClick
     end
     object BtnExit: TButton
-      Left = 605
-      Top = 351
+      Left = 597
+      Top = 339
       Width = 65
       Height = 22
       Caption = #21462#28040
@@ -61,7 +61,7 @@ inherited fFormMembers: TfFormMembers
     end
     object Check1: TcxCheckBox
       Left = 11
-      Top = 351
+      Top = 339
       Caption = #36830#32493#28155#21152':'#20445#23384#21518#19981#20851#38381#31383#21475'.'
       ParentFont = False
       TabOrder = 15

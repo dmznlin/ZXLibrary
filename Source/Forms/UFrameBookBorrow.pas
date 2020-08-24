@@ -156,7 +156,7 @@ begin
   end;
 end;
 
-//Desc: Èë¿â
+//Desc: ½èÔÄ
 procedure TfFrameBookBorrow.BtnAddClick(Sender: TObject);
 var nParam: TFormCommandParam;
 begin
@@ -170,7 +170,7 @@ begin
   end;
 end;
 
-//Desc: ³ö¿â
+//Desc: ¹é»¹
 procedure TfFrameBookBorrow.BtnDelClick(Sender: TObject);
 var nParam: TFormCommandParam;
 begin

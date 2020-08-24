@@ -1,44 +1,44 @@
 inherited fFormIOMoney: TfFormIOMoney
   Left = 395
   Top = 342
-  ClientHeight = 437
-  ClientWidth = 390
+  ClientHeight = 523
+  ClientWidth = 435
   OnClose = FormClose
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 12
   inherited dxLayout1: TdxLayoutControl
-    Width = 390
-    Height = 437
+    Width = 435
+    Height = 523
     inherited BtnOK: TButton
-      Left = 244
-      Top = 404
-      TabOrder = 14
+      Left = 289
+      Top = 490
+      TabOrder = 18
     end
     inherited BtnExit: TButton
-      Left = 314
-      Top = 404
-      TabOrder = 15
+      Left = 359
+      Top = 490
+      TabOrder = 19
     end
     object EditMemo: TcxMemo [2]
       Left = 81
-      Top = 342
+      Top = 408
       ParentFont = False
       Properties.MaxLength = 200
-      TabOrder = 13
+      TabOrder = 17
       Height = 89
       Width = 185
     end
     object EditPayment: TcxComboBox [3]
       Left = 81
-      Top = 292
+      Top = 358
       ParentFont = False
       Properties.DropDownRows = 20
       Properties.ImmediateDropDown = False
       Properties.IncrementalSearch = False
       Properties.ItemHeight = 20
       Properties.MaxLength = 100
-      TabOrder = 10
+      TabOrder = 14
       Width = 121
     end
     object EditCard: TcxTextEdit [4]
@@ -75,37 +75,37 @@ inherited fFormIOMoney: TfFormIOMoney
     end
     object EditMoney: TcxTextEdit [8]
       Left = 81
-      Top = 317
+      Top = 383
       ParentFont = False
-      TabOrder = 11
+      TabOrder = 15
       Text = '0'
       Width = 121
     end
     object RadioPay: TcxRadioButton [9]
       Left = 86
-      Top = 270
+      Top = 336
       Width = 52
       Height = 17
       Caption = #20184#27454
       Checked = True
       ParentColor = False
-      TabOrder = 8
+      TabOrder = 12
       TabStop = True
       OnClick = RadioPayClick
     end
     object RadioTui: TcxRadioButton [10]
       Left = 143
-      Top = 270
+      Top = 336
       Width = 52
       Height = 17
       Caption = #36864#27454
       ParentColor = False
-      TabOrder = 9
+      TabOrder = 13
       OnClick = RadioPayClick
     end
     object cxLabel1: TcxLabel [11]
       Left = 23
-      Top = 270
+      Top = 336
       Caption = #19994#21153#31867#22411':'
       ParentFont = False
       Transparent = True
@@ -157,8 +157,8 @@ inherited fFormIOMoney: TfFormIOMoney
       Width = 344
     end
     object cxLabel2: TcxLabel [14]
-      Left = 225
-      Top = 317
+      Left = 270
+      Top = 383
       Caption = #20803' '#27880':'#36864#27454#26102#37329#39069#20026#36127#20540'.'
       ParentFont = False
       Transparent = True
@@ -166,12 +166,44 @@ inherited fFormIOMoney: TfFormIOMoney
     object cxLabel3: TcxLabel [15]
       Left = 23
       Top = 255
+      Caption = #20250#21592#26435#30410':'
+      ParentFont = False
+      Properties.LineOptions.Alignment = cxllaBottom
+      Transparent = True
+    end
+    object Label1: TcxLabel [16]
+      Left = 23
+      Top = 326
       AutoSize = False
       ParentFont = False
       Properties.LineOptions.Alignment = cxllaBottom
       Transparent = True
-      Height = 10
-      Width = 344
+      Height = 5
+      Width = 370
+    end
+    object EditCN: TcxTextEdit [17]
+      Left = 81
+      Top = 276
+      ParentFont = False
+      TabOrder = 7
+      Text = '0'
+      Width = 121
+    end
+    object EditEN: TcxTextEdit [18]
+      Left = 265
+      Top = 276
+      ParentFont = False
+      TabOrder = 8
+      Text = '0'
+      Width = 121
+    end
+    object EditPlay: TcxTextEdit [19]
+      Left = 81
+      Top = 301
+      ParentFont = False
+      TabOrder = 9
+      Text = '0'
+      Width = 121
     end
     inherited dxLayout1Group_Root: TdxLayoutGroup
       inherited dxGroup1: TdxLayoutGroup
@@ -221,6 +253,39 @@ inherited fFormIOMoney: TfFormIOMoney
             ShowCaption = False
             Control = cxLabel3
             ControlOptions.ShowBorder = False
+          end
+          object dxGroupLayout1Group7: TdxLayoutGroup
+            ShowCaption = False
+            Hidden = True
+            ShowBorder = False
+            object dxGroupLayout1Group8: TdxLayoutGroup
+              ShowCaption = False
+              Hidden = True
+              LayoutDirection = ldHorizontal
+              ShowBorder = False
+              object dxlytmLayout1Item18: TdxLayoutItem
+                Caption = #21487#20511#20013#25991':'
+                Control = EditCN
+                ControlOptions.ShowBorder = False
+              end
+              object dxlytmLayout1Item19: TdxLayoutItem
+                AutoAligns = [aaVertical]
+                AlignHorz = ahClient
+                Caption = #21487#20511#33521#25991':'
+                Control = EditEN
+                ControlOptions.ShowBorder = False
+              end
+            end
+            object dxlytmLayout1Item20: TdxLayoutItem
+              Caption = #28216' '#29609' '#21306':'
+              Control = EditPlay
+              ControlOptions.ShowBorder = False
+            end
+            object dxlytmLayout1Item17: TdxLayoutItem
+              ShowCaption = False
+              Control = Label1
+              ControlOptions.ShowBorder = False
+            end
           end
           object dxLayout1Group5: TdxLayoutGroup
             ShowCaption = False

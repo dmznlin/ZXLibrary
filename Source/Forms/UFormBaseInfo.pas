@@ -57,7 +57,8 @@ implementation
 
 {$R *.dfm}
 uses
-  ULibFun, UFormCtrl, UFormBase, UMgrControl, USysDB, USysConst, UDataModule;
+  ULibFun, UFormCtrl, UFormBase, UMgrControl, USysDB, USysConst, USysBusiness,
+  UDataModule;
 
 class function TfFormBaseInfo.CreateForm(const nPopedom: string;
   const nParam: Pointer): TWinControl;
@@ -224,35 +225,27 @@ begin
 end;
 
 procedure TfFormBaseInfo.BtnOKClick(Sender: TObject);
-var nStr: string;
+var nVal: TBaseDataItem;
 begin
   if not IsDataValid then Exit;
   //verify data
 
-  nStr := MakeSQLByStr([SF('B_Group', cBaseData[FBaseData].FName),
-      SF('B_GroupName', cBaseData[FBaseData].FDesc),
-      SF('B_Text', EditName.Text),
-      SF('B_Py', GetPinYinOfStr(EditName.Text)),
-      SF('B_ParamA', EditParamA.Text),
-      SF('B_ParamB', EditParamB.Text),
-
-      SF_IF([SF('B_Default', sFlag_Yes),
-             SF('B_Default', '')], CheckDef.Checked),
-      SF('B_Memo', EditMemo.Text)], sTable_BaseInfo,
-      SF('B_ID', FRecordID, sfVal), FRecordID = '');
-  FDM.ExecuteSQL(nStr);
-
-  if CheckDef.Checked then
+  with nVal do
   begin
-    nStr := 'Update %s Set B_Default=''%s'' ' +
-            'Where B_Group=''%s'' And B_Text<>''%s''';
-    nStr := Format(nStr, [sTable_BaseInfo, '',
-            cBaseData[FBaseData].FName, EditName.Text]);
-    //关闭其它默认项
-    FDM.ExecuteSQL(nStr);
+    FRecord := FRecordID;
+    FGroup := cBaseData[FBaseData].FName;
+    FGroupName := cBaseData[FBaseData].FDesc;
+    FName := EditName.Text;
+
+    FParamA := EditParamA.Text;
+    FParamB := EditParamB.Text;
+    FMemo := EditMemo.Text;
+    FDefault := CheckDef.Checked;
   end;
-  
+
+  SaveBaseDataItem(@nVal, True);  
   FSaveResult := mrOk;
+  
   if Check1.Checked then
   begin
     ResetFormData;

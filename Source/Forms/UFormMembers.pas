@@ -310,8 +310,15 @@ begin
       SF_IF([SF('M_BorrowNum', 0, sfVal), ''], nIsNew),
       SF_IF([SF('M_BorrowBooks', 0, sfVal), ''], nIsNew),
       SF_IF([SF('M_BuyNum', 0, sfVal), ''], nIsNew),
-      SF_IF([SF('M_BuyBooks', 0, sfVal), ''], nIsNew)], sTable_Members,
-      SF('R_ID', FRecordID, sfVal), nIsNew);
+      SF_IF([SF('M_BuyBooks', 0, sfVal), ''], nIsNew),
+
+      SF_IF([SF('M_MonCH', 0, sfVal), ''], nIsNew),
+      SF_IF([SF('M_MonCHHas', 0, sfVal), ''], nIsNew),
+      SF_IF([SF('M_MonEN', 0, sfVal), ''], nIsNew),
+      SF_IF([SF('M_MonENHas', 0, sfVal), ''], nIsNew),
+      SF_IF([SF('M_Month', GetCurrentMonth), ''], nIsNew),
+      SF_IF([SF('M_PlayArea', 0, sfVal), ''], nIsNew)
+    ], sTable_Members, SF('R_ID', FRecordID, sfVal), nIsNew);
   FDM.ExecuteSQL(nStr);
   
   FSaveResult := mrOk;

@@ -32,19 +32,22 @@ type
 
   PNameAndValue = ^TNameAndValue;
   TNameAndValue = record
-    FName: string;      //数据名称
-    FDesc: string;      //数据描述
-    FValue: string;     //数据取值
+    FName     : string;     //数据名称
+    FDesc     : string;     //数据描述
+    FValue    : string;     //数据取值
   end;
 
   //基础档案
   PBaseDataItem = ^TBaseDataItem;
   TBaseDataItem = record
-    FGroup: string;     //分组
-    FName: string;      //名称
-    FParamA: string;    //参数A
-    FParamB: string;    //参数B
-    FDefault: Boolean;  //默认值
+    FRecord   : string;     //记录编号
+    FGroup    : string;     //分组标识
+    FGroupName: string;     //分组名称
+    FName     : string;     //名称
+    FParamA   : string;     //参数A
+    FParamB   : string;     //参数B
+    FDefault  : Boolean;    //默认值
+    FMemo     : string;     //备注信息
   end;
 
 var
@@ -228,7 +231,10 @@ ResourceString
        'M_Phone varChar(32), M_Sex Char(1), M_Level varChar(100),' +
        'M_JoinDate DateTime, M_ValidDate DateTime, ' +
        'M_BorrowNum Integer, M_BorrowBooks Integer,' +
-       'M_BuyNum Integer, M_BuyBooks Integer, M_Memo varChar(50))';
+       'M_BuyNum Integer, M_BuyBooks Integer,' +
+       'M_MonCH Integer, M_MonCHHas Integer,' +
+       'M_MonEN Integer, M_MonENHas Integer, M_Month varChar(10),' +
+       'M_PlayArea Integer, M_Memo varChar(50))';
   {-----------------------------------------------------------------------------
    会员档案: Members
    *.R_ID: 记录编号
@@ -244,6 +250,12 @@ ResourceString
    *.M_BorrowBooks: 书本数
    *.M_BuyNum: 购买次数
    *.M_BuyBooks: 购买本数
+   *.M_MonCH: 可借阅中文本数
+   *.M_MonCHHas: 当月中文已借
+   *.M_MonEN: 可借阅外文本数
+   *.M_MonENHas: 当月英文已借
+   *.M_Month: 计数月份
+   *.M_PlayArea: 游玩区计数
    *.M_Memo: 备注信息
   -----------------------------------------------------------------------------}
 

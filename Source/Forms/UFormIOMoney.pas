@@ -49,6 +49,16 @@ type
     dxLayout1Group6: TdxLayoutGroup;
     dxLayout1Group5: TdxLayoutGroup;
     dxLayout1Group3: TdxLayoutGroup;
+    dxlytmLayout1Item17: TdxLayoutItem;
+    Label1: TcxLabel;
+    EditCN: TcxTextEdit;
+    dxlytmLayout1Item18: TdxLayoutItem;
+    EditEN: TcxTextEdit;
+    dxlytmLayout1Item19: TdxLayoutItem;
+    dxGroupLayout1Group7: TdxLayoutGroup;
+    dxGroupLayout1Group8: TdxLayoutGroup;
+    EditPlay: TcxTextEdit;
+    dxlytmLayout1Item20: TdxLayoutItem;
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure BtnOKClick(Sender: TObject);
@@ -144,6 +154,10 @@ begin
     EditPhone.Text := FieldByName('M_Phone').AsString;
     EditLevel.Text := FieldByName('M_Level').AsString;
 
+    EditCN.Text := FieldByName('M_MonCH').AsString;
+    EditEN.Text := FieldByName('M_MonEN').AsString;
+    EditPlay.Text := FieldByName('M_PlayArea').AsString;
+
     FValidDate := FieldByName('M_ValidDate').AsDateTime;
     EditValid.Date := FValidDate;
   end;
@@ -184,6 +198,24 @@ begin
     nHint := '请选择支付方式';
   end else
 
+  if Sender = EditCN then
+  begin
+    Result := IsNumber(EditCN.Text, False) and (StrToInt(EditCN.Text) >= 0);
+    nHint := '请填写中文可借阅数量';
+  end else
+
+  if Sender = EditEN then
+  begin
+    Result := IsNumber(EditEN.Text, False) and (StrToInt(EditEN.Text) >= 0);
+    nHint := '请填写英文可借阅数量';
+  end else
+
+  if Sender = EditPlay then
+  begin
+    Result := IsNumber(EditPlay.Text, False) and (StrToInt(EditPlay.Text) >= 0);
+    nHint := '请填写游玩区次数';
+  end else
+
   if Sender = EditMoney then
   begin
     nHint := '请填写正确的金额';
@@ -221,8 +253,11 @@ begin
       SF('M_Memo', nMemo)], sTable_InOutMoney, '', True);
     FDM.ExecuteSQL(nStr);
 
-    nStr := 'Update %s Set M_ValidDate=''%s'' Where M_ID=''%s''';
-    nStr := Format(nStr, [sTable_Members, DateTime2Str(EditValid.Date), FMember]);
+    nStr := MakeSQLByStr([SF('M_ValidDate', DateTime2Str(EditValid.Date)),
+      SF('M_MonCH', EditCN.Text, sfVal),
+      SF('M_MonEN', EditEN.Text, sfVal),
+      SF('M_PlayArea', EditPlay.Text, sfVal)
+      ], sTable_Members, SF('M_ID', FMember), False);
     FDM.ExecuteSQL(nStr);
 
     FDM.ADOConn.CommitTrans;
