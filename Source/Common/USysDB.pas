@@ -79,8 +79,12 @@ const
   sFlag_Base_Age                 = 'age';            //基础档案: 年龄段
   sFlag_Base_Payment             = 'payment';        //基础档案: 付款方式
   sFlag_Base_BookClass           = 'bookclass';      //基础档案: 图书分类
-  
   sFlag_Base_MemLevel            = 'memlevel';       //基础档案: 会员等级
+
+  sFlag_Language_CN               = '中文';
+  sFlag_Language_EN               = '英文';
+  sFlag_Language_Default          = sFlag_Language_CN + '|' + sFlag_Language_EN;
+
   sFlag_Member_Level_VIP         = 'VIP会员';
   sFlag_Member_Level_Common      = '普通会员';
   sFlag_Member_Levels            = sFlag_Member_Level_VIP + '|' +
@@ -88,7 +92,7 @@ const
   //会员等级列表
 
   cBaseData: array[0..7] of TNameAndValue = (
-    (FName: sFlag_Base_Lanuage;  FDesc: '语言';     FValue: ''),
+    (FName: sFlag_Base_Lanuage;  FDesc: '语言';     FValue: sFlag_Language_Default),
     (FName: sFlag_Base_Author;   FDesc: '作者';     FValue: ''),
     (FName: sFlag_Base_Publish;  FDesc: '出版社';   FValue: ''),
     (FName: sFlag_Base_Provide;  FDesc: '供应商';   FValue: ''),

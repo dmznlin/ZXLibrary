@@ -303,22 +303,42 @@ end;
 
 //Desc: 删除
 procedure TfFrameBooks.BtnDelClick(Sender: TObject);
-var nStr,nAsk: string;
+var nStr: string;
 begin
   if cxView1.DataController.GetSelectedCount < 1 then
   begin
     ShowMsg('请选择要删除的图书', sHint); Exit;
   end;
 
-  nAsk := Format('确定要删除%s的会员吗?', [nAsk]);
-  if not QueryDlg(nAsk, sAsk) then Exit;
+  if SQLQuery.FieldByName('B_NumAll').AsInteger > 0 then
+  begin
+    ShowMsg('已入库图书不能删除', sHint); Exit;
+  end;
 
-  nStr := SQLQuery.FieldByName('R_ID').AsString;
-  nStr := Format('Delete From %s Where R_ID=%s', [sTable_Books, nStr]);
-  FDM.ExecuteSQL(nStr);
-  
-  InitFormData(FWhere);
-  ShowMsg('删除成功', sHint);
+  nStr := SQLQuery.FieldByName('B_Name').AsString;
+  nStr := Format('确定要删除名称为[ %s ]的图书吗?', [nStr]);
+  if not QueryDlg(nStr, sAsk) then Exit;
+
+  FDM.ADOConn.BeginTrans;
+  try
+    nStr := SQLQuery.FieldByName('R_ID').AsString;
+    nStr := Format('Delete From %s Where R_ID=%s', [sTable_Books, nStr]);
+    FDM.ExecuteSQL(nStr);
+
+    nStr := SQLQuery.FieldByName('B_ID').AsString;
+    nStr := Format('Delete From %s Where D_Book=''%s''', [sTable_BookDetail, nStr]);
+    FDM.ExecuteSQL(nStr);
+
+    FDM.ADOConn.CommitTrans;
+    InitFormData(FWhere);
+    ShowMsg('删除成功', sHint);
+  except
+    on nErr: Exception do
+    begin
+      FDM.ADOConn.RollbackTrans;
+      ShowDlg(nErr.Message, sError);
+    end;  
+  end;
 end;
 
 //------------------------------------------------------------------------------

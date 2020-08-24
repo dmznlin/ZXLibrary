@@ -1,23 +1,23 @@
 inherited fFormIOMoney: TfFormIOMoney
   Left = 395
   Top = 342
-  ClientHeight = 523
-  ClientWidth = 435
+  ClientHeight = 493
+  ClientWidth = 452
   OnClose = FormClose
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 12
   inherited dxLayout1: TdxLayoutControl
-    Width = 435
-    Height = 523
+    Width = 452
+    Height = 493
     inherited BtnOK: TButton
-      Left = 289
-      Top = 490
+      Left = 306
+      Top = 460
       TabOrder = 18
     end
     inherited BtnExit: TButton
-      Left = 359
-      Top = 490
+      Left = 376
+      Top = 460
       TabOrder = 19
     end
     object EditMemo: TcxMemo [2]
@@ -157,7 +157,7 @@ inherited fFormIOMoney: TfFormIOMoney
       Width = 344
     end
     object cxLabel2: TcxLabel [14]
-      Left = 270
+      Left = 287
       Top = 383
       Caption = #20803' '#27880':'#36864#27454#26102#37329#39069#20026#36127#20540'.'
       ParentFont = False

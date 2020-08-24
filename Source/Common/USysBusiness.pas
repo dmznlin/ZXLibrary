@@ -10,8 +10,36 @@ uses
   Windows, DB, Classes, Controls, SysUtils, UDataModule, UDataReport,
   UFormBase, ULibFun, UFormCtrl, USysConst, USysDB, USysLoger;
 
+type
+  PBookItem = ^TBookItem;
+  TBookItem = record
+    FEnabled     : Boolean;    //记录有效  
+    FRecord      : string;     //记录标识
+    FBookID      : string;     //档案标识
+    FBookName    : string;     //系列名称
+    FDetailID    : string;     //图书编号
+    FAuthor      : string;     //作者
+    FLang        : string;     //语种
+    FClass       : string;     //分类
+    FISBN        : string;     //isdn
+    FName        : string;     //图书名称
+    FPublisher   : string;     //出版商
+    FProvider    : string;     //供应商
+    FPubPrice    : Double;     //定价
+    FGetPrice    : Double;     //采购价
+    FSalePrice   : Double;     //销售价
+    FNumAll      : Integer;    //库存
+    FNumIn       : Integer;    //在库
+    FNumOut      : Integer;    //借出
+    FNumAfter    : Integer;
+    FValid       : Boolean;    //有效
+  end;
+  TBooks = array of TBookItem;
+
 function GetCurrentMonth: string;
 {*当前月份*}
+function EncodePhone(const nPhone: string): string;
+{*手机号隐私处理*}
 function GetSerailID(var nID: string; const nGroup,nObject: string;
   const nUserDate: Boolean = True): Boolean;
 {*获取串号*}
@@ -25,6 +53,9 @@ procedure SaveBaseDataItemNoExists(const nGroup,nText: string);
 {*基础档案业务*}
 procedure SyncBookNumber(const nBookID: string);
 {*同步图书库存量*}
+function LoadBooks(const nISDN: string; var nBooks: TBooks;
+  var nHint: string): Boolean;
+{*加载图书列表*}
 
 implementation
 
@@ -39,6 +70,23 @@ end;
 function GetCurrentMonth: string;
 begin
   Result := Copy(DateTime2Str(Now), 1, 7);
+end;
+
+function EncodePhone(const nPhone: string): string;
+var nEnd: string;
+    nLen: Integer;
+begin
+  Result := nPhone;
+  nLen := Length(Result);
+  if nLen <= 4 then Exit;
+
+  nEnd := Copy(Result, nLen - 3, 4);
+  Result := Copy(Result, 1, nLen - 4);
+
+  nLen := Length(Result);
+  if nLen > 3 then
+    Result := Copy(Result, 1, nLen - 3) + 'xxx';
+  Result := Result + nEnd;
 end;
 
 //Date: 2020-08-14
@@ -296,6 +344,71 @@ begin
             FieldByName('NumOut').AsInteger, nBookID]);
     FDM.ExecuteSQL(nStr);
   end;
+end;
+
+//Date: 2020-08-24
+//Parm: isdn;图书清单;提示信息
+//Desc: 读取isdn的书单,存入nBooks
+function LoadBooks(const nISDN: string; var nBooks: TBooks;
+  var nHint: string): Boolean;
+var nStr: string;
+    nIdx: Integer;
+begin
+  Result := False;
+  SetLength(nBooks, 0);
+  //init default
+
+  nStr := 'Select dt.*,B_Name,B_Author,B_Lang,B_Class,B_Valid From %s dt ' +
+          ' Left Join %s On B_ID=D_Book ' +
+          'Where D_ISBN=''%s''';
+  nStr := Format(nStr, [sTable_BookDetail, sTable_Books, nISDN]);
+
+  with FDM.QueryTemp(nStr) do
+  begin
+    if RecordCount < 1 then
+    begin
+      nHint := '该条码没有图书档案';
+      Exit;
+    end;
+
+    SetLength(nBooks, RecordCount);
+    nIdx := 0;
+    First;
+
+    while not Eof do
+    begin
+      with nBooks[nIdx] do
+      begin
+        FRecord      := FieldByName('R_ID').AsString;
+        FBookID      := FieldByName('D_Book').AsString;
+        FBookName    := FieldByName('B_Name').AsString;
+        FAuthor      := FieldByName('B_Author').AsString;
+        FLang        := FieldByName('B_Lang').AsString;
+        FClass       := FieldByName('B_Class').AsString;
+
+        FDetailID    := FieldByName('D_ID').AsString;
+        FISBN        := FieldByName('D_ISBN').AsString;
+        FName        := FieldByName('D_Name').AsString;
+        FPublisher   := FieldByName('D_Publisher').AsString;
+        FProvider    := FieldByName('D_Provider').AsString;
+        FPubPrice    := FieldByName('D_PubPrice').AsFloat;
+        FGetPrice    := FieldByName('D_GetPrice').AsFloat;
+        FSalePrice   := FieldByName('D_SalePrice').AsFloat;
+        FNumAll      := FieldByName('D_NumAll').AsInteger;
+        FNumIn       := FieldByName('D_NumIn').AsInteger;
+        FNumOut      := FieldByName('D_NumOut').AsInteger;
+
+        FValid := (FieldByName('D_Valid').AsString = sFlag_Yes) and
+                  (FieldByName('B_Valid').AsString = sFlag_Yes);
+        FEnabled := True;
+      end;
+
+      Inc(nIdx);
+      Next;
+    end;
+  end;
+
+  Result := True;
 end;
 
 end.
