@@ -1,6 +1,7 @@
 program ZXLibrary;
 
 uses
+  FastMM4,
   Forms,
   Windows,
   ULibFun,

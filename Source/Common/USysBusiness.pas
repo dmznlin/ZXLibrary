@@ -19,7 +19,7 @@ type
     FEnabled     : Boolean;    //记录有效  
     FRecord      : string;     //记录标识
     FBookID      : string;     //档案标识
-    FBookName    : string;     //系列名称
+    FBookName    : string;     //档案名称
     FDetailID    : string;     //图书编号
     FAuthor      : string;     //作者
     FLang        : string;     //语种
@@ -36,16 +36,17 @@ type
     FNumOut      : Integer;    //借出
     FNumAfter    : Integer;
     
-    FValid       : Boolean;    //有效
+    FValid       : Boolean;    //允许借阅
+    FBookValid   : Boolean;    //允许借阅总开关
+    FStatus      : TBookStatus;//编辑状态
     FMemo        : string;
-    FStatus      : TBookStatus;
   end;
   TBooks = array of TBookItem;
 
-  PMemberData = ^TMemberData;
-  TMemberData = record
+  PMemberItem = ^TMemberItem;
+  TMemberItem = record
     FRecord      : string;     //记录标识
-    FMember      : string;     //会员编号
+    FMID         : string;     //会员编号
     FName        : string;     //会员名称
     FSex         : string;     //性别
     FCard        : string;     //会员卡号
@@ -60,7 +61,7 @@ type
     FMonENHas    : Integer;    //当月已借: 英文
     FPlayArea    : Integer;    //游玩区次数
   end;
-  TMembers = array of TMemberData;
+  TMembers = array of TMemberItem;
 
 function GetCurrentMonth: string;
 {*当前月份*}
@@ -82,6 +83,9 @@ procedure SyncBookNumber(const nBookID: string);
 function LoadBooks(const nISDN: string; var nBooks: TBooks;
   var nHint: string; nWhere: string = ''): Boolean;
 {*加载图书列表*}
+function LoadMembers(const nMID: string; var nMembers: TMembers;
+  var nHint: string; nWhere: string = ''): Boolean;
+{*加载会员列表*}
 
 implementation
 
@@ -427,10 +431,84 @@ begin
         FNumAll      := FieldByName('D_NumAll').AsInteger;
         FNumIn       := FieldByName('D_NumIn').AsInteger;
         FNumOut      := FieldByName('D_NumOut').AsInteger;
+        FMemo        := FieldByName('D_Memo').AsString;
 
-        FValid := (FieldByName('D_Valid').AsString = sFlag_Yes) and
-                  (FieldByName('B_Valid').AsString = sFlag_Yes);
-        FEnabled := True;
+        FValid       := FieldByName('D_Valid').AsString = sFlag_Yes;
+        FBookValid   := FieldByName('B_Valid').AsString = sFlag_Yes;
+        FEnabled     := True;
+      end;
+
+      Inc(nIdx);
+      Next;
+    end;
+  end;
+
+  Result := True;
+end;
+
+//Date: 2020-08-26
+//Parm: 会员编号;会员列表;提示信息
+//Desc: 读取nMID会员的信息
+function LoadMembers(const nMID: string; var nMembers: TMembers;
+  var nHint: string; nWhere: string): Boolean;
+var nStr: string;
+    nIdx: Integer;
+begin
+  Result := False;
+  SetLength(nMembers, 0);
+  //init default
+
+  if nWhere = '' then
+    nWhere := Format('M_ID=''%s''', [nMID]);
+  //default
+
+  nStr := 'Select * From %s Where %s';
+  nStr := Format(nStr, [sTable_Members, nWhere]);
+
+  with FDM.QueryTemp(nStr) do
+  begin
+    if RecordCount < 1 then
+    begin
+      nHint := '会员档案已丢失';
+      Exit;
+    end;
+
+    SetLength(nMembers, RecordCount);
+    nIdx := 0;
+    First;
+
+    while not Eof do
+    begin
+      with nMembers[nIdx] do
+      begin
+        FRecord    := FieldByName('R_ID').AsString;
+        FMID       := FieldByName('M_ID').AsString;
+        FName      := FieldByName('M_Name').AsString;
+        FSex       := FieldByName('M_Sex').AsString;
+        FCard      := FieldByName('M_Card').AsString;
+        FPhone     := FieldByName('M_Phone').AsString;
+        FLevel     := FieldByName('M_Level').AsString;
+        FValidDate := FieldByName('M_ValidDate').AsDateTime;
+
+        FMonCH     := FieldByName('M_MonCH').AsInteger;
+        FMonEN     := FieldByName('M_MonEN').AsInteger;
+        FMonth     := FieldByName('M_Month').AsString;
+        FMonCHHas  := FieldByName('M_MonCHHas').AsInteger;
+        FMonENHas  := FieldByName('M_MonENHas').AsInteger;
+
+        if FMonth <> GetCurrentMonth then //每月第一次清零计数
+        begin
+          nStr := 'Update %s Set M_Month=''%s'',M_MonCHHas=0,M_MonENHas=0 ' +
+                  'Where R_ID=%s';
+          nStr := Format(nStr, [sTable_Members, GetCurrentMonth, FRecord]);
+          FDM.ExecuteSQL(nStr);
+
+          FMonth := GetCurrentMonth;
+          FMonCHHas := 0;
+          FMonENHas := 0;
+        end;
+
+        FPlayArea := FieldByName('M_PlayArea').AsInteger;
       end;
 
       Inc(nIdx);

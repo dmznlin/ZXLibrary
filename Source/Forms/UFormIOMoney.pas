@@ -8,7 +8,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, UFormNormal, cxGraphics, cxControls, cxLookAndFeels,
+  USysBusiness, UFormNormal, cxGraphics, cxControls, cxLookAndFeels,
   cxLookAndFeelPainters, dxSkinsCore, dxSkinsDefaultPainters,
   dxLayoutControl, StdCtrls, cxContainer, cxEdit, cxMemo, cxTextEdit,
   cxMaskEdit, cxDropDownEdit, cxCheckBox, cxLabel, cxRadioGroup, cxCalendar,
@@ -66,7 +66,7 @@ type
     procedure RadioPayClick(Sender: TObject);
   private
     { Private declarations }
-    FMember: string;
+    FMember: TMemberItem;
     {*会员编号*}
     FValidDate: TDateTime;
     procedure InitFormData(const nID: string);
@@ -83,7 +83,7 @@ implementation
 
 {$R *.dfm}
 uses
-  ULibFun, UFormCtrl, UFormBase, UMgrControl, UDataModule, USysBusiness, USysDB,
+  ULibFun, UFormCtrl, UFormBase, UMgrControl, UDataModule, USysDB,
   USysConst;
 
 class function TfFormIOMoney.CreateForm(const nPopedom: string;
@@ -97,7 +97,7 @@ begin
 
   with TfFormIOMoney.Create(Application) do
   begin
-    FMember := nP.FParamA;
+    FMember.FMID := nP.FParamA;
     if nP.FCommand = cCmd_DeleteData then
          Caption := '会员 - 退费'
     else Caption := '会员 - 续费';
@@ -128,6 +128,7 @@ end;
 
 procedure TfFormIOMoney.InitFormData(const nID: string);
 var nStr: string;
+    nMems: TMembers;
     nPayment: TBaseDataItem;
 begin
   ActiveControl := EditMoney;
@@ -139,26 +140,23 @@ begin
     EditPayment.ItemIndex := EditPayment.Properties.Items.IndexOf(nPayment.FName);
   end;
 
-  nStr :='Select * From %s Where M_ID=''%s''';
-  nStr := Format(nStr, [sTable_Members, FMember]);
-  with FDM.QueryTemp(nStr) do
+  if not LoadMembers(FMember.FMID, nMems, nStr) then
   begin
-    if RecordCount < 1 then
-    begin
-      BtnOK.Enabled := False;
-      ShowMsg('会员档案已丢失', sHint); Exit;
-    end;
+    BtnOK.Enabled := False;
+    ShowMsg(nStr, sHint); Exit;
+  end;
 
-    EditCard.Text := FieldByName('M_Card').AsString;
-    EditName.Text := FieldByName('M_Name').AsString;
-    EditPhone.Text := FieldByName('M_Phone').AsString;
-    EditLevel.Text := FieldByName('M_Level').AsString;
+  FMember := nMems[0];
+  with FMember do
+  begin
+    EditCard.Text := FCard;
+    EditName.Text := FName;
+    EditPhone.Text := FPhone;
+    EditLevel.Text := FLevel;
 
-    EditCN.Text := FieldByName('M_MonCH').AsString;
-    EditEN.Text := FieldByName('M_MonEN').AsString;
-    EditPlay.Text := FieldByName('M_PlayArea').AsString;
-
-    FValidDate := FieldByName('M_ValidDate').AsDateTime;
+    EditCN.Text := IntToStr(FMonCH);
+    EditEN.Text := IntToStr(FMonEN);
+    EditPlay.Text := IntToStr(FPlayArea);
     EditValid.Date := FValidDate;
   end;
 end;
@@ -240,8 +238,8 @@ begin
              '设定会员有效期: ' + Date2Str(EditValid.Date);
     //xxxxx
 
-    nStr := MakeSQLByStr([SF('M_MemID', FMember),
-      SF('M_MemName', EditName.Text),
+    nStr := MakeSQLByStr([SF('M_MemID', FMember.FMID),
+      SF('M_MemName', FMember.FName),
       SF_IF([SF('M_Type', sFlag_In),
              SF('M_Type', sFlag_Out)], RadioPay.Checked),
       //xxxxx
@@ -257,7 +255,7 @@ begin
       SF('M_MonCH', EditCN.Text, sfVal),
       SF('M_MonEN', EditEN.Text, sfVal),
       SF('M_PlayArea', EditPlay.Text, sfVal)
-      ], sTable_Members, SF('M_ID', FMember), False);
+      ], sTable_Members, SF('M_ID', FMember.FMID), False);
     FDM.ExecuteSQL(nStr);
 
     FDM.ADOConn.CommitTrans;

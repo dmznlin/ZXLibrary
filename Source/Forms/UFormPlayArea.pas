@@ -65,10 +65,10 @@ type
     procedure BtnOKClick(Sender: TObject);
   private
     { Private declarations }
-    FMember: TMemberData;
+    FMember: TMemberItem;
     {*数据相关*}
     procedure InitFormData(const nID: string);
-    procedure LoadMember(const nData: PMemberData = nil);
+    procedure LoadMember(const nData: PMemberItem = nil);
     {*界面数据*}
     procedure SetLableCaption(const nHint,nText: string);
     procedure ClearLabelCaption(const nHint: string = '';
@@ -167,36 +167,23 @@ end;
 
 procedure TfFormPlayArea.EditMemPropertiesEditValueChanged(Sender: TObject);
 var nStr: string;
+    nMems: TMembers;
 begin
-  if EditMem.Text = '' then Exit;
-  nStr := 'Select * From %s Where M_ID=''%s''';
-  nStr := Format(nStr, [sTable_Members, EditMem.Text]);
-
-  with FDM.QueryTemp(nStr) do
+  if EditMem.Focused and (EditMem.Text <> '') then
   begin
-    if RecordCount < 1 then
+    if not LoadMembers(EditMem.Text, nMems, nStr) then
     begin
       LoadMember(nil);
       Exit;
     end;
 
-    with FMember do
-    begin
-      FMember    := FieldByName('M_ID').AsString;
-      FName      := FieldByName('M_Name').AsString;
-      FCard      := FieldByName('M_Card').AsString;
-      FPhone     := FieldByName('M_Phone').AsString;
-      FLevel     := FieldByName('M_Level').AsString;
-      FValidDate := FieldByName('M_ValidDate').AsDateTime;
-      FPlayArea  := FieldByName('M_PlayArea').AsInteger;
-    end;
-
+    FMember := nMems[0];
     LoadMember(@FMember);
     ActiveControl := EditNum;
   end;
 end;
 
-procedure TfFormPlayArea.LoadMember(const nData: PMemberData);
+procedure TfFormPlayArea.LoadMember(const nData: PMemberItem);
 var nStr: string;
 begin
   if not Assigned(nData) then
@@ -269,7 +256,7 @@ begin
 
   FDM.ADOConn.BeginTrans;
   try
-    nStr := MakeSQLByStr([SF('P_Member', FMember.FMember),
+    nStr := MakeSQLByStr([SF('P_Member', FMember.FMID),
         SF('P_GoodsID', sFlag_PlayArea),
         SF('P_GoodsName', '游玩区'),
         SF('P_GoodsPy', 'ywq'),
@@ -285,7 +272,7 @@ begin
     FDM.ExecuteSQL(nStr);
 
     nStr := 'Update %s Set M_PlayArea=M_PlayArea-(%d) Where M_ID=''%s''';
-    nStr := Format(nStr, [sTable_Members, StrToInt(EditNum.Value), FMember.FMember]);
+    nStr := Format(nStr, [sTable_Members, StrToInt(EditNum.Value), FMember.FMID]);
     FDM.ExecuteSQL(nStr);
 
     FDM.ADOConn.CommitTrans;

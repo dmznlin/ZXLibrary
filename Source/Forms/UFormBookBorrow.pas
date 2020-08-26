@@ -78,13 +78,13 @@ type
   private
     { Private declarations }
     FListA: TStrings;
-    FMember: TMemberData;
+    FMember: TMemberItem;
     FBookISDN: string;
     FBooks: TBooks;
     FBooksBorrow: TBooks;
     {*数据相关*}
     procedure InitFormData(const nID: string);
-    procedure LoadMember(const nData: PMemberData = nil);
+    procedure LoadMember(const nData: PMemberItem = nil);
     procedure LoadListViewData(const nList: TcxListView; const nBooks: TBooks);
     procedure BorrowBook(const nIdx: Integer);
     {*界面数据*}
@@ -194,53 +194,23 @@ end;
 
 procedure TfFormBookBorrow.EditMemPropertiesEditValueChanged(Sender: TObject);
 var nStr: string;
+    nMems: TMembers;
 begin
-  if EditMem.Text = '' then Exit;
-  nStr := 'Select * From %s Where M_ID=''%s''';
-  nStr := Format(nStr, [sTable_Members, EditMem.Text]);
-
-  with FDM.QueryTemp(nStr) do
+  if EditMem.Focused and (EditMem.Text <> '') then
   begin
-    if RecordCount < 1 then
+    if not LoadMembers(EditMem.Text, nMems, nStr) then
     begin
       LoadMember(nil);
       Exit;
     end;
 
-    with FMember do
-    begin
-      FMember    := FieldByName('M_ID').AsString;
-      FName      := FieldByName('M_Name').AsString;
-      FCard      := FieldByName('M_Card').AsString;
-      FPhone     := FieldByName('M_Phone').AsString;
-      FLevel     := FieldByName('M_Level').AsString;
-      FValidDate := FieldByName('M_ValidDate').AsDateTime;
-
-      FMonCH     := FieldByName('M_MonCH').AsInteger;
-      FMonEN     := FieldByName('M_MonEN').AsInteger;
-      FMonth     := FieldByName('M_Month').AsString;
-      FMonCHHas  := FieldByName('M_MonCHHas').AsInteger;
-      FMonENHas  := FieldByName('M_MonENHas').AsInteger;
-
-      if FMonth <> GetCurrentMonth then //每月第一次清零计数
-      begin
-        nStr := 'Update %s Set M_Month=''%s'',M_MonCHHas=0,M_MonENHas=0 ' +
-                'Where M_ID=''%s''';
-        nStr := Format(nStr, [sTable_Members, GetCurrentMonth, FMember]);
-        FDM.ExecuteSQL(nStr);
-
-        FMonth := GetCurrentMonth;
-        FMonCHHas := 0;
-        FMonENHas := 0;
-      end;
-    end;
-
+    FMember := nMems[0];
     LoadMember(@FMember);
     ActiveControl := EditISDN;
   end;
 end;
 
-procedure TfFormBookBorrow.LoadMember(const nData: PMemberData);
+procedure TfFormBookBorrow.LoadMember(const nData: PMemberItem);
 var nStr: string;
 begin
   if not Assigned(nData) then
@@ -370,7 +340,7 @@ end;
 procedure TfFormBookBorrow.BorrowBook(const nIdx: Integer);
 var nInt: Integer;
 begin
-  if not FBooks[nIdx].FValid then
+  if not (FBooks[nIdx].FValid and FBooks[nIdx].FBookValid)then
   begin
     EditISDN.Text := '管理员已禁止借阅此书';
     Exit;
@@ -478,7 +448,7 @@ begin
       if not FEnabled then Continue;
       //invalid
 
-      nStr := MakeSQLByStr([SF('B_Member', FMember.FMember),
+      nStr := MakeSQLByStr([SF('B_Member', FMember.FMID),
           SF('B_Book', FBookID),
           SF('B_BookDtl', FDetailID),
           SF('B_Type', sFlag_Out),
@@ -508,7 +478,7 @@ begin
             'M_BorrowNum=M_BorrowNum+1,M_BorrowBooks=M_BorrowBooks+%d,' +
             'M_MonCHHas=M_MonCHHas+%d,M_MonENHas=M_MonENHas+%d ' +
             'Where M_ID=''%s''';
-    nStr := Format(nStr, [sTable_Members, nAll, nCN, nEN, FMember.FMember]);
+    nStr := Format(nStr, [sTable_Members, nAll, nCN, nEN, FMember.FMID]);
     FDM.ExecuteSQL(nStr); //3.增加会员信息计数
 
     FDM.ADOConn.CommitTrans;

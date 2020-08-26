@@ -98,7 +98,7 @@ type
     FRecordID: string;
     FBookID: string;
     {*图书编号*}
-    FBooks: array of TBookItem;
+    FBooks: TBooks;
     {*图书明细*}
     FListA: TStrings;
     FSaveResult: Integer;
@@ -301,45 +301,12 @@ begin
       //档案编号
     end;
 
-    //-------------------------------------------------------------------------
-    SetLength(FBooks, 0);
-    nStr := 'Select * From %s Where D_Book=''%s''';
-    nStr := Format(nStr, [sTable_BookDetail, FBookID]);
-
-    with FDM.QueryTemp(nStr) do
-    if RecordCount > 0 then
-    begin
-      SetLength(FBooks, RecordCount);
-      nIdx := 0;
-      First;
-
-      while not Eof do
-      begin
-        with FBooks[nIdx] do
-        begin
-          FRecord      := FieldByName('R_ID').AsString;
-          FISBN        := FieldByName('D_ISBN').AsString;
-          FName        := FieldByName('D_Name').AsString;
-          FPublisher   := FieldByName('D_Publisher').AsString;
-          FProvider    := FieldByName('D_Provider').AsString;
-          FPubPrice    := FieldByName('D_PubPrice').AsFloat;
-          FGetPrice    := FieldByName('D_GetPrice').AsFloat;
-          FSalePrice   := FieldByName('D_SalePrice').AsFloat;
-          FNumAll      := FieldByName('D_NumAll').AsInteger;
-          FNumIn       := FieldByName('D_NumIn').AsInteger;
-          FNumOut      := FieldByName('D_NumOut').AsInteger;
-          FValid       := FieldByName('D_Valid').AsString = sFlag_Yes;
-          FMemo        := FieldByName('D_Memo').AsString;
-          FStatus      := bsNone;
-        end;
-
-        Inc(nIdx);
-        Next;
-      end;
-    end;
-
-    LoadBookDetail;
-    //载入明细
+    nStr := Format('D_Book=''%s''', [FBookID]);
+    LoadBooks('', FBooks, nStr, nStr);
+    
+    for nIdx:=Low(FBooks) to High(FBooks) do
+      FBooks[nIdx].FStatus := bsNone;
+    LoadBookDetail; //载入明细
   end;
 end;
 
