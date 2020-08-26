@@ -9,17 +9,17 @@ inherited fFormBookQuery: TfFormBookQuery
   PixelsPerInch = 96
   TextHeight = 12
   inherited dxLayout1: TdxLayoutControl
-    Width = 590
-    Height = 566
+    Width = 582
+    Height = 554
     ParentFont = False
     inherited BtnOK: TButton
-      Left = 444
-      Top = 533
+      Left = 436
+      Top = 521
       TabOrder = 20
     end
     inherited BtnExit: TButton
-      Left = 514
-      Top = 533
+      Left = 506
+      Top = 521
       Caption = #20851#38381
       TabOrder = 21
     end
@@ -256,7 +256,7 @@ inherited fFormBookQuery: TfFormBookQuery
     end
     object ListDetail: TcxListView [19]
       Left = 23
-      Top = 327
+      Top = 386
       Width = 121
       Height = 97
       Columns = <

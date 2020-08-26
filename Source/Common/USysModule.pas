@@ -12,7 +12,8 @@ uses
   UFrameLog, UFrameSysLog, UFormIncInfo, UFormBackupSQL, UFormRestoreSQL,
   UFormPassword, UFrameBaseInfo, UFormBaseInfo, UFrameMembers, UFormMembers,
   UFormIOMoney, UFrameBooks, UFormBooks, UFrameBookInOut, UFormIOBook,
-  UFrameBookBorrow, UFormBookBorrow, UFormBookQuery;
+  UFrameBookBorrow, UFormBookBorrow, UFormBookQuery, UFrameIOMoney,
+  UFramePlayGoods, UFormPlayArea, UFormSaleGoods;
 
 procedure InitSystemObject;
 procedure RunSystemObject;

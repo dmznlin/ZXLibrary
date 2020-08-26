@@ -15,22 +15,6 @@ uses
   cxDBLookupEdit, cxDBLookupComboBox, ComCtrls, cxListView, ImgList;
 
 type
-  PMemberData = ^TMemberData;
-  TMemberData = record
-    FMember: string;
-    FName: string;
-    FCard: string;
-    FPhone: string;
-    FLevel: string;
-    FValidDate: TDateTime;
-
-    FMonCH: Integer;
-    FMonEN: Integer;
-    FMonth: string;
-    FMonCHHas: Integer;
-    FMonENHas: Integer;
-  end;
-
   TfFormBookBorrow = class(TfFormNormal)
     dxGroup3: TdxLayoutGroup;
     EditMem: TcxLookupComboBox;
@@ -181,7 +165,9 @@ var nStr,nTmp: string;
     nDStr: TDynamicStrArray;
     nItem: TLookupComboBoxItem;
 begin
+  BtnOK.Enabled := False;
   ActiveControl := EditMem;
+  
   if not Assigned(gLookupComboBoxAdapter) then
     gLookupComboBoxAdapter := TLookupComboBoxAdapter.Create(FDM.ADOConn);
   //xxxxx

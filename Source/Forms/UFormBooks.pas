@@ -8,7 +8,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, UFormNormal, cxGraphics, cxControls, cxLookAndFeels,
+  USysBusiness, UFormNormal, cxGraphics, cxControls, cxLookAndFeels,
   cxLookAndFeelPainters, dxSkinsCore, dxSkinsDefaultPainters,
   dxLayoutControl, StdCtrls, cxContainer, cxEdit, cxMemo, cxTextEdit,
   cxMaskEdit, cxDropDownEdit, cxCheckBox, cxLabel, cxRadioGroup, cxCalendar,
@@ -16,26 +16,6 @@ uses
   cxListView, Menus, cxButtons, ImgList;
 
 type
-  TBookStatus = (bsNone, bsNew, bsEdit, bsDel);
-  //Í¼Êé×´Ì¬
-
-  TBookItem = record
-    FRecord      : string;
-    FISBN        : string;
-    FName        : string;
-    FPublisher   : string;
-    FProvider    : string;
-    FPubPrice    : Double;
-    FGetPrice    : Double;
-    FSalePrice   : Double;
-    FNumAll      : Integer;
-    FNumIn       : Integer;
-    FNumOut      : Integer;
-    FValid       : string;
-    FMemo        : string;
-    FStatus      : TBookStatus;
-  end;
-
   TfFormBooks = class(TfFormNormal)
     EditISBN: TcxTextEdit;
     dxLayout1Item4: TdxLayoutItem;
@@ -142,7 +122,7 @@ implementation
 {$R *.dfm}
 uses
   ULibFun, UFormCtrl, UFormBase, UMgrControl, UMgrLookupAdapter, UDataModule,
-  USysBusiness, USysGrid, USysDB, USysConst;
+  USysGrid, USysDB, USysConst;
 
 class function TfFormBooks.CreateForm(const nPopedom: string;
   const nParam: Pointer): TWinControl;
@@ -348,7 +328,7 @@ begin
           FNumAll      := FieldByName('D_NumAll').AsInteger;
           FNumIn       := FieldByName('D_NumIn').AsInteger;
           FNumOut      := FieldByName('D_NumOut').AsInteger;
-          FValid       := FieldByName('D_Valid').AsString;
+          FValid       := FieldByName('D_Valid').AsString = sFlag_Yes;
           FMemo        := FieldByName('D_Memo').AsString;
           FStatus      := bsNone;
         end;
@@ -408,7 +388,7 @@ begin
         SubItems.Add(Format('%.2f', [FPubPrice]));
         SubItems.Add(IntToStr(FNumAll));
 
-        if FValid = sFlag_Yes then
+        if FValid then
              SubItems.Add('Õý³£')
         else SubItems.Add('½ûÖ¹');
 
@@ -522,12 +502,9 @@ begin
     FNumAll      := StrToInt(EditNumAll.Text);
     FNumIn       := StrToInt(EditNumIn.Text);
     FNumOut      := StrToInt(EditNumOut.Text);
-
-    if RadioNormal.Checked then
-         FValid := sFlag_Yes
-    else FValid := sFlag_No;
+    FValid       := RadioNormal.Checked;
   end;
-
+  
   if Sender = BtnAdd then
   begin
     EditDName.Text := '';
@@ -586,7 +563,7 @@ begin
     EditNumIn.Text := IntToStr(FNumIn);
     EditNumOut.Text := IntToStr(FNumOut);
 
-    if FValid = sFlag_Yes then
+    if FValid then
          RadioNormal.Checked := True
     else RadioForbid.Checked := True;
   end;
@@ -749,9 +726,9 @@ begin
         SF('D_NumAll', IntToStr(FNumAll), sfVal),
         SF('D_NumIn', IntToStr(FNumIn), sfVal),
         SF('D_NumOut', IntToStr(FNumOut), sfVal),
-        SF('D_Valid', FValid),
         SF('D_Memo', FMemo),
 
+        SF_IF([SF('D_Valid', sFlag_Yes), SF('D_Valid', sFlag_No)], FValid),
         SF_IF([SF('D_ID', nID), ''], nIsNew),
         SF_IF([SF('D_Man', gSysParam.FUserID), ''], nIsNew),
         SF_IF([SF('D_Date', sField_SQLServer_Now, sfVal), ''], nIsNew)

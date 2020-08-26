@@ -11,6 +11,9 @@ uses
   UFormBase, ULibFun, UFormCtrl, USysConst, USysDB, USysLoger;
 
 type
+  TBookStatus = (bsNone, bsNew, bsEdit, bsDel);
+  //图书状态
+  
   PBookItem = ^TBookItem;
   TBookItem = record
     FEnabled     : Boolean;    //记录有效  
@@ -32,9 +35,32 @@ type
     FNumIn       : Integer;    //在库
     FNumOut      : Integer;    //借出
     FNumAfter    : Integer;
+    
     FValid       : Boolean;    //有效
+    FMemo        : string;
+    FStatus      : TBookStatus;
   end;
   TBooks = array of TBookItem;
+
+  PMemberData = ^TMemberData;
+  TMemberData = record
+    FRecord      : string;     //记录标识
+    FMember      : string;     //会员编号
+    FName        : string;     //会员名称
+    FSex         : string;     //性别
+    FCard        : string;     //会员卡号
+    FPhone       : string;     //手机号码
+    FLevel       : string;     //会员等级
+    FValidDate   : TDateTime;  //有效期
+
+    FMonCH       : Integer;    //每月可借: 中文
+    FMonEN       : Integer;    //每月可借: 英文
+    FMonth       : string;     //计数月份
+    FMonCHHas    : Integer;    //当月已借: 中文
+    FMonENHas    : Integer;    //当月已借: 英文
+    FPlayArea    : Integer;    //游玩区次数
+  end;
+  TMembers = array of TMemberData;
 
 function GetCurrentMonth: string;
 {*当前月份*}
@@ -54,7 +80,7 @@ procedure SaveBaseDataItemNoExists(const nGroup,nText: string);
 procedure SyncBookNumber(const nBookID: string);
 {*同步图书库存量*}
 function LoadBooks(const nISDN: string; var nBooks: TBooks;
-  var nHint: string): Boolean;
+  var nHint: string; nWhere: string = ''): Boolean;
 {*加载图书列表*}
 
 implementation
@@ -350,7 +376,7 @@ end;
 //Parm: isdn;图书清单;提示信息
 //Desc: 读取isdn的书单,存入nBooks
 function LoadBooks(const nISDN: string; var nBooks: TBooks;
-  var nHint: string): Boolean;
+  var nHint: string; nWhere: string): Boolean;
 var nStr: string;
     nIdx: Integer;
 begin
@@ -358,10 +384,14 @@ begin
   SetLength(nBooks, 0);
   //init default
 
+  if nWhere = '' then
+    nWhere := Format('D_ISBN=''%s''', [nISDN]);
+  //default
+
   nStr := 'Select dt.*,B_Name,B_Author,B_Lang,B_Class,B_Valid From %s dt ' +
           ' Left Join %s On B_ID=D_Book ' +
-          'Where D_ISBN=''%s''';
-  nStr := Format(nStr, [sTable_BookDetail, sTable_Books, nISDN]);
+          'Where %s';
+  nStr := Format(nStr, [sTable_BookDetail, sTable_Books, nWhere]);
 
   with FDM.QueryTemp(nStr) do
   begin

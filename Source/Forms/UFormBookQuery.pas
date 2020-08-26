@@ -8,31 +8,13 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, UFormNormal, cxGraphics, cxControls, cxLookAndFeels,
+  USysBusiness, UFormNormal, cxGraphics, cxControls, cxLookAndFeels,
   cxLookAndFeelPainters, dxSkinsCore, dxSkinsDefaultPainters,
   dxLayoutControl, StdCtrls, cxContainer, cxEdit, cxMemo, cxTextEdit,
   cxMaskEdit, cxDropDownEdit, cxCheckBox, cxLabel, cxRadioGroup, cxCalendar,
   cxGroupBox, ComCtrls, ImgList, cxListView, cxSpinEdit;
 
 type
-  TBookItem = record
-    FRecord      : string;
-    FBookID      : string;
-    FBookName    : string;
-    FDetailID    : string;
-    FAuthor      : string;
-    FISBN        : string;
-    FName        : string;
-    FPublisher   : string;
-    FProvider    : string;
-    FPubPrice    : Double;
-    FGetPrice    : Double;
-    FSalePrice   : Double;
-    FNumAll      : Integer;
-    FNumIn       : Integer;
-    FNumOut      : Integer;
-  end;
-
   TfFormBookQuery = class(TfFormNormal)
     EditISDN: TcxTextEdit;
     dxLayout1Item4: TdxLayoutItem;
@@ -95,7 +77,7 @@ type
       Selected: Boolean);
   private
     { Private declarations }
-    FBooks: array of TBookItem;
+    FBooks: TBooks;
     {*图书列表*}
     function LoadBookData(const nISDN: string): Boolean;
     procedure LoadBookDataToForm;
@@ -117,7 +99,7 @@ implementation
 
 {$R *.dfm}
 uses
-  ULibFun, UFormCtrl, UFormBase, UMgrControl, UDataModule, USysBusiness, USysDB,
+  ULibFun, UFormCtrl, UFormBase, UMgrControl, UDataModule, USysDB,
   USysGrid, USysConst;
 
 class function TfFormBookQuery.CreateForm(const nPopedom: string;
@@ -182,58 +164,17 @@ end;
 //Desc: 载入isdn对应的书目
 function TfFormBookQuery.LoadBookData(const nISDN: string): Boolean;
 var nStr: string;
-    nIdx: Integer;
 begin
-  Result := False;
-  SetLength(FBooks, 0);
+  nStr := 'D_ISBN=''%s'' Or (D_Name Like ''%%%s%%'' Or D_Py Like ''%%%s%%'')';
+  nStr := Format(nStr, [nISDN, nISDN, nISDN]);
 
-  nStr := 'Select dt.*,B_Name,B_Author From %s dt ' +
-          ' Left Join %s On B_ID=D_Book ' +
-          'Where D_ISBN=''%s'' Or (D_Name Like ''%%%s%%'' Or D_Py Like ''%%%s%%'')';
-  nStr := Format(nStr, [sTable_BookDetail, sTable_Books, nISDN, nISDN, nISDN]);
-
-  with FDM.QueryTemp(nStr) do
+  Result := LoadBooks(nISDN, FBooks, nStr, nStr);
+  if not Result then
   begin
-    if RecordCount < 1 then
-    begin
-      ApplyBook(-1, clRed);
-      ClearLabelCaption('D_NumAll', '该条码没有图书档案');
-      
-      LoadBookDataToForm();
-      Exit;
-    end;
-
-    SetLength(FBooks, RecordCount);
-    nIdx := 0;
-    First;
-
-    while not Eof do
-    begin
-      with FBooks[nIdx] do
-      begin
-        FRecord      := FieldByName('R_ID').AsString;
-        FBookID      := FieldByName('D_Book').AsString;
-        FBookName    := FieldByName('B_Name').AsString;
-        FAuthor      := FieldByName('B_Author').AsString;
-        FDetailID    := FieldByName('D_ID').AsString;
-        FISBN        := FieldByName('D_ISBN').AsString;
-        FName        := FieldByName('D_Name').AsString;
-        FPublisher   := FieldByName('D_Publisher').AsString;
-        FProvider    := FieldByName('D_Provider').AsString;
-        FPubPrice    := FieldByName('D_PubPrice').AsFloat;
-        FGetPrice    := FieldByName('D_GetPrice').AsFloat;
-        FSalePrice   := FieldByName('D_SalePrice').AsFloat;
-        FNumAll      := FieldByName('D_NumAll').AsInteger;
-        FNumIn       := FieldByName('D_NumIn').AsInteger;
-        FNumOut      := FieldByName('D_NumOut').AsInteger;
-      end;
-
-      Inc(nIdx);
-      Next;
-    end;
+    ApplyBook(-1, clRed);
+    ClearLabelCaption('D_NumAll', nStr);
+    LoadBookDataToForm();
   end;
-
-  Result := True;
 end;
 
 procedure TfFormBookQuery.LoadBookDataToForm;

@@ -36,6 +36,8 @@ const
   cFI_FrameBookInOut    = $0016;                     //图书入库
   cFI_FrameBookBorrow   = $0017;                     //图书借阅
   cFI_FrameBookReturn   = $0018;                     //图书归还
+  cFI_FrameInOutMoney   = $0019;                     //充值查询
+  cFI_FramePlayGoods    = $0020;                     //游玩零售
 
   cFI_FormBackup        = $1001;                     //数据备份
   cFI_FormRestore       = $1002;                     //数据恢复
@@ -51,6 +53,8 @@ const
   cFI_FormBookBorrow    = $1017;                     //图书借阅
   cFI_FormBookReturn    = $1018;                     //图书归还
   cFI_FormBookQuery     = $1019;                     //图书查询
+  cFI_FormPlayArea      = $1020;                     //游玩区
+  cFI_FormSaleGoods     = $1021;                     //商品零售
 
 type
   TSysParam = record
@@ -163,6 +167,9 @@ begin
   AddMenuModuleItem('MAIN_B04', cFI_FrameBookBorrow);
   AddMenuModuleItem('MAIN_B05', cFI_FrameBookBorrow);
   AddMenuModuleItem('MAIN_B06', cFI_FrameBookInOut);
+  AddMenuModuleItem('MAIN_B07', cFI_FramePlayGoods);
+
+  AddMenuModuleItem('MAIN_C02', cFI_FrameInOutMoney);
   AddMenuModuleItem('MAIN_C04', cFI_FormBookQuery, mtForm);
 end;
 

@@ -1,30 +1,31 @@
-inherited fFormBookBorrow: TfFormBookBorrow
+inherited fFormPlayArea: TfFormPlayArea
   Left = 377
   Top = 274
-  Width = 658
-  Height = 685
+  Width = 416
+  Height = 468
   BorderStyle = bsSizeable
   OnClose = FormClose
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 12
   inherited dxLayout1: TdxLayoutControl
-    Width = 642
-    Height = 646
+    Width = 400
+    Height = 429
     inherited BtnOK: TButton
-      Left = 496
-      Top = 613
-      TabOrder = 19
+      Left = 254
+      Top = 396
+      TabOrder = 16
     end
     inherited BtnExit: TButton
-      Left = 566
-      Top = 613
-      TabOrder = 20
+      Left = 324
+      Top = 396
+      TabOrder = 17
     end
     object EditMem: TcxLookupComboBox [2]
       Left = 81
       Top = 36
       ParentFont = False
+      Properties.DropDownWidth = 450
       Properties.ListColumns = <>
       Properties.OnEditValueChanged = EditMemPropertiesEditValueChanged
       Style.Font.Charset = GB2312_CHARSET
@@ -198,150 +199,31 @@ inherited fFormBookBorrow: TfFormBookBorrow
       Style.IsFontAssigned = True
       Transparent = True
     end
-    object cxLabel3: TcxLabel [15]
-      Left = 23
-      Top = 211
-      Caption = #21487' '#20511' '#38405':'
+    object EditNum: TcxSpinEdit [15]
+      Left = 81
+      Top = 246
       ParentFont = False
-      Style.Font.Charset = GB2312_CHARSET
-      Style.Font.Color = clBlack
-      Style.Font.Height = -16
-      Style.Font.Name = #23435#20307
-      Style.Font.Style = []
-      Style.IsFontAssigned = True
+      Properties.MaxValue = 10.000000000000000000
+      Properties.MinValue = -10.000000000000000000
+      TabOrder = 13
+      Value = 1
+      Width = 121
+    end
+    object Label11: TcxLabel [16]
+      Left = 23
+      Top = 271
+      Caption = #27880':'#33509#20540#20026#36127','#34920#31034#21462#28040#20250#21592#30340#28040#36153','#26435#30410#36820#22238#21040#20250#21592#24080#25143'.'
+      ParentFont = False
       Transparent = True
     end
-    object cxLabel4: TcxLabel [16]
-      Left = 104
-      Top = 211
-      Hint = 'M_CanBorrow'
-      Caption = #21487#20511#38405
-      ParentFont = False
-      Style.Font.Charset = GB2312_CHARSET
-      Style.Font.Color = clBlack
-      Style.Font.Height = -16
-      Style.Font.Name = #23435#20307
-      Style.Font.Style = []
-      Style.IsFontAssigned = True
-      Transparent = True
-    end
-    object EditISDN: TcxTextEdit [17]
+    object EditMemo: TcxMemo [17]
       Left = 81
-      Top = 280
-      ParentFont = False
-      Style.Font.Charset = DEFAULT_CHARSET
-      Style.Font.Color = clWindowText
-      Style.Font.Height = -21
-      Style.Font.Name = #23435#20307
-      Style.Font.Style = []
-      Style.IsFontAssigned = True
-      TabOrder = 15
-      OnKeyPress = EditISDNKeyPress
-      Width = 512
-    end
-    object ListBooks: TcxListView [18]
-      Left = 23
-      Top = 314
-      Width = 544
-      Height = 108
-      Columns = <
-        item
-          Caption = #22270#20070#21517#31216
-          Width = 65
-        end
-        item
-          Caption = #25152#23646#31995#21015
-          Width = 65
-        end
-        item
-          Caption = #20986#29256#21830
-          Width = 65
-        end
-        item
-          Caption = #20379#24212#21830
-          Width = 65
-        end
-        item
-          Caption = #23450#20215
-          Width = 65
-        end
-        item
-          Caption = #35821#31181
-          Width = 65
-        end
-        item
-          Caption = #20998#31867
-          Width = 65
-        end
-        item
-          Caption = #24403#21069#24211#23384
-          Width = 65
-        end>
-      HideSelection = False
-      ParentFont = False
-      ReadOnly = True
-      RowSelect = True
-      SmallImages = cxImageList1
-      Style.Edges = []
-      TabOrder = 16
-      ViewStyle = vsReport
-      OnDblClick = ListBooksDblClick
-    end
-    object ListDetail: TcxListView [19]
-      Left = 23
-      Top = 459
-      Width = 544
-      Height = 108
-      Columns = <
-        item
-          Caption = #22270#20070#21517#31216
-          Width = 65
-        end
-        item
-          Caption = #25152#23646#31995#21015
-          Width = 65
-        end
-        item
-          Caption = #20986#29256#21830
-          Width = 65
-        end
-        item
-          Caption = #20379#24212#21830
-          Width = 65
-        end
-        item
-          Caption = #23450#20215
-          Width = 65
-        end
-        item
-          Caption = #35821#31181
-          Width = 65
-        end
-        item
-          Caption = #20998#31867
-          Width = 65
-        end
-        item
-          Caption = #24403#21069#24211#23384
-          Width = 65
-        end>
-      HideSelection = False
-      ParentFont = False
-      ReadOnly = True
-      RowSelect = True
-      SmallImages = cxImageList1
-      Style.Edges = []
-      TabOrder = 17
-      ViewStyle = vsReport
-      OnDblClick = ListDetailDblClick
-    end
-    object EditMemo: TcxTextEdit [20]
-      Left = 81
-      Top = 581
+      Top = 292
       ParentFont = False
       Properties.MaxLength = 200
-      TabOrder = 18
-      Width = 121
+      TabOrder = 15
+      Height = 89
+      Width = 185
     end
     inherited dxLayout1Group_Root: TdxLayoutGroup
       inherited dxGroup1: TdxLayoutGroup
@@ -448,38 +330,17 @@ inherited fFormBookBorrow: TfFormBookBorrow
               object dxGroupLayout1Group9: TdxLayoutGroup
                 ShowCaption = False
                 Hidden = True
+                LayoutDirection = ldHorizontal
                 ShowBorder = False
-                object dxLayout1Group3: TdxLayoutGroup
+                object dxlytmLayout1Item12: TdxLayoutItem
                   ShowCaption = False
-                  Hidden = True
-                  LayoutDirection = ldHorizontal
-                  ShowBorder = False
-                  object dxlytmLayout1Item12: TdxLayoutItem
-                    ShowCaption = False
-                    Control = Label9
-                    ControlOptions.ShowBorder = False
-                  end
-                  object dxlytmLayout1Item13: TdxLayoutItem
-                    ShowCaption = False
-                    Control = Label10
-                    ControlOptions.ShowBorder = False
-                  end
+                  Control = Label9
+                  ControlOptions.ShowBorder = False
                 end
-                object dxLayout1Group4: TdxLayoutGroup
+                object dxlytmLayout1Item13: TdxLayoutItem
                   ShowCaption = False
-                  Hidden = True
-                  LayoutDirection = ldHorizontal
-                  ShowBorder = False
-                  object dxLayout1Item5: TdxLayoutItem
-                    ShowCaption = False
-                    Control = cxLabel3
-                    ControlOptions.ShowBorder = False
-                  end
-                  object dxLayout1Item6: TdxLayoutItem
-                    ShowCaption = False
-                    Control = cxLabel4
-                    ControlOptions.ShowBorder = False
-                  end
+                  Control = Label10
+                  ControlOptions.ShowBorder = False
                 end
               end
             end
@@ -487,75 +348,28 @@ inherited fFormBookBorrow: TfFormBookBorrow
         end
       end
       object dxGroup2: TdxLayoutGroup [1]
-        Caption = #22270#20070#20449#24687': '#21452#20987#30830#35748#20511#38405'.'
-        object dxLayout1Item7: TdxLayoutItem
-          Caption = #35831#25195#26465#30721':'
-          Control = EditISDN
-          ControlOptions.ShowBorder = False
-        end
-        object dxLayout1Item8: TdxLayoutItem
-          Control = ListBooks
-          ControlOptions.ShowBorder = False
-        end
-      end
-      object dxGroup3: TdxLayoutGroup [2]
         AutoAligns = [aaHorizontal]
         AlignVert = avClient
-        Caption = #20511#38405#26126#32454': '#21452#20987#21462#28040#20511#38405'.'
-        object dxLayout1Item9: TdxLayoutItem
-          AutoAligns = [aaHorizontal]
-          AlignVert = avClient
-          Control = ListDetail
+        Caption = #28216#29609#21306
+        object dxlytmLayout1Item14: TdxLayoutItem
+          Caption = #28040#36153#27425#25968':'
+          Control = EditNum
           ControlOptions.ShowBorder = False
         end
-        object dxLayout1Item10: TdxLayoutItem
+        object dxlytmLayout1Item16: TdxLayoutItem
+          Caption = 'cxLabel3'
+          ShowCaption = False
+          Control = Label11
+          ControlOptions.ShowBorder = False
+        end
+        object dxlytmLayout1Item17: TdxLayoutItem
+          AutoAligns = [aaHorizontal]
+          AlignVert = avClient
           Caption = #22791#27880#20449#24687':'
           Control = EditMemo
           ControlOptions.ShowBorder = False
         end
       end
     end
-  end
-  object cxImageList1: TcxImageList
-    FormatVersion = 1
-    DesignInfo = 22544440
-    ImageInfo = <
-      item
-        Image.Data = {
-          36040000424D3604000000000000360000002800000010000000100000000100
-          2000000000000004000000000000000000000000000000000000000000000000
-          0000000000000000000000000000000000000000000000000000000000000000
-          00000000000000000000000000000000000000000000000000008D6441B7C78F
-          5FFFC89162FFC99465FFCB9767FF926E4DB70000000000000000000000000000
-          0000000000000000000000000000000000000000000000000000C68F5FFFF2E5
-          D8FFF4E8DDFFF6EBE1FFFBF8F3FFCE9B6EFF0000000000000000000000000000
-          0000000000000000000000000000000000000000000000000000C79161FFF8F0
-          E9FFFAF4EEFFFBF7F3FFFCFAF7FFD09E70FF0000000000000000000000000000
-          0000000000000000000000000000000000000000000000000000B8865BECCB96
-          68FFCC996AFFCE9C6DFFD09D70FFC19269EC0000000000000000000000000000
-          0000000000000000000000000000000000000000000000000000C68F5FFFF2E5
-          D8FFF4E8DDFFF6EBE1FFFBF8F3FFCE9B6EFF0000000000000000000000000000
-          0000000000000000000000000000000000000000000000000000C79161FFF8F0
-          E9FFFAF4EEFFFBF7F3FFFCFAF7FFD09E70FF000000080000000F000000130000
-          0016000000170000001100000004000000000000000000000000956D49BDCB96
-          68FFCC996AFFCE9C6DFFD09D70FF9B7754BD0C498EBF1165C6FF0F63C5FF0E61
-          C4FF0D60C3FF09438BC80000001100000000552D128100000000000000000000
-          0000000000000000000000000000000000001268C8FFA3DAFFFF59BCFFFF56BB
-          FFFF53BAFFFF0E60C3FF0000001700000000A95A25FF552D1281000000000000
-          00000000000000000000000000002C1709421369C9FFB5E1FFFF5BBDFFFF59BB
-          FFFF56BAFFFF0F61C3FFAD5E2AFFAC5D28FFAA5B27FFAA5924FF000000000000
-          000000000000000000000000000000000000146ACAFFC6E8FFFFB7E2FFFFA7DC
-          FFFF97D5FFFF0F63C5FF0000001200000000AC5D28FF542D137E8D6441B7C78F
-          5FFFC89162FFC99465FFCB9767FF926E4DB70F4F97BF136ACAFF1368C9FF1267
-          C7FF1065C6FF0C4A93C60000000A00000000552F157E00000000C68F5FFFF2E5
-          D8FFF4E8DDFFF6EBE1FFFBF8F3FFCE9B6EFF0000000100000003000000050000
-          0007000000080000000700000002000000000000000000000000C79161FFF8F0
-          E9FFFAF4EEFFFBF7F3FFFCFAF7FFD09E70FF0000000000000000000000000000
-          0000000000000000000000000000000000000000000000000000956D49BDCB96
-          68FFCC996AFFCE9C6DFFD09D70FF9B7754BD0000000000000000000000000000
-          0000000000000000000000000000000000000000000000000000000000000000
-          0000000000000000000000000000000000000000000000000000000000000000
-          0000000000000000000000000000000000000000000000000000}
-      end>
   end
 end

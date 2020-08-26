@@ -103,8 +103,11 @@ begin
 
   if FFilteDate then
   begin
-    Result := ' Where (br.B_Date>=''%s'' and br.B_Date <''%s'')';
-    Result := Format(Result, [Date2Str(FStart), Date2Str(FEnd+1)]);
+    Result := ' Where ((B_DateBorrow>=''$ST'' and B_DateBorrow <''$ED'') Or ' +
+              '(B_DateReturn>=''$ST'' and B_DateReturn <''$ED''))';
+    Result := MacroValue(Result, [MI('$ST', Date2Str(FStart)),
+              MI('$ED', Date2Str(FEnd+1))]);
+    //xxxxx
   end;
 
   if FWhere <> '' then

@@ -17,11 +17,14 @@ inherited fFrameBooks: TfFrameBooks
     Top = 202
     Width = 856
     Height = 353
-    PopupMenu = PMenu1
     LevelTabs.Slants.Kind = skCutCorner
     LevelTabs.Style = 9
     RootLevelOptions.DetailTabsPosition = dtpTop
+    inherited cxView1: TcxGridDBTableView
+      PopupMenu = PMenu1
+    end
     object cxView2: TcxGridDBTableView [1]
+      PopupMenu = PMenu1
       NavigatorButtons.ConfirmDelete = False
       DataController.DataSource = DataSource2
       DataController.Summary.DefaultGroupSummaryItems = <>

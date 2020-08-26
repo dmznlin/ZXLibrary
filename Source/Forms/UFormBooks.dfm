@@ -111,6 +111,7 @@ inherited fFormBooks: TfFormBooks
       ParentFont = False
       TabOrder = 12
       Text = '0'
+      OnKeyPress = EditDNameKeyPress
       Width = 152
     end
     object EditGetPrice: TcxTextEdit [12]
@@ -119,6 +120,7 @@ inherited fFormBooks: TfFormBooks
       ParentFont = False
       TabOrder = 13
       Text = '0'
+      OnKeyPress = EditDNameKeyPress
       Width = 152
     end
     object EditSalePrice: TcxTextEdit [13]
@@ -127,6 +129,7 @@ inherited fFormBooks: TfFormBooks
       ParentFont = False
       TabOrder = 14
       Text = '0'
+      OnKeyPress = EditDNameKeyPress
       Width = 90
     end
     object cxLabel2: TcxLabel [14]
@@ -145,6 +148,7 @@ inherited fFormBooks: TfFormBooks
       ParentFont = False
       TabOrder = 17
       Text = '0'
+      OnKeyPress = EditDNameKeyPress
       Width = 90
     end
     object EditNumAll: TcxTextEdit [16]
@@ -153,6 +157,7 @@ inherited fFormBooks: TfFormBooks
       ParentFont = False
       TabOrder = 15
       Text = '0'
+      OnKeyPress = EditDNameKeyPress
       Width = 152
     end
     object EditNumIn: TcxTextEdit [17]
@@ -161,6 +166,7 @@ inherited fFormBooks: TfFormBooks
       ParentFont = False
       TabOrder = 16
       Text = '0'
+      OnKeyPress = EditDNameKeyPress
       Width = 152
     end
     object ListDetail: TcxListView [18]

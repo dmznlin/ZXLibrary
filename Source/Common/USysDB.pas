@@ -80,6 +80,7 @@ const
   sFlag_Base_Payment             = 'payment';        //基础档案: 付款方式
   sFlag_Base_BookClass           = 'bookclass';      //基础档案: 图书分类
   sFlag_Base_MemLevel            = 'memlevel';       //基础档案: 会员等级
+  sFlag_Base_Goods               = 'goods';          //基础档案: 零售商品
 
   sFlag_Language_CN               = '中文';
   sFlag_Language_EN               = '英文';
@@ -91,7 +92,7 @@ const
                                    sFlag_Member_Level_Common;
   //会员等级列表
 
-  cBaseData: array[0..7] of TNameAndValue = (
+  cBaseData: array[0..8] of TNameAndValue = (
     (FName: sFlag_Base_Lanuage;  FDesc: '语言';     FValue: sFlag_Language_Default),
     (FName: sFlag_Base_Author;   FDesc: '作者';     FValue: ''),
     (FName: sFlag_Base_Publish;  FDesc: '出版社';   FValue: ''),
@@ -99,7 +100,8 @@ const
     (FName: sFlag_Base_Age;      FDesc: '年龄段';   FValue: ''),
     (FName: sFlag_Base_MemLevel; FDesc: '会员等级'; FValue: sFlag_Member_Levels),
     (FName: sFlag_Base_Payment;  FDesc: '付款方式'; FValue: ''),
-    (FName: sFlag_Base_BookClass;FDesc: '图书分类'; FValue: '')
+    (FName: sFlag_Base_BookClass;FDesc: '图书分类'; FValue: ''),
+    (FName: sFlag_Base_Goods;    FDesc: '零售商品'; FValue: '')
   ); //基础项列表
 
 ResourceString
@@ -132,6 +134,8 @@ ResourceString
   sFlag_ID_Books      = 'Bus_Books';                 //图书档案编号
   sFlag_ID_BookDtl    = 'Bus_BookDtl';               //图书明细编号
 
+  sFlag_PlayArea      = 'yw001';                     //游玩区标识
+
   {*数据表*}
   sTable_Group        = 'Sys_Group';                 //用户组
   sTable_User         = 'Sys_User';                  //用户表
@@ -148,6 +152,8 @@ ResourceString
   sTable_BaseInfo     = 'Sys_BaseInfo';              //基础信息
   sTable_Members      = 'M_Members';                 //会员档案
   sTable_InOutMoney   = 'M_InOutMoney';              //资金明细
+  sTable_PlayGoods    = 'M_PlayGoods';               //游玩零售
+
   sTable_Books        = 'B_Books';                   //图书
   sTable_BookDetail   = 'B_BookDtl';                 //图书明细(丛书)
   sTable_BookInOut    = 'B_BookInOut';               //出入库记录
@@ -265,7 +271,7 @@ ResourceString
 
   sSQL_NewInOutMoney = 'Create Table $Table(R_ID $Inc, M_MemID varChar(15),' +
        'M_MemName varChar(80), M_Type Char(1), M_Payment varChar(100),' +
-       'M_Money Decimal(15,5), M_Man varChar(32),' +
+       'M_Money $Float, M_Man varChar(32),' +
        'M_Date DateTime, M_Memo varChar(200))';
   {-----------------------------------------------------------------------------
    出入金明细: InOutMoney
@@ -348,17 +354,35 @@ ResourceString
   sSQL_NewBookBorrow = 'Create Table $Table(R_ID $Inc, B_Member varChar(15),' +
        'B_Book varChar(15), B_BookDtl varChar(15), B_Type Char(1),' +
        'B_NumBorrow Integer, B_NumReturn Integer,' +
-       'B_Man varChar(32), B_Date DateTime, B_Memo varChar(200))';
+       'B_ManBorrow varChar(32), B_ManReturn varChar(32),' +
+       'B_DateBorrow DateTime, B_DateReturn DateTime, B_Memo varChar(200))';
   {-----------------------------------------------------------------------------
    图书借阅: BookBorrow
    *.B_Member: 会员编号
    *.B_Book,B_BookDtl: 图书编号
-   *.B_Type: 借阅/归还
+   *.B_Type: 借阅/购买
    *.B_NumBorrow: 借阅数量
    *.B_NumReturn: 归还数量
-   *.B_Man:操作人
-   *.B_Date:借出日期
+   *.B_ManBorrow,B_ManReturn:操作人
+   *.B_DateBorrow,B_DateReturn:日期
    *.B_Memo: 备注
+  -----------------------------------------------------------------------------}
+
+  sSQL_NewPlayGoods = 'Create Table $Table(R_ID $Inc, P_Member varChar(15),' +
+       'P_GoodsID varChar(32), P_GoodsName varChar(100), P_GoodsPy varChar(100),' +
+       'P_Number Integer, P_Price $Float, P_Payment varChar(100),' +
+       'P_Man varChar(32), P_Date DateTime, P_Memo varChar(200))';
+  {-----------------------------------------------------------------------------
+   游玩零售: PlayGoods
+   *.P_Member: 会员编号
+   *.P_GoodsID: 商品标识
+   *.P_GoodsName,P_GoodsPy: 商品名称
+   *.P_Number: 商品数量
+   *.P_Price: 商品价格
+   *.P_Payment: 支付方式
+   *.P_Man:操作人
+   *.P_Date:日期
+   *.P_Memo: 备注
   -----------------------------------------------------------------------------}
 
 implementation
@@ -392,6 +416,7 @@ begin
   AddSysTableItem(sTable_BookDetail, sSQL_NewBookDtl);
   AddSysTableItem(sTable_BookInOut, sSQL_NewBookInOut);
   AddSysTableItem(sTable_BookBorrow, sSQL_NewBookBorrow);
+  AddSysTableItem(sTable_PlayGoods, sSQL_NewPlayGoods);
 end;
 
 //Desc: 清理系统表

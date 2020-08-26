@@ -179,7 +179,7 @@ var nStr,nSQL: string;
 begin
   EditDate.Text := Format('%s жа %s', [Date2Str(FStart), Date2Str(FEnd)]);
 
-  nSQL := 'Select dtl.*,B_Name,B_Author From %s dtl' +
+  nSQL := 'Select dtl.*,B_Name,B_Author,B_Lang,B_Class From %s dtl' +
           ' Left Join %s b On b.B_ID=dtl.D_Book';
   nSQL := Format(nSQL, [sTable_BookDetail, sTable_Books]);
 
