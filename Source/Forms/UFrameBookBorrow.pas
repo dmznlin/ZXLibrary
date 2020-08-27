@@ -39,7 +39,6 @@ type
     procedure BtnDelClick(Sender: TObject);
   private
     { Private declarations }
-    FInOut: string;
     FStart,FEnd: TDate;
     //时间区间
     FFilteDate: Boolean;
@@ -49,7 +48,6 @@ type
     class function FrameID: integer; override;
     procedure OnCreateFrame; override;
     procedure OnDestroyFrame; override;
-    procedure OnLoadGridConfig(const nIni: TIniFile); override;
     {*基类函数*}
     function InitFormDataSQL(const nWhere: string): string; override;
     procedure AfterInitFormData; override;
@@ -80,20 +78,6 @@ procedure TfFrameBookBorrow.OnDestroyFrame;
 begin
   SaveDateRange(Name, FStart, FEnd);
   inherited;
-end;
-
-procedure TfFrameBookBorrow.OnLoadGridConfig(const nIni: TIniFile);
-begin
-  if CompareText(FPopedom, 'MAIN_B04') = 0 then
-       FInOut := sFlag_Out //借阅(借出)
-  else FInOut := sFlag_In;
-
-  FWhere := Format('B_Type=''%s''', [FInOut]);
-  if FInOut = sFlag_In then
-  begin
-    gSysEntityManager.BuildViewColumn(cxView1, 'MAIN_B04');
-    InitTableView(Name, cxView1, nIni);
-  end;
 end;
 
 function TfFrameBookBorrow.InitFormDataSQL(const nWhere: string): string;

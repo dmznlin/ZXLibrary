@@ -228,7 +228,8 @@ var nParam: TFormCommandParam;
 begin
   nParam.FCommand := cCmd_AddData;
   nParam.FParamA := nID;
-  
+  nParam.FParamB := 0;
+  nParam.FParamD := 'ÐÂ»áÔ±';
   CreateBaseFormItem(cFI_FormInOutMoney, PopedomItem, @nParam);
   Result := (nParam.FCommand = cCmd_ModalResult) and (nParam.FParamA = mrOK);
 end;

@@ -16,16 +16,6 @@ uses
   cxSpinEdit, Menus, cxButtons;
 
 type
-  TGoodsItem = record
-    FID      : string;
-    FName    : string;
-    FNum     : Integer;
-    FPrice   : Double;
-    FMoney   : Double;
-    FEnabled : Boolean;
-  end;
-  TGoods = array of TGoodsItem;
-
   TfFormSaleGoods = class(TfFormNormal)
     EditMem: TcxLookupComboBox;
     dxlytmLayout1Item3: TdxLayoutItem;
@@ -398,6 +388,7 @@ begin
   nParam.FParamA := FMember.FMID;
   nParam.FParamB := FMoneyAll;
   nParam.FParamC := sFlag_Yes;
+  nParam.FParamD := '¡„ €';
   CreateBaseFormItem(cFI_FormInOutMoney, PopedomItem, @nParam);
 
   if (nParam.FCommand <> cCmd_ModalResult) or (nParam.FParamA <> mrOK) then

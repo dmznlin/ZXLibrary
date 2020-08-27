@@ -1,24 +1,24 @@
 inherited fFormBookBorrow: TfFormBookBorrow
   Left = 377
   Top = 274
-  Width = 658
-  Height = 685
+  Width = 659
+  Height = 674
   BorderStyle = bsSizeable
   OnClose = FormClose
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 12
   inherited dxLayout1: TdxLayoutControl
-    Width = 642
-    Height = 646
+    Width = 651
+    Height = 647
     inherited BtnOK: TButton
-      Left = 496
-      Top = 613
+      Left = 505
+      Top = 614
       TabOrder = 19
     end
     inherited BtnExit: TButton
-      Left = 566
-      Top = 613
+      Left = 575
+      Top = 614
       TabOrder = 20
     end
     object EditMem: TcxLookupComboBox [2]
@@ -227,7 +227,7 @@ inherited fFormBookBorrow: TfFormBookBorrow
     end
     object EditISDN: TcxTextEdit [17]
       Left = 81
-      Top = 280
+      Top = 268
       ParentFont = False
       Style.Font.Charset = DEFAULT_CHARSET
       Style.Font.Color = clWindowText
@@ -241,7 +241,7 @@ inherited fFormBookBorrow: TfFormBookBorrow
     end
     object ListBooks: TcxListView [18]
       Left = 23
-      Top = 314
+      Top = 302
       Width = 544
       Height = 108
       Columns = <
@@ -289,7 +289,7 @@ inherited fFormBookBorrow: TfFormBookBorrow
     end
     object ListDetail: TcxListView [19]
       Left = 23
-      Top = 459
+      Top = 447
       Width = 544
       Height = 108
       Columns = <
@@ -335,13 +335,14 @@ inherited fFormBookBorrow: TfFormBookBorrow
       ViewStyle = vsReport
       OnDblClick = ListDetailDblClick
     end
-    object EditMemo: TcxTextEdit [20]
+    object EditMemo: TcxMemo [20]
       Left = 81
-      Top = 581
+      Top = 557
       ParentFont = False
       Properties.MaxLength = 200
       TabOrder = 18
-      Width = 121
+      Height = 45
+      Width = 489
     end
     inherited dxLayout1Group_Root: TdxLayoutGroup
       inherited dxGroup1: TdxLayoutGroup
@@ -508,7 +509,7 @@ inherited fFormBookBorrow: TfFormBookBorrow
           Control = ListDetail
           ControlOptions.ShowBorder = False
         end
-        object dxLayout1Item10: TdxLayoutItem
+        object dxLayout1Item11: TdxLayoutItem
           Caption = #22791#27880#20449#24687':'
           Control = EditMemo
           ControlOptions.ShowBorder = False

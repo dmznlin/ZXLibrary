@@ -1,8 +1,8 @@
 {*******************************************************************************
-  作者: dmzn@163.com 2020-08-23
-  描述: 图书借阅
+  作者: dmzn@163.com 2020-08-28
+  描述: 图书归还
 *******************************************************************************}
-unit UFormBookBorrow;
+unit UFormBookReturn;
 
 interface
 
@@ -15,7 +15,7 @@ uses
   cxDBLookupEdit, cxDBLookupComboBox, ComCtrls, cxListView, ImgList;
 
 type
-  TfFormBookBorrow = class(TfFormNormal)
+  TfFormBookReturn = class(TfFormNormal)
     dxGroup3: TdxLayoutGroup;
     EditMem: TcxLookupComboBox;
     dxlytmLayout1Item3: TdxLayoutItem;
@@ -81,12 +81,12 @@ type
     FMember: TMemberItem;
     FBookISDN: string;
     FBooks: TBooks;
-    FBooksBorrow: TBooks;
+    FBooksReturn: TBooks;
     {*数据相关*}
     procedure InitFormData(const nID: string);
     procedure LoadMember(const nData: PMemberItem = nil);
     procedure LoadListViewData(const nList: TcxListView; const nBooks: TBooks);
-    procedure BorrowBook(const nIdx: Integer);
+    procedure ReturnBook(const nIdx: Integer);
     {*界面数据*}
     procedure SetLableCaption(const nHint,nText: string);
     procedure ClearLabelCaption(const nHint: string = '';
@@ -106,7 +106,7 @@ uses
   ULibFun, UFormCtrl, UFormBase, UMgrControl, USysDB, USysConst,
   UMgrLookupAdapter, USysGrid, UDataModule;
 
-class function TfFormBookBorrow.CreateForm(const nPopedom: string;
+class function TfFormBookReturn.CreateForm(const nPopedom: string;
   const nParam: Pointer): TWinControl;
 var nP: PFormCommandParam;
 begin
@@ -115,9 +115,9 @@ begin
        nP := nParam
   else nP := nil;
 
-  with TfFormBookBorrow.Create(Application) do
+  with TfFormBookReturn.Create(Application) do
   try
-    Caption := '图书 - 借阅';
+    Caption := '图书 - 归还';
     LoadMember(nil);
     InitFormData('');
 
@@ -131,12 +131,12 @@ begin
   end;
 end;
 
-class function TfFormBookBorrow.FormID: integer;
+class function TfFormBookReturn.FormID: integer;
 begin
-  Result := cFI_FormBookBorrow;
+  Result := cFI_FormBookReturn;
 end;
 
-procedure TfFormBookBorrow.FormCreate(Sender: TObject);
+procedure TfFormBookReturn.FormCreate(Sender: TObject);
 begin
   inherited;
   dxGroup1.AlignVert := avTop;
@@ -149,7 +149,7 @@ begin
   LoadcxListViewConfig(Name, ListDetail);
 end;
 
-procedure TfFormBookBorrow.FormClose(Sender: TObject; var Action: TCloseAction);
+procedure TfFormBookReturn.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   gLookupComboBoxAdapter.DeleteGroup(Name);
   SaveFormConfig(Self);
@@ -160,13 +160,14 @@ begin
   inherited;
 end;
 
-procedure TfFormBookBorrow.InitFormData(const nID: string);
+procedure TfFormBookReturn.InitFormData(const nID: string);
 var nStr,nTmp: string;
     nDStr: TDynamicStrArray;
     nItem: TLookupComboBoxItem;
 begin
   BtnOK.Enabled := False;
   ActiveControl := EditMem;
+  EditISDN.Enabled := False;
   
   if not Assigned(gLookupComboBoxAdapter) then
     gLookupComboBoxAdapter := TLookupComboBoxAdapter.Create(FDM.ADOConn);
@@ -192,7 +193,7 @@ begin
   end;
 end;
 
-procedure TfFormBookBorrow.EditMemPropertiesEditValueChanged(Sender: TObject);
+procedure TfFormBookReturn.EditMemPropertiesEditValueChanged(Sender: TObject);
 var nStr: string;
     nMems: TMembers;
 begin
@@ -210,9 +211,10 @@ begin
   end;
 end;
 
-procedure TfFormBookBorrow.LoadMember(const nData: PMemberItem);
+procedure TfFormBookReturn.LoadMember(const nData: PMemberItem);
 var nStr: string;
 begin
+  EditISDN.Enabled := Assigned(nData);
   if not Assigned(nData) then
   begin
     ClearLabelCaption();
@@ -243,7 +245,7 @@ begin
 end;
 
 //Desc: 根据Hint设置标题
-procedure TfFormBookBorrow.SetLableCaption(const nHint, nText: string);
+procedure TfFormBookReturn.SetLableCaption(const nHint, nText: string);
 var nIdx: Integer;
 begin
   with dxLayout1 do
@@ -257,7 +259,7 @@ begin
 end;
 
 //Desc: 清理标签标题
-procedure TfFormBookBorrow.ClearLabelCaption(const nHint,nCaption: string);
+procedure TfFormBookReturn.ClearLabelCaption(const nHint,nCaption: string);
 var nStr: string;
     nIdx: Integer;
 begin
@@ -273,7 +275,7 @@ begin
   end;
 end;
 
-procedure TfFormBookBorrow.EditISDNKeyPress(Sender: TObject;
+procedure TfFormBookReturn.EditISDNKeyPress(Sender: TObject;
   var Key: Char);
 var nStr: string;
 begin
@@ -287,13 +289,13 @@ begin
       Exit;
     end;
 
-    if LoadBooks(EditISDN.Text, FBooks, nStr) then
+    if LoadBooksBorrow(FMember.FMID, EditISDN.Text, FBooks, nStr) then
     begin
       FBookISDN := EditISDN.Text;
       LoadListViewData(ListBooks, FBooks);
 
       if Length(FBooks) = 1 then
-        BorrowBook(0);
+        ReturnBook(0);
       //xxxxx
     end else
     begin
@@ -307,7 +309,7 @@ begin
 end;
 
 //Desc: 载入列表数据
-procedure TfFormBookBorrow.LoadListViewData(const nList: TcxListView;
+procedure TfFormBookReturn.LoadListViewData(const nList: TcxListView;
   const nBooks: TBooks);
 var nIdx: Integer;
 begin
@@ -336,134 +338,79 @@ begin
   end;   
 end;
 
-//Desc: 借阅索引为nIdx的图书
-procedure TfFormBookBorrow.BorrowBook(const nIdx: Integer);
+//Desc: 归还索引为nIdx的图书
+procedure TfFormBookReturn.ReturnBook(const nIdx: Integer);
 var nInt: Integer;
 begin
-  if not (FBooks[nIdx].FValid and FBooks[nIdx].FBookValid)then
-  begin
-    EditISDN.Text := '管理员已禁止借阅此书';
-    Exit;
-  end;
-
   EditISDN.Text := FBookISDN;
   EditISDN.SelectAll;
   ActiveControl := EditISDN;
 
-  if FBooks[nIdx].FNumIn < 1 then
-  begin
-    ShowMsg('库存不足', sHint);
-    Exit;
-  end;
-  
-  for nInt:=Low(FBooksBorrow) to High(FBooksBorrow) do
-   with FBooksBorrow[nInt] do
+  for nInt:=Low(FBooksReturn) to High(FBooksReturn) do
+   with FBooksReturn[nInt] do
     if FEnabled and (FRecord = FBooks[nIdx].FRecord) then
     begin
-      ShowMsg('已借阅', sHint);
+      ShowMsg('已归还', sHint);
       Exit;
     end;
 
-  nInt := Length(FBooksBorrow);
-  SetLength(FBooksBorrow, nInt + 1);
-  FBooksBorrow[nInt] := FBooks[nIdx];
-  LoadListViewData(ListDetail, FBooksBorrow);
+  nInt := Length(FBooksReturn);
+  SetLength(FBooksReturn, nInt + 1);
+  FBooksReturn[nInt] := FBooks[nIdx];
+  LoadListViewData(ListDetail, FBooksReturn);
 end;
 
-procedure TfFormBookBorrow.ListBooksDblClick(Sender: TObject);
+procedure TfFormBookReturn.ListBooksDblClick(Sender: TObject);
 var nIdx: Integer;
 begin
   if not Assigned(ListBooks.Selected) then Exit;
   nIdx := Integer(ListBooks.Selected.Data);
-  BorrowBook(nIdx);
+  ReturnBook(nIdx);
 end;
 
-procedure TfFormBookBorrow.ListDetailDblClick(Sender: TObject);
+procedure TfFormBookReturn.ListDetailDblClick(Sender: TObject);
 var nIdx: Integer;
 begin
   if not Assigned(ListDetail.Selected) then Exit;
   nIdx := Integer(ListDetail.Selected.Data);
   
-  FBooksBorrow[nIdx].FEnabled := False;
-  LoadListViewData(ListDetail, FBooksBorrow);
+  FBooksReturn[nIdx].FEnabled := False;
+  LoadListViewData(ListDetail, FBooksReturn);
 end;
 
-procedure TfFormBookBorrow.BtnOKClick(Sender: TObject);
+procedure TfFormBookReturn.BtnOKClick(Sender: TObject);
 var nStr: string;
-    nIdx,nInt: Integer;
-    nCN,nEN,nAll: Integer;
+    nIdx: Integer;
 begin
   if ListDetail.Items.Count < 1 then
   begin
-    ShowMsg('请先添加图书', sHint);
+    ShowMsg('请先归还图书', sHint);
     Exit;
   end;
-
-  nCN := 0;
-  nEN := 0;
-  nAll := 0;
-
-  for nIdx:=Low(FBooksBorrow) to High(FBooksBorrow) do
-  with FBooksBorrow[nIdx] do
-  begin
-    if not FEnabled then Continue;
-    //invalid
-
-    Inc(nAll);
-    if FLang = sFlag_Language_CN then Inc(nCN);
-    if FLang = sFlag_Language_EN then Inc(nEN);
-  end;
-
-  with FMember do
-  begin
-    nInt := nCN + FMonCHHas - FMonCH;
-    if nInt > 0 then
-    begin
-      nStr := '中文图书超出可借阅 %d 本,请减少借阅.';
-      nStr := Format(nStr, [nInt]);
-
-      ShowDlg(nStr, sWarn);
-      Exit;
-    end;
-
-    nInt := nEN + FMonENHas - FMonEN;
-    if nInt > 0 then
-    begin
-      nStr := '英文图书超出可借阅 %d 本,请减少借阅.';
-      nStr := Format(nStr, [nInt]);
-
-      ShowDlg(nStr, sWarn);
-      Exit;
-    end;
-  end; 
 
   FDM.ADOConn.BeginTrans;
   try
     FListA.Clear;
     //档案列表
 
-    for nIdx:=Low(FBooksBorrow) to High(FBooksBorrow) do
-    with FBooksBorrow[nIdx] do
+    for nIdx:=Low(FBooksReturn) to High(FBooksReturn) do
+    with FBooksReturn[nIdx] do
     begin
       if not FEnabled then Continue;
       //invalid
 
-      nStr := MakeSQLByStr([SF('B_Member', FMember.FMID),
-          SF('B_Book', FBookID),
-          SF('B_BookDtl', FDetailID),
-          SF('B_Type', sFlag_Out),
-          SF('B_NumBorrow', 1, sfVal),
-          SF('B_NumReturn', 0, sfVal),
-          SF('B_ManBorrow', gSysParam.FUserID),
-          SF('B_DateBorrow', sField_SQLServer_Now, sfVal),
+      nStr := MakeSQLByStr([
+          SF('B_NumReturn', 1, sfVal),
+          SF('B_ManReturn', gSysParam.FUserID),
+          SF('B_DateReturn', sField_SQLServer_Now, sfVal),
           SF('B_Memo', EditMemo.Text)
-        ], sTable_BookBorrow, '', True);
-      FDM.ExecuteSQL(nStr); //0.借阅记录
+        ], sTable_BookBorrow, SF('R_ID', FBorrowID), False);
+      FDM.ExecuteSQL(nStr); //0.归还记录
 
-      nStr := 'Update %s Set D_NumIn=D_NumIn-1,D_NumOut=D_NumOut+1 ' +
+      nStr := 'Update %s Set D_NumIn=D_NumIn+1,D_NumOut=D_NumOut-1 ' +
               'Where R_ID=%s';
       nStr := Format(nStr, [sTable_BookDetail, FRecord]);
-      FDM.ExecuteSQL(nStr); //1.增加借阅量
+      FDM.ExecuteSQL(nStr); //1.减少借阅量
 
       if FListA.IndexOf(FBookID) < 0 then
         FListA.Add(FBookID);
@@ -473,13 +420,6 @@ begin
     for nIdx:=FListA.Count-1 downto 0 do
       SyncBookNumber(FListA[nIdx]);
     //2.同步库存量
-
-    nStr := 'Update %s Set ' +
-            'M_BorrowNum=M_BorrowNum+1,M_BorrowBooks=M_BorrowBooks+%d,' +
-            'M_MonCHHas=M_MonCHHas+%d,M_MonENHas=M_MonENHas+%d ' +
-            'Where M_ID=''%s''';
-    nStr := Format(nStr, [sTable_Members, nAll, nCN, nEN, FMember.FMID]);
-    FDM.ExecuteSQL(nStr); //3.增加会员信息计数
 
     FDM.ADOConn.CommitTrans;
     ModalResult := mrOk;
@@ -493,5 +433,5 @@ begin
 end;
 
 initialization
-  gControlManager.RegCtrl(TfFormBookBorrow, TfFormBookBorrow.FormID);
+  gControlManager.RegCtrl(TfFormBookReturn, TfFormBookReturn.FormID);
 end.

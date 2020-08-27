@@ -68,6 +68,8 @@ type
     { Private declarations }
     FMember: TMemberItem;
     {*会员编号*}
+    FOnlyMoney: Boolean;
+    {*仅交费标记*}
     procedure InitFormData(const nOnMoney: Boolean);
     {*界面数据*}
   public
@@ -102,8 +104,10 @@ begin
 
     FMember.FMID := nP.FParamA;
     EditMoney.Text := nP.FParamB;
-    InitFormData(nP.FParamC = sFlag_Yes);
-    
+    FOnlyMoney := nP.FParamC = sFlag_Yes;
+    EditMemo.Text := nP.FParamD;
+
+    InitFormData(FOnlyMoney);    
     nP.FCommand := cCmd_ModalResult;
     nP.FParamA := ShowModal;
     nP.FParamB := EditPayment.Text;
@@ -135,9 +139,7 @@ var nStr: string;
 begin
   ActiveControl := EditMoney;
   EditValid.Enabled := False;
-
   GroupDate.Enabled := not nOnMoney;
-  EditValid.Enabled := not nOnMoney;
   EditCN.Enabled := not nOnMoney;
   EditEN.Enabled := not nOnMoney;
   EditPlay.Enabled := not nOnMoney;
@@ -235,7 +237,7 @@ begin
 end;
 
 procedure TfFormIOMoney.BtnOKClick(Sender: TObject);
-var nStr,nMemo: string;
+var nStr: string;
 begin
   if not IsDataValid then Exit;
   //verify data
@@ -252,10 +254,10 @@ begin
       SF('M_Money', EditMoney.Text, sfVal),
       SF('M_Date', sField_SQLServer_Now, sfVal),
       SF('M_Man', gSysParam.FUserID),
-      SF('M_Memo', nMemo)], sTable_InOutMoney, '', True);
+      SF('M_Memo', EditMemo.Text)], sTable_InOutMoney, '', True);
     FDM.ExecuteSQL(nStr);
 
-    if GroupDate.Enabled then
+    if not FOnlyMoney then
     begin
       nStr := MakeSQLByStr([SF('M_ValidDate', DateTime2Str(EditValid.Date)),
         SF('M_MonCH', EditCN.Text, sfVal),
@@ -268,11 +270,11 @@ begin
       if EditValid.Date <> FMember.FValidDate then
         nStr := '会员有效期: ' + Date2Str(EditValid.Date);
       if StrToInt(EditCN.Text) <> FMember.FMonCH then
-        nStr := nStr + Format(' 可借中文:[ %d>%s]', [FMember.FMonCH, EditCN.Text]);
+        nStr := nStr + Format(' 可借中文:[ %d→%s]', [FMember.FMonCH, EditCN.Text]);
       if StrToInt(EditEN.Text) <> FMember.FMonEN then
-        nStr := nStr + Format(' 可借英文:[ %d>%s]', [FMember.FMonEN, EditEN.Text]);
+        nStr := nStr + Format(' 可借英文:[ %d→%s]', [FMember.FMonEN, EditEN.Text]);
       if StrToInt(EditPlay.Text) <> FMember.FPlayArea then
-        nStr := nStr + Format(' 游玩区:[ %d>%s ]', [FMember.FPlayArea, EditPlay.Text]);
+        nStr := nStr + Format(' 游玩区:[ %d→%s ]', [FMember.FPlayArea, EditPlay.Text]);
       FDM.WriteSysLog(sFlag_Member, FMember.FMID, nStr);
     end;
 

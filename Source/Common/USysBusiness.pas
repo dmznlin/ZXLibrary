@@ -39,6 +39,12 @@ type
     FValid       : Boolean;    //允许借阅
     FBookValid   : Boolean;    //允许借阅总开关
     FStatus      : TBookStatus;//编辑状态
+
+    FBorrowID    : string;     //借阅记录          
+    FBorrowDate  : TDateTime;  //借阅时间
+    FBorrowNum   : Integer;    //借阅量
+    FReturnDate  : TDateTime;  //归还时间
+    FReturnNum   : Integer;    //归还量
     FMemo        : string;
   end;
   TBooks = array of TBookItem;
@@ -63,6 +69,16 @@ type
   end;
   TMembers = array of TMemberItem;
 
+  TGoodsItem = record
+    FEnabled     : Boolean;    //记录有效   
+    FID          : string;     //商品编号
+    FName        : string;     //商品名称
+    FNum         : Integer;    //数量
+    FPrice       : Double;     //价格
+    FMoney       : Double;     //金额
+  end;
+  TGoods = array of TGoodsItem;
+
 function GetCurrentMonth: string;
 {*当前月份*}
 function EncodePhone(const nPhone: string): string;
@@ -83,6 +99,8 @@ procedure SaveBaseDataItemNoExists(const nGroup,nText: string);
 procedure SyncBookNumber(const nBookID: string);
 {*同步图书库存量*}
 function LoadBooks(const nISDN: string; var nBooks: TBooks;
+  var nHint: string; nWhere: string = ''): Boolean;
+function LoadBooksBorrow(const nMID,nISDN: string; var nBooks: TBooks;
   var nHint: string; nWhere: string = ''): Boolean;
 {*加载图书列表*}
 function LoadMembers(const nMID: string; var nMembers: TMembers;
@@ -432,6 +450,7 @@ begin
     begin
       with nBooks[nIdx] do
       begin
+        FEnabled     := True;
         FRecord      := FieldByName('R_ID').AsString;
         FBookID      := FieldByName('D_Book').AsString;
         FBookName    := FieldByName('B_Name').AsString;
@@ -453,8 +472,87 @@ begin
         FMemo        := FieldByName('D_Memo').AsString;
 
         FValid       := FieldByName('D_Valid').AsString = sFlag_Yes;
-        FBookValid   := FieldByName('B_Valid').AsString = sFlag_Yes;
+        FBookValid   := FieldByName('B_Valid').AsString = sFlag_Yes; 
+      end;
+
+      Inc(nIdx);
+      Next;
+    end;
+  end;
+
+  Result := True;
+end;
+
+//Date: 2020-08-28
+//Parm: 会员编号;isdn;图书清单;提示细腻
+//Desc: 加载nMID借阅的nISDN书单
+function LoadBooksBorrow(const nMID,nISDN: string; var nBooks: TBooks;
+  var nHint: string; nWhere: string = ''): Boolean;
+var nStr: string;
+    nIdx: Integer;
+begin
+  Result := False;
+  SetLength(nBooks, 0);
+  //init default
+
+  if nWhere = '' then
+  begin
+    nWhere := 'B_NumBorrow > B_NumReturn And B_Member=''%s'' And D_ISBN=''%s''';
+    nWhere := Format(nWhere, [nMID, nISDN]);
+  end;
+
+  nStr := 'Select br.*,dt.*,B_Name,B_Author,B_Lang,B_Class,B_Valid,' +
+          'br.R_ID as BorrowID,dt.R_ID as DetailID From %s br ' +
+          ' Left Join %s bk on bk.B_ID=br.B_Book ' +
+          ' Left Join %s dt on dt.D_ID=br.B_BookDtl ' +
+          'Where %s';
+  nStr := Format(nStr, [sTable_BookBorrow, sTable_Books, sTable_BookDetail, nWhere]);
+
+  with FDM.QueryTemp(nStr) do
+  begin
+    if RecordCount < 1 then
+    begin
+      nHint := '该条码没有需要归还的图书';
+      Exit;
+    end;
+
+    SetLength(nBooks, RecordCount);
+    nIdx := 0;
+    First;
+
+    while not Eof do
+    begin
+      with nBooks[nIdx] do
+      begin
         FEnabled     := True;
+        FRecord      := FieldByName('DetailID').AsString;
+        FBookID      := FieldByName('D_Book').AsString;
+        FBookName    := FieldByName('B_Name').AsString;
+        FAuthor      := FieldByName('B_Author').AsString;
+        FLang        := FieldByName('B_Lang').AsString;
+        FClass       := FieldByName('B_Class').AsString;
+
+        FDetailID    := FieldByName('D_ID').AsString;
+        FISBN        := FieldByName('D_ISBN').AsString;
+        FName        := FieldByName('D_Name').AsString;
+        FPublisher   := FieldByName('D_Publisher').AsString;
+        FProvider    := FieldByName('D_Provider').AsString;
+        FPubPrice    := FieldByName('D_PubPrice').AsFloat;
+        FGetPrice    := FieldByName('D_GetPrice').AsFloat;
+        FSalePrice   := FieldByName('D_SalePrice').AsFloat;
+        FNumAll      := FieldByName('D_NumAll').AsInteger;
+        FNumIn       := FieldByName('D_NumIn').AsInteger;
+        FNumOut      := FieldByName('D_NumOut').AsInteger;
+        FMemo        := FieldByName('D_Memo').AsString;
+
+        FValid       := FieldByName('D_Valid').AsString = sFlag_Yes;
+        FBookValid   := FieldByName('B_Valid').AsString = sFlag_Yes;
+
+        FBorrowID    := FieldByName('BorrowID').AsString;
+        FBorrowDate  := FieldByName('B_DateBorrow').AsDateTime;
+        FBorrowNum   := FieldByName('B_NumBorrow').AsInteger;
+        FReturnDate  := FieldByName('B_DateReturn').AsDateTime;
+        FReturnNum   := FieldByName('B_NumReturn').AsInteger;
       end;
 
       Inc(nIdx);
