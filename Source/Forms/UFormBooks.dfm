@@ -37,6 +37,7 @@ inherited fFormBooks: TfFormBooks
       Properties.MaxLength = 100
       Properties.ReadOnly = False
       TabOrder = 1
+      OnKeyPress = EditNameKeyPress
       Width = 121
     end
     object Check1: TcxCheckBox [4]

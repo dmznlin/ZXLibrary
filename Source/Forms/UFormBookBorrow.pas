@@ -454,8 +454,8 @@ begin
           SF('B_Type', sFlag_Out),
           SF('B_NumBorrow', 1, sfVal),
           SF('B_NumReturn', 0, sfVal),
-          SF('B_Man', gSysParam.FUserID),
-          SF('B_Date', sField_SQLServer_Now, sfVal),
+          SF('B_ManBorrow', gSysParam.FUserID),
+          SF('B_DateBorrow', sField_SQLServer_Now, sfVal),
           SF('B_Memo', EditMemo.Text)
         ], sTable_BookBorrow, '', True);
       FDM.ExecuteSQL(nStr); //0.½èÔÄ¼ÇÂ¼

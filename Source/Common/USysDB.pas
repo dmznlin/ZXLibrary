@@ -135,6 +135,7 @@ ResourceString
   sFlag_ID_BookDtl    = 'Bus_BookDtl';               //图书明细编号
 
   sFlag_PlayArea      = 'yw001';                     //游玩区标识
+  sFlag_Member        = 'Member';                    //会员相关
 
   {*数据表*}
   sTable_Group        = 'Sys_Group';                 //用户组
@@ -370,7 +371,7 @@ ResourceString
 
   sSQL_NewPlayGoods = 'Create Table $Table(R_ID $Inc, P_Member varChar(15),' +
        'P_GoodsID varChar(32), P_GoodsName varChar(100), P_GoodsPy varChar(100),' +
-       'P_Number Integer, P_Price $Float, P_Payment varChar(100),' +
+       'P_Number Integer, P_Price $Float, P_Money $Float, P_Payment varChar(100),' +
        'P_Man varChar(32), P_Date DateTime, P_Memo varChar(200))';
   {-----------------------------------------------------------------------------
    游玩零售: PlayGoods
@@ -379,6 +380,7 @@ ResourceString
    *.P_GoodsName,P_GoodsPy: 商品名称
    *.P_Number: 商品数量
    *.P_Price: 商品价格
+   *.P_Money: 商品金额
    *.P_Payment: 支付方式
    *.P_Man:操作人
    *.P_Date:日期

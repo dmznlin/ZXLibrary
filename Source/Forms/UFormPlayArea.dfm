@@ -1,31 +1,32 @@
 inherited fFormPlayArea: TfFormPlayArea
   Left = 377
   Top = 274
-  Width = 416
-  Height = 468
+  Width = 410
+  Height = 460
   BorderStyle = bsSizeable
+  Constraints.MinHeight = 460
+  Constraints.MinWidth = 410
   OnClose = FormClose
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 12
   inherited dxLayout1: TdxLayoutControl
-    Width = 400
-    Height = 429
+    Width = 394
+    Height = 421
     inherited BtnOK: TButton
-      Left = 254
-      Top = 396
+      Left = 248
+      Top = 388
       TabOrder = 16
     end
     inherited BtnExit: TButton
-      Left = 324
-      Top = 396
+      Left = 318
+      Top = 388
       TabOrder = 17
     end
     object EditMem: TcxLookupComboBox [2]
       Left = 81
       Top = 36
       ParentFont = False
-      Properties.DropDownWidth = 450
       Properties.ListColumns = <>
       Properties.OnEditValueChanged = EditMemPropertiesEditValueChanged
       Style.Font.Charset = GB2312_CHARSET
@@ -201,7 +202,7 @@ inherited fFormPlayArea: TfFormPlayArea
     end
     object EditNum: TcxSpinEdit [15]
       Left = 81
-      Top = 246
+      Top = 243
       ParentFont = False
       Properties.MaxValue = 10.000000000000000000
       Properties.MinValue = -10.000000000000000000
@@ -211,14 +212,14 @@ inherited fFormPlayArea: TfFormPlayArea
     end
     object Label11: TcxLabel [16]
       Left = 23
-      Top = 271
+      Top = 268
       Caption = #27880':'#33509#20540#20026#36127','#34920#31034#21462#28040#20250#21592#30340#28040#36153','#26435#30410#36820#22238#21040#20250#21592#24080#25143'.'
       ParentFont = False
       Transparent = True
     end
     object EditMemo: TcxMemo [17]
       Left = 81
-      Top = 292
+      Top = 289
       ParentFont = False
       Properties.MaxLength = 200
       TabOrder = 15

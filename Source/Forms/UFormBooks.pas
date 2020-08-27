@@ -93,6 +93,7 @@ type
     procedure EditDNameKeyPress(Sender: TObject; var Key: Char);
     procedure EditDISBNKeyPress(Sender: TObject; var Key: Char);
     procedure EditISBNKeyPress(Sender: TObject; var Key: Char);
+    procedure EditNameKeyPress(Sender: TObject; var Key: Char);
   private
     { Private declarations }
     FRecordID: string;
@@ -237,6 +238,10 @@ begin
              [MI('B_Text', '姓名'), MI('B_Py', '助记码')], nDStr);
     gLookupComboBoxAdapter.AddItem(nItem);
     gLookupComboBoxAdapter.BindItem(nTmp, EditAuthor);
+
+    if LoadBaseDataDefault(sFlag_Base_Author, nDefault) then
+      EditAuthor.Text := nDefault.FName;
+    //xxxxx
   end;
 
   if not Assigned(EditPublisher.Properties.ListSource) then
@@ -252,6 +257,10 @@ begin
              [MI('B_Text', '名称'), MI('B_Py', '助记码')], nDStr);
     gLookupComboBoxAdapter.AddItem(nItem);
     gLookupComboBoxAdapter.BindItem(nTmp, EditPublisher);
+
+    if LoadBaseDataDefault(sFlag_Base_Publish, nDefault) then
+      EditPublisher.Text := nDefault.FName;
+    //xxxxx
   end;
 
   if not Assigned(EditProvider.Properties.ListSource) then
@@ -267,6 +276,10 @@ begin
              [MI('B_Text', '名称'), MI('B_Py', '助记码')], nDStr);
     gLookupComboBoxAdapter.AddItem(nItem);
     gLookupComboBoxAdapter.BindItem(nTmp, EditProvider);
+
+    if LoadBaseDataDefault(sFlag_Base_Provide, nDefault) then
+      EditProvider.Text := nDefault.FName;
+    //xxxxx
   end;
 
   //---------------------------------------------------------------------------
@@ -776,14 +789,6 @@ begin
 
     EditNumAll.Text := '1';
     EditNumIn.Text := '1';
-    
-    {if IsNumber(EditNumAll.Text, False) then
-         EditNumAll.Text := IntToStr(StrToInt(EditNumAll.Text) + 1)
-    else EditNumAll.Text := '1';
-
-    if IsNumber(EditNumIn.Text, False) then
-         EditNumIn.Text := IntToStr(StrToInt(EditNumIn.Text) + 1)
-    else EditNumIn.Text := '1';}
   end;
 end;
 
@@ -793,6 +798,20 @@ begin
   begin
     Key := #0;
     ActiveControl := EditName;
+  end;
+end;
+
+procedure TfFormBooks.EditNameKeyPress(Sender: TObject; var Key: Char);
+begin
+  if Key = #13 then
+  begin
+    Key := #0;
+    EditNumAll.Text := '1';
+    EditNumIn.Text := '1';
+
+    EditDISBN.Text := EditISBN.Text;
+    EditDName.Text := EditName.Text;
+    ActiveControl := EditPublisher;
   end;
 end;
 

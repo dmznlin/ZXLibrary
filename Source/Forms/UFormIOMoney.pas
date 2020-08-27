@@ -68,8 +68,7 @@ type
     { Private declarations }
     FMember: TMemberItem;
     {*会员编号*}
-    FValidDate: TDateTime;
-    procedure InitFormData(const nID: string);
+    procedure InitFormData(const nOnMoney: Boolean);
     {*界面数据*}
   public
     { Public declarations }
@@ -97,14 +96,17 @@ begin
 
   with TfFormIOMoney.Create(Application) do
   begin
-    FMember.FMID := nP.FParamA;
     if nP.FCommand = cCmd_DeleteData then
-         Caption := '会员 - 退费'
-    else Caption := '会员 - 续费';
+         Caption := '会员 - 退款'
+    else Caption := '会员 - 交款';
 
-    InitFormData('');
+    FMember.FMID := nP.FParamA;
+    EditMoney.Text := nP.FParamB;
+    InitFormData(nP.FParamC = sFlag_Yes);
+    
     nP.FCommand := cCmd_ModalResult;
-    nP.FParamA := ShowModal;;
+    nP.FParamA := ShowModal;
+    nP.FParamB := EditPayment.Text;
     Free;
   end;
 end;
@@ -126,20 +128,26 @@ begin
   inherited;
 end;
 
-procedure TfFormIOMoney.InitFormData(const nID: string);
+procedure TfFormIOMoney.InitFormData(const nOnMoney: Boolean);
 var nStr: string;
     nMems: TMembers;
     nPayment: TBaseDataItem;
 begin
   ActiveControl := EditMoney;
   EditValid.Enabled := False;
-  
+
+  GroupDate.Enabled := not nOnMoney;
+  EditValid.Enabled := not nOnMoney;
+  EditCN.Enabled := not nOnMoney;
+  EditEN.Enabled := not nOnMoney;
+  EditPlay.Enabled := not nOnMoney;
+
   if EditPayment.Properties.Items.Count < 1 then
   begin
     LoadBaseDataList(EditPayment.Properties.Items, sFlag_Base_Payment, @nPayment);
     EditPayment.ItemIndex := EditPayment.Properties.Items.IndexOf(nPayment.FName);
   end;
-
+       
   if not LoadMembers(FMember.FMID, nMems, nStr) then
   begin
     BtnOK.Enabled := False;
@@ -171,13 +179,13 @@ begin
 
   if nInt <= 0 then
   begin
-    EditValid.Date := FValidDate;
+    EditValid.Date := FMember.FValidDate;
     Exit;
   end;
 
   if RadioTui.Checked then
     nInt := nInt * (-1);
-  EditValid.Date := IncMonth(FValidDate, nInt);
+  EditValid.Date := IncMonth(FMember.FValidDate, nInt);
 end;
 
 procedure TfFormIOMoney.RadioPayClick(Sender: TObject);
@@ -234,10 +242,6 @@ begin
 
   FDM.ADOConn.BeginTrans;
   try
-    nMemo := Trim(EditMemo.Text) +
-             '设定会员有效期: ' + Date2Str(EditValid.Date);
-    //xxxxx
-
     nStr := MakeSQLByStr([SF('M_MemID', FMember.FMID),
       SF('M_MemName', FMember.FName),
       SF_IF([SF('M_Type', sFlag_In),
@@ -251,12 +255,26 @@ begin
       SF('M_Memo', nMemo)], sTable_InOutMoney, '', True);
     FDM.ExecuteSQL(nStr);
 
-    nStr := MakeSQLByStr([SF('M_ValidDate', DateTime2Str(EditValid.Date)),
-      SF('M_MonCH', EditCN.Text, sfVal),
-      SF('M_MonEN', EditEN.Text, sfVal),
-      SF('M_PlayArea', EditPlay.Text, sfVal)
-      ], sTable_Members, SF('M_ID', FMember.FMID), False);
-    FDM.ExecuteSQL(nStr);
+    if GroupDate.Enabled then
+    begin
+      nStr := MakeSQLByStr([SF('M_ValidDate', DateTime2Str(EditValid.Date)),
+        SF('M_MonCH', EditCN.Text, sfVal),
+        SF('M_MonEN', EditEN.Text, sfVal),
+        SF('M_PlayArea', EditPlay.Text, sfVal)
+        ], sTable_Members, SF('M_ID', FMember.FMID), False);
+      FDM.ExecuteSQL(nStr);
+
+      nStr := '';
+      if EditValid.Date <> FMember.FValidDate then
+        nStr := '会员有效期: ' + Date2Str(EditValid.Date);
+      if StrToInt(EditCN.Text) <> FMember.FMonCH then
+        nStr := nStr + Format(' 可借中文:[ %d>%s]', [FMember.FMonCH, EditCN.Text]);
+      if StrToInt(EditEN.Text) <> FMember.FMonEN then
+        nStr := nStr + Format(' 可借英文:[ %d>%s]', [FMember.FMonEN, EditEN.Text]);
+      if StrToInt(EditPlay.Text) <> FMember.FPlayArea then
+        nStr := nStr + Format(' 游玩区:[ %d>%s ]', [FMember.FPlayArea, EditPlay.Text]);
+      FDM.WriteSysLog(sFlag_Member, FMember.FMID, nStr);
+    end;
 
     FDM.ADOConn.CommitTrans;
     ModalResult := mrOk;

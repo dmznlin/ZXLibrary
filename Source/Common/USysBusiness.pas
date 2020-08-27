@@ -74,6 +74,8 @@ function LoadBaseDataList(const nList: TStrings; const nGroup: string;
   const nDefault: PBaseDataItem = nil): Boolean;
 function LoadBaseDataItem(const nGroup,nItem: string;
   var nValue: TBaseDataItem): Boolean;
+function LoadBaseDataDefault(const nGroup: string;
+  var nValue: TBaseDataItem): Boolean;
 procedure SaveBaseDataItem(const nValue: PBaseDataItem;
   const nOverride: Boolean = False);
 procedure SaveBaseDataItemNoExists(const nGroup,nText: string);
@@ -199,6 +201,25 @@ begin
   end;
 end;
 
+//Date: 2020-08-27
+//Parm: 数据集;值
+//Desc: 将nDS的当前记录填充到nVal中
+procedure LoadBaseDataFormDataset(const nDS: TDataSet; const nVal: PBaseDataItem);
+begin
+  with nDS, nVal^ do
+  begin
+    FRecord := FieldByName('B_ID').AsString;
+    FGroup := FieldByName('B_Group').AsString;
+    FGroupName := FieldByName('B_GroupName').AsString;
+    FName := FieldByName('B_Text').AsString;
+
+    FParamA := FieldByName('B_ParamA').AsString;
+    FParamB := FieldByName('B_ParamB').AsString;
+    FMemo := FieldByName('B_Memo').AsString;
+    FDefault := FieldByName('B_Default').AsString = sFlag_Yes;
+  end;
+end;
+
 //Date: 2020-08-17
 //Parm: 列表;档案分组;默认值
 //Desc: 读取nGroup的档案清单,存入nList
@@ -222,18 +243,8 @@ begin
 
       if Assigned(nDefault) and
          (FieldByName('B_Default').AsString = sFlag_Yes) then
-      with nDefault^ do
-      begin
-        FRecord := FieldByName('B_ID').AsString;
-        FGroup := FieldByName('B_Group').AsString;
-        FGroupName := FieldByName('B_GroupName').AsString;
-        FName := FieldByName('B_Text').AsString;
-
-        FParamA := FieldByName('B_ParamA').AsString;
-        FParamB := FieldByName('B_ParamB').AsString;
-        FMemo := FieldByName('B_Memo').AsString;
-        FDefault := FieldByName('B_Default').AsString = sFlag_Yes;
-      end;
+        LoadBaseDataFormDataset(FDM.SQLTemp, nDefault);
+      //xxxxx
       Next;
     end;
   end;
@@ -252,20 +263,28 @@ begin
   with FDM.QueryTemp(nStr) do
   begin
     Result := RecordCount > 0;
-    if not Result then Exit;
+    if Result then
+      LoadBaseDataFormDataset(FDM.SqlTemp, @nValue);
+    //xxxxx
+  end;
+end;
 
-    with nValue do
-    begin
-      FRecord := FieldByName('B_ID').AsString;
-      FGroup := FieldByName('B_Group').AsString;
-      FGroupName := FieldByName('B_GroupName').AsString;
-      FName := FieldByName('B_Text').AsString;
+//Date: 2020-08-27
+//Parm: 档案分组
+//Desc: 读取nGroup的默认项
+function LoadBaseDataDefault(const nGroup: string;
+  var nValue: TBaseDataItem): Boolean;
+var nStr: string;
+begin
+  nStr := 'Select * From %s Where B_Group=''%s'' And B_Default=''%s''';
+  nStr := Format(nStr, [sTable_BaseInfo, nGroup, sFlag_Yes]);
 
-      FParamA := FieldByName('B_ParamA').AsString;
-      FParamB := FieldByName('B_ParamB').AsString;
-      FMemo := FieldByName('B_Memo').AsString;
-      FDefault := FieldByName('B_Default').AsString = sFlag_Yes;
-    end;
+  with FDM.QueryTemp(nStr) do
+  begin
+    Result := RecordCount > 0;
+    if Result then
+      LoadBaseDataFormDataset(FDM.SqlTemp, @nValue);
+    //xxxxx
   end;
 end;
 

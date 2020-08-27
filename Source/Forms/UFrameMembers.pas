@@ -257,6 +257,7 @@ begin
 
   nParam.FCommand := cCmd_AddData;
   nParam.FParamA := SQLQuery.FieldByName('M_ID').AsString;
+  nParam.FParamB := 0;
   CreateBaseFormItem(cFI_FormInOutMoney, PopedomItem, @nParam);
 
   if (nParam.FCommand = cCmd_ModalResult) and (nParam.FParamA = mrOK) then

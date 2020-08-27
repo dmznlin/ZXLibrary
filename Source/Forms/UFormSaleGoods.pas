@@ -13,9 +13,19 @@ uses
   dxLayoutControl, StdCtrls, cxContainer, cxEdit, cxMemo, cxTextEdit,
   cxMaskEdit, cxDropDownEdit, cxCheckBox, cxLabel, cxLookupEdit,
   cxDBLookupEdit, cxDBLookupComboBox, ComCtrls, cxListView, ImgList,
-  cxSpinEdit;
+  cxSpinEdit, Menus, cxButtons;
 
 type
+  TGoodsItem = record
+    FID      : string;
+    FName    : string;
+    FNum     : Integer;
+    FPrice   : Double;
+    FMoney   : Double;
+    FEnabled : Boolean;
+  end;
+  TGoods = array of TGoodsItem;
+
   TfFormSaleGoods = class(TfFormNormal)
     EditMem: TcxLookupComboBox;
     dxlytmLayout1Item3: TdxLayoutItem;
@@ -41,12 +51,6 @@ type
     dxGroupLayout1Group6: TdxLayoutGroup;
     dxGroupLayout1Group4: TdxLayoutGroup;
     dxGroupLayout1Group7: TdxLayoutGroup;
-    dxlytmLayout1Item12: TdxLayoutItem;
-    Label9: TcxLabel;
-    dxGroupLayout1Group8: TdxLayoutGroup;
-    dxlytmLayout1Item13: TdxLayoutItem;
-    Label10: TcxLabel;
-    dxGroupLayout1Group9: TdxLayoutGroup;
     dxLayout1Item3: TdxLayoutItem;
     cxLabel1: TcxLabel;
     dxLayout1Item4: TdxLayoutItem;
@@ -58,17 +62,31 @@ type
     EditMemo: TcxMemo;
     dxlytmLayout1Item17: TdxLayoutItem;
     dxlytmLayout1Item15: TdxLayoutItem;
-    Edit1: TcxLookupComboBox;
+    EditName: TcxLookupComboBox;
+    dxlytmLayout1Item16: TdxLayoutItem;
+    ListDetail: TcxListView;
+    dxlytmLayout1Item18: TdxLayoutItem;
+    BtnAdd: TcxButton;
+    dxlytmLayout1Item19: TdxLayoutItem;
+    BtnDel: TcxButton;
+    dxGroupLayout1Group10: TdxLayoutGroup;
+    cxImageList1: TcxImageList;
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure EditMemPropertiesEditValueChanged(Sender: TObject);
     procedure BtnOKClick(Sender: TObject);
+    procedure EditNameKeyPress(Sender: TObject; var Key: Char);
+    procedure BtnAddClick(Sender: TObject);
+    procedure BtnDelClick(Sender: TObject);
   private
     { Private declarations }
     FMember: TMemberItem;
+    FGoods: TGoods;
+    FMoneyAll: Double;
     {*数据相关*}
     procedure InitFormData(const nID: string);
     procedure LoadMember(const nData: PMemberItem = nil);
+    procedure LoadGoodsDetail;
     {*界面数据*}
     procedure SetLableCaption(const nHint,nText: string);
     procedure ClearLabelCaption(const nHint: string = '';
@@ -123,12 +141,15 @@ begin
   inherited;
   dxGroup1.AlignVert := avTop;
   dxGroup2.AlignVert := avClient;
+
   LoadFormConfig(Self);
+  LoadcxListViewConfig(Name, ListDetail);
 end;
 
 procedure TfFormSaleGoods.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   gLookupComboBoxAdapter.DeleteGroup(Name);
+  SavecxListViewConfig(Name, ListDetail);
   SaveFormConfig(Self);
   inherited;
 end;
@@ -163,6 +184,25 @@ begin
     gLookupComboBoxAdapter.AddItem(nItem);
     gLookupComboBoxAdapter.BindItem(nTmp, EditMem);
   end;
+
+  if not Assigned(EditName.Properties.ListSource) then
+  begin
+    nStr := 'Select B_Text,B_Py,B_ParamA,B_ParamB From %s ' +
+            'Where B_Group=''%s''';
+    nStr := Format(nStr, [sTable_BaseInfo, sFlag_Base_Goods]);
+
+    nTmp := Name + 'GD';
+    SetLength(nDStr, 3);
+    nDStr[0] := 'B_Py';
+    nDStr[1] := 'B_ParamA';
+    nDStr[2] := 'B_ParamB';
+
+    nItem := gLookupComboBoxAdapter.MakeItem(Name, nTmp, nStr, 'B_Text', 0,
+             [MI('B_Text', '名称'), MI('B_Py', '助记码'),
+              MI('B_ParamA', '编号'), MI('B_ParamB', '价格')], nDStr);
+    gLookupComboBoxAdapter.AddItem(nItem);
+    gLookupComboBoxAdapter.BindItem(nTmp, EditName);
+  end;
 end;
 
 procedure TfFormSaleGoods.EditMemPropertiesEditValueChanged(Sender: TObject);
@@ -179,13 +219,13 @@ begin
 
     FMember := nMems[0];
     LoadMember(@FMember);
-    ActiveControl := EditNum;
+    ActiveControl := EditName;
   end;
 end;
 
 procedure TfFormSaleGoods.LoadMember(const nData: PMemberItem);
-var nStr: string;
 begin
+  BtnOK.Enabled := Assigned(nData);
   if not Assigned(nData) then
   begin
     ClearLabelCaption();
@@ -199,10 +239,54 @@ begin
     SetLableCaption('M_Phone', EncodePhone(FPhone));
     SetLableCaption('M_Level', FLevel);
     SetLableCaption('M_ValidDate', DateTime2Str(FValidDate));
+  end;
+end;
 
-    nStr := '游玩区剩余 %d 次';
-    SetLableCaption('M_Quanyi', Format(nStr, [FPlayArea]));
-    BtnOK.Enabled := FPlayArea > 0;
+procedure TfFormSaleGoods.LoadGoodsDetail;
+var nIdx,nSelected: Integer;
+begin
+  with ListDetail do
+  try
+    if Assigned(Selected) then
+         nSelected := Integer(Selected.Data)
+    else nSelected := -1;
+
+    Items.BeginUpdate;
+    Items.Clear;
+    FMoneyAll := 0;
+
+    for nIdx:=Low(FGoods) to High(FGoods) do
+     if FGoods[nIdx].FEnabled then
+      with Items.Add, FGoods[nIdx] do
+      begin
+        Caption := FID;
+        SubItems.Add(FName);
+        SubItems.Add(Format('%.2f', [FPrice]));
+        SubItems.Add(IntToStr(FNum));
+        SubItems.Add(Format('%.2f', [FMoney]));
+
+        Data := Pointer(nIdx);
+        FMoneyAll := FMoneyAll + FMoney;
+
+        if nIdx = nSelected then
+          Selected := True;
+        //xxxxx
+      end;
+
+    if FMoneyAll = 0 then
+         dxGroup2.Caption := '零售明细'
+    else dxGroup2.Caption := Format('合计: %.2f 元', [FMoneyAll]);
+  finally
+    ListDetail.Items.EndUpdate;
+  end;
+end;
+
+procedure TfFormSaleGoods.EditNameKeyPress(Sender: TObject; var Key: Char);
+begin
+  if Key = #13 then
+  begin
+    Key := #0;
+    BtnAdd.Click();
   end;
 end;
 
@@ -237,43 +321,109 @@ begin
   end;
 end;
 
-procedure TfFormSaleGoods.BtnOKClick(Sender: TObject);
+procedure TfFormSaleGoods.BtnAddClick(Sender: TObject);
 var nStr: string;
+    nInt: Integer;
 begin
-  if EditNum.Value = 0 then
+  if EditName.Text = '' then
   begin
-    ActiveControl := EditNum;
-    ShowMsg('消费次数不能为0', sHint);
+    ShowMsg('请选择商品', sHint);
     Exit;
   end;
 
-  if EditNum.Value > FMember.FPlayArea then
+  nStr := 'Select * From %s Where B_Group=''%s'' And B_Text=''%s''';
+  nStr := Format(nStr, [sTable_BaseInfo, sFlag_Base_Goods, EditName.Text]);
+  with FDM.QueryTemp(nStr) do
   begin
-    ActiveControl := EditNum;
-    ShowMsg('会员权益不足', sHint);
+    if RecordCount < 1 then
+    begin
+      ShowMsg('商品信息已丢失', sHint);
+      Exit;
+    end;
+
+    nInt := Length(FGoods);
+    SetLength(FGoods, nInt + 1);
+    with FGoods[nInt] do
+    begin
+      FEnabled := True;
+      FID := FieldByName('B_ParamA').AsString;
+      FName := FieldByName('B_Text').AsString;
+
+      nStr := FieldByName('B_ParamB').AsString;
+      if not IsNumber(nStr, True) then
+        nStr := '0';
+      FPrice := StrToFloat(nStr);
+      FNum := EditNum.Value;
+      FMoney := Float2Float(FPrice * FNum, 100, False);
+    end;
+
+    LoadGoodsDetail;
+  end; 
+end;
+
+procedure TfFormSaleGoods.BtnDelClick(Sender: TObject);
+var nIdx,nInt: Integer;
+begin
+  if not Assigned(ListDetail.Selected) then
+  begin
+    ShowMsg('请选择要删除的记录', sHint);
     Exit;
   end;
+
+  nInt := Integer(ListDetail.Selected.Data);
+  FGoods[nInt].FEnabled := False;
+  nIdx := ListDetail.ItemIndex;
+
+  LoadGoodsDetail;
+  if ListDetail.Items.Count > 0 then
+  begin
+    if ListDetail.Items.Count > nIdx then
+         ListDetail.ItemIndex := nIdx
+    else ListDetail.ItemIndex := ListDetail.Items.Count-1;
+  end;
+end;
+
+procedure TfFormSaleGoods.BtnOKClick(Sender: TObject);
+var nStr: string;
+    nIdx: Integer;
+    nParam: TFormCommandParam;
+begin
+  if ListDetail.Items.Count < 1 then
+  begin
+    ShowMsg('请添加商品', sHint);
+    Exit;
+  end;
+
+  nParam.FCommand := cCmd_AddData;
+  nParam.FParamA := FMember.FMID;
+  nParam.FParamB := FMoneyAll;
+  nParam.FParamC := sFlag_Yes;
+  CreateBaseFormItem(cFI_FormInOutMoney, PopedomItem, @nParam);
+
+  if (nParam.FCommand <> cCmd_ModalResult) or (nParam.FParamA <> mrOK) then
+    Exit;
+  //取消付款
 
   FDM.ADOConn.BeginTrans;
   try
-    nStr := MakeSQLByStr([SF('P_Member', FMember.FMID),
-        SF('P_GoodsID', sFlag_PlayArea),
-        SF('P_GoodsName', '游玩区'),
-        SF('P_GoodsPy', 'ywq'),
-        SF('P_Number', EditNum.Value, sfVal),
-        SF('P_Price', 0, sfVal),
-        SF('P_Man', gSysParam.FUserID),
-        SF('P_Date', sField_SQLServer_Now, sfVal),
-        SF('P_Memo', EditMemo.Text),
-
-        SF_IF([SF('P_Payment', '账号扣除'),
-               SF('P_Payment', '返回账号')], EditNum.Value > 0)
-      ], sTable_PlayGoods, '', True);
-    FDM.ExecuteSQL(nStr);
-
-    nStr := 'Update %s Set M_PlayArea=M_PlayArea-(%d) Where M_ID=''%s''';
-    nStr := Format(nStr, [sTable_Members, StrToInt(EditNum.Value), FMember.FMID]);
-    FDM.ExecuteSQL(nStr);
+    for nIdx:=Low(FGoods) to High(FGoods) do
+    with FGoods[nIdx] do
+    begin
+      if not FEnabled then Continue;
+      nStr := MakeSQLByStr([SF('P_Member', FMember.FMID),
+          SF('P_GoodsID', FID),
+          SF('P_GoodsName', FName),
+          SF('P_GoodsPy', GetPinYinOfStr(FName)),
+          SF('P_Number', FNum, sfVal),
+          SF('P_Price', FPrice, sfVal),
+          SF('P_Money', FMoney, sfVal),
+          SF('P_Payment', nParam.FParamB),
+          SF('P_Man', gSysParam.FUserID),
+          SF('P_Date', sField_SQLServer_Now, sfVal),
+          SF('P_Memo', EditMemo.Text)
+        ], sTable_PlayGoods, '', True);
+      FDM.ExecuteSQL(nStr);
+    end;
 
     FDM.ADOConn.CommitTrans;
     ModalResult := mrOk;
