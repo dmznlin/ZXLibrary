@@ -215,7 +215,7 @@ inherited fFormBookQuery: TfFormBookQuery
     object cxLabel15: TcxLabel [16]
       Left = 104
       Top = 120
-      Hint = 'B_Author'
+      Hint = 'D_Author'
       Caption = #22270#20070#20316#32773
       ParentFont = False
       Style.Font.Charset = GB2312_CHARSET

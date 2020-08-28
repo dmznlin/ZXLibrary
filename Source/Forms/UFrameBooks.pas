@@ -163,12 +163,12 @@ begin
 
   if (cxGrid1.ActiveLevel = cxLevel1) and (SQLQuery.RecordCount < 1) and
      (QueryDtl.RecordCount > 0) then
-    cxgrid1.ActiveLevel := cxLevel2;
+    cxGrid1.ActiveLevel := cxLevel2;
   //xxxxx
 
   if (cxGrid1.ActiveLevel = cxLevel2) and (SQLQuery.RecordCount > 0) and
      (QueryDtl.RecordCount < 1) then
-    cxgrid1.ActiveLevel := cxLevel1;
+    cxGrid1.ActiveLevel := cxLevel1;
   //xxxxx
 
 end;
@@ -227,11 +227,12 @@ begin
     EditAuthor.Text := Trim(EditAuthor.Text);
     if EditAuthor.Text = '' then Exit;
 
-    FWhere := Format('B_Author like ''%%%s%%''', [EditAuthor.Text]);
-    FWhereDtl := FWhere;
+    FWhereDtl := 'D_Author like ''%%%s%%'' Or D_AuthorPy like ''%%%s%%''';
+    FWhereDtl := Format(FWhereDtl, [EditAuthor.Text, EditAuthor.Text]);
 
     FFilteDate := False;
-    InitFormData;
+    QueryDetail(FWhereDtl);
+    cxGrid1.ActiveLevel := cxLevel2;
   end else
 
   if Sender = EditISBN then

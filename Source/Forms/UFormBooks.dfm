@@ -1,23 +1,23 @@
 inherited fFormBooks: TfFormBooks
-  Left = 371
-  Top = 300
-  ClientHeight = 670
-  ClientWidth = 692
+  Left = 402
+  Top = 209
+  ClientHeight = 711
+  ClientWidth = 684
   OnClose = FormClose
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 12
   inherited dxLayout1: TdxLayoutControl
-    Width = 692
-    Height = 670
+    Width = 684
+    Height = 711
     inherited BtnOK: TButton
-      Left = 546
-      Top = 637
+      Left = 538
+      Top = 678
       TabOrder = 27
     end
     inherited BtnExit: TButton
-      Left = 616
-      Top = 637
+      Left = 608
+      Top = 678
       TabOrder = 28
     end
     object EditISBN: TcxTextEdit [2]
@@ -42,7 +42,7 @@ inherited fFormBooks: TfFormBooks
     end
     object Check1: TcxCheckBox [4]
       Left = 11
-      Top = 637
+      Top = 678
       Caption = #36830#32493#28155#21152':'#20445#23384#21518#19981#20851#38381#31383#21475'.'
       ParentFont = False
       TabOrder = 26
@@ -51,91 +51,91 @@ inherited fFormBooks: TfFormBooks
     end
     object EditClass: TcxComboBox [5]
       Left = 81
-      Top = 86
+      Top = 61
+      ParentFont = False
+      Properties.DropDownListStyle = lsEditFixedList
+      Properties.DropDownRows = 20
+      Properties.ItemHeight = 20
+      TabOrder = 2
+      Width = 245
+    end
+    object EditLang: TcxComboBox [6]
+      Left = 389
+      Top = 61
       ParentFont = False
       Properties.DropDownListStyle = lsEditFixedList
       Properties.DropDownRows = 20
       Properties.ItemHeight = 20
       TabOrder = 3
-      Width = 245
-    end
-    object EditLang: TcxComboBox [6]
-      Left = 389
-      Top = 86
-      ParentFont = False
-      Properties.DropDownListStyle = lsEditFixedList
-      Properties.DropDownRows = 20
-      Properties.ItemHeight = 20
-      TabOrder = 4
       Width = 286
     end
     object EditMemo: TcxMemo [7]
       Left = 81
-      Top = 111
+      Top = 86
       ParentFont = False
       Properties.MaxLength = 200
-      TabOrder = 5
+      TabOrder = 4
       Height = 45
-      Width = 586
+      Width = 588
     end
     object EditAuthor: TcxLookupComboBox [8]
       Left = 81
-      Top = 61
+      Top = 241
       ParentFont = False
       Properties.DropDownListStyle = lsEditList
       Properties.ListColumns = <>
       Properties.MaxLength = 80
-      TabOrder = 2
-      Width = 145
+      TabOrder = 7
+      Width = 245
     end
     object EditDISBN: TcxTextEdit [9]
       Left = 81
-      Top = 237
+      Top = 216
       ParentFont = False
       Properties.MaxLength = 32
-      TabOrder = 6
+      TabOrder = 5
       OnKeyPress = EditDISBNKeyPress
       Width = 245
     end
     object EditDName: TcxTextEdit [10]
       Left = 389
-      Top = 237
+      Top = 216
       ParentFont = False
       Properties.MaxLength = 100
-      TabOrder = 7
+      TabOrder = 6
       OnKeyPress = EditDNameKeyPress
       Width = 121
     end
     object EditPubPrice: TcxTextEdit [11]
       Left = 81
-      Top = 347
+      Top = 326
       ParentFont = False
-      TabOrder = 12
+      TabOrder = 11
       Text = '0'
       OnKeyPress = EditDNameKeyPress
       Width = 152
     end
     object EditGetPrice: TcxTextEdit [12]
       Left = 296
-      Top = 347
+      Top = 326
       ParentFont = False
-      TabOrder = 13
+      TabOrder = 12
       Text = '0'
       OnKeyPress = EditDNameKeyPress
       Width = 152
     end
     object EditSalePrice: TcxTextEdit [13]
       Left = 511
-      Top = 347
+      Top = 326
       ParentFont = False
-      TabOrder = 14
+      TabOrder = 13
       Text = '0'
       OnKeyPress = EditDNameKeyPress
       Width = 90
     end
     object cxLabel2: TcxLabel [14]
       Left = 23
-      Top = 337
+      Top = 316
       AutoSize = False
       ParentFont = False
       Properties.LineOptions.Alignment = cxllaBottom
@@ -145,34 +145,34 @@ inherited fFormBooks: TfFormBooks
     end
     object EditNumOut: TcxTextEdit [15]
       Left = 511
-      Top = 372
+      Top = 351
       ParentFont = False
-      TabOrder = 17
+      TabOrder = 16
       Text = '0'
       OnKeyPress = EditDNameKeyPress
       Width = 90
     end
     object EditNumAll: TcxTextEdit [16]
       Left = 81
-      Top = 372
+      Top = 351
       ParentFont = False
-      TabOrder = 15
+      TabOrder = 14
       Text = '0'
       OnKeyPress = EditDNameKeyPress
       Width = 152
     end
     object EditNumIn: TcxTextEdit [17]
       Left = 296
-      Top = 372
+      Top = 351
       ParentFont = False
-      TabOrder = 16
+      TabOrder = 15
       Text = '0'
       OnKeyPress = EditDNameKeyPress
       Width = 152
     end
     object ListDetail: TcxListView [18]
       Left = 23
-      Top = 434
+      Top = 438
       Width = 121
       Height = 97
       Columns = <
@@ -215,7 +215,7 @@ inherited fFormBooks: TfFormBooks
     end
     object EditProvider: TcxLookupComboBox [19]
       Left = 81
-      Top = 287
+      Top = 291
       ParentFont = False
       Properties.DropDownListStyle = lsEditList
       Properties.ListColumns = <>
@@ -225,24 +225,24 @@ inherited fFormBooks: TfFormBooks
     end
     object EditPublisher: TcxLookupComboBox [20]
       Left = 81
-      Top = 262
+      Top = 266
       ParentFont = False
       Properties.DropDownListStyle = lsEditList
       Properties.ListColumns = <>
       Properties.MaxLength = 80
       TabOrder = 8
-      Width = 175
+      Width = 245
     end
     object cxLabel3: TcxLabel [21]
       Left = 23
-      Top = 407
+      Top = 411
       Caption = #20511#38405#29366#24577':'
       ParentFont = False
       Transparent = True
     end
     object RadioNormal: TcxRadioButton [22]
       Left = 86
-      Top = 407
+      Top = 411
       Width = 95
       Height = 17
       Caption = #27491#24120#20511#38405
@@ -253,7 +253,7 @@ inherited fFormBooks: TfFormBooks
     end
     object RadioForbid: TcxRadioButton [23]
       Left = 186
-      Top = 407
+      Top = 411
       Width = 95
       Height = 17
       Caption = #31105#27490#20511#38405
@@ -261,8 +261,8 @@ inherited fFormBooks: TfFormBooks
       TabOrder = 21
     end
     object BtnDel: TcxButton [24]
-      Left = 617
-      Top = 407
+      Left = 609
+      Top = 411
       Width = 52
       Height = 22
       Caption = #21024#38500
@@ -272,7 +272,7 @@ inherited fFormBooks: TfFormBooks
     end
     object cxLabel4: TcxLabel [25]
       Left = 23
-      Top = 397
+      Top = 401
       AutoSize = False
       ParentFont = False
       Properties.LineOptions.Alignment = cxllaBottom
@@ -281,8 +281,8 @@ inherited fFormBooks: TfFormBooks
       Width = 514
     end
     object BtnAdd: TcxButton [26]
-      Left = 503
-      Top = 407
+      Left = 495
+      Top = 411
       Width = 52
       Height = 22
       Caption = #28155#21152
@@ -292,14 +292,14 @@ inherited fFormBooks: TfFormBooks
     end
     object EditDMemo: TcxTextEdit [27]
       Left = 81
-      Top = 312
+      Top = 376
       ParentFont = False
-      TabOrder = 10
+      TabOrder = 17
       Width = 121
     end
     object BtnEdit: TcxButton [28]
-      Left = 560
-      Top = 407
+      Left = 552
+      Top = 411
       Width = 52
       Height = 22
       Caption = #35206#30422
@@ -327,11 +327,6 @@ inherited fFormBooks: TfFormBooks
             Control = EditName
             ControlOptions.ShowBorder = False
           end
-        end
-        object dxLayout1Item12: TdxLayoutItem
-          Caption = #22270#20070#20316#32773':'
-          Control = EditAuthor
-          ControlOptions.ShowBorder = False
         end
         object dxLayout1Group3: TdxLayoutGroup
           ShowCaption = False
@@ -367,11 +362,11 @@ inherited fFormBooks: TfFormBooks
           ShowCaption = False
           Hidden = True
           ShowBorder = False
-          object dxLayout1Group11: TdxLayoutGroup
+          object dxLayout1Group6: TdxLayoutGroup
             ShowCaption = False
             Hidden = True
             ShowBorder = False
-            object dxLayout1Group6: TdxLayoutGroup
+            object dxGroupLayout1Group5: TdxLayoutGroup
               ShowCaption = False
               Hidden = True
               LayoutDirection = ldHorizontal
@@ -389,23 +384,28 @@ inherited fFormBooks: TfFormBooks
                 ControlOptions.ShowBorder = False
               end
             end
+            object dxLayout1Item12: TdxLayoutItem
+              Caption = #22270#20070#20316#32773':'
+              Control = EditAuthor
+              ControlOptions.ShowBorder = False
+            end
+          end
+          object dxGroupLayout1Group4: TdxLayoutGroup
+            ShowCaption = False
+            Hidden = True
+            ShowBorder = False
             object dxLayout1Item26: TdxLayoutItem
               Caption = #20986' '#29256' '#21830':'
               Control = EditPublisher
               ControlOptions.ShowBorder = False
             end
-          end
-          object dxLayout1Item25: TdxLayoutItem
-            AutoAligns = [aaVertical]
-            AlignHorz = ahClient
-            Caption = #20379' '#24212' '#21830':'
-            Control = EditProvider
-            ControlOptions.ShowBorder = False
-          end
-          object dxLayout1Item10: TdxLayoutItem
-            Caption = #22791#27880#20449#24687':'
-            Control = EditDMemo
-            ControlOptions.ShowBorder = False
+            object dxLayout1Item25: TdxLayoutItem
+              AutoAligns = [aaVertical]
+              AlignHorz = ahClient
+              Caption = #20379' '#24212' '#21830':'
+              Control = EditProvider
+              ControlOptions.ShowBorder = False
+            end
           end
         end
         object dxLayout1Item20: TdxLayoutItem
@@ -452,23 +452,35 @@ inherited fFormBooks: TfFormBooks
               object dxLayout1Group13: TdxLayoutGroup
                 ShowCaption = False
                 Hidden = True
-                LayoutDirection = ldHorizontal
                 ShowBorder = False
-                object dxLayout1Item22: TdxLayoutItem
-                  Caption = #37319#36141#24635#37327':'
-                  Control = EditNumAll
-                  ControlOptions.ShowBorder = False
+                object dxGroupLayout1Group6: TdxLayoutGroup
+                  ShowCaption = False
+                  Hidden = True
+                  LayoutDirection = ldHorizontal
+                  ShowBorder = False
+                  object dxLayout1Item22: TdxLayoutItem
+                    Caption = #37319#36141#24635#37327':'
+                    Control = EditNumAll
+                    ControlOptions.ShowBorder = False
+                  end
+                  object dxLayout1Item23: TdxLayoutItem
+                    Caption = #22312#39302#25968#37327':'
+                    Control = EditNumIn
+                    ControlOptions.ShowBorder = False
+                  end
+                  object dxLayout1Item21: TdxLayoutItem
+                    AutoAligns = [aaVertical]
+                    AlignHorz = ahClient
+                    Caption = #20511#20986#25968#37327':'
+                    Control = EditNumOut
+                    ControlOptions.ShowBorder = False
+                  end
                 end
-                object dxLayout1Item23: TdxLayoutItem
-                  Caption = #22312#39302#25968#37327':'
-                  Control = EditNumIn
-                  ControlOptions.ShowBorder = False
-                end
-                object dxLayout1Item21: TdxLayoutItem
+                object dxLayout1Item10: TdxLayoutItem
                   AutoAligns = [aaVertical]
                   AlignHorz = ahClient
-                  Caption = #20511#20986#25968#37327':'
-                  Control = EditNumOut
+                  Caption = #22791#27880#20449#24687':'
+                  Control = EditDMemo
                   ControlOptions.ShowBorder = False
                 end
               end

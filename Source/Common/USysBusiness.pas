@@ -454,13 +454,13 @@ begin
         FRecord      := FieldByName('R_ID').AsString;
         FBookID      := FieldByName('D_Book').AsString;
         FBookName    := FieldByName('B_Name').AsString;
-        FAuthor      := FieldByName('B_Author').AsString;
         FLang        := FieldByName('B_Lang').AsString;
         FClass       := FieldByName('B_Class').AsString;
 
         FDetailID    := FieldByName('D_ID').AsString;
         FISBN        := FieldByName('D_ISBN').AsString;
         FName        := FieldByName('D_Name').AsString;
+        FAuthor      := FieldByName('D_Author').AsString;
         FPublisher   := FieldByName('D_Publisher').AsString;
         FProvider    := FieldByName('D_Provider').AsString;
         FPubPrice    := FieldByName('D_PubPrice').AsFloat;
@@ -528,13 +528,13 @@ begin
         FRecord      := FieldByName('DetailID').AsString;
         FBookID      := FieldByName('D_Book').AsString;
         FBookName    := FieldByName('B_Name').AsString;
-        FAuthor      := FieldByName('B_Author').AsString;
         FLang        := FieldByName('B_Lang').AsString;
         FClass       := FieldByName('B_Class').AsString;
 
         FDetailID    := FieldByName('D_ID').AsString;
         FISBN        := FieldByName('D_ISBN').AsString;
         FName        := FieldByName('D_Name').AsString;
+        FAuthor      := FieldByName('D_Author').AsString;
         FPublisher   := FieldByName('D_Publisher').AsString;
         FProvider    := FieldByName('D_Provider').AsString;
         FPubPrice    := FieldByName('D_PubPrice').AsFloat;

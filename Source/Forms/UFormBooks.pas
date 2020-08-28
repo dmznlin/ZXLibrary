@@ -62,7 +62,6 @@ type
     EditProvider: TcxLookupComboBox;
     dxLayout1Item26: TdxLayoutItem;
     EditPublisher: TcxLookupComboBox;
-    dxLayout1Group11: TdxLayoutGroup;
     dxLayout1Group6: TdxLayoutGroup;
     dxLayout1Item14: TdxLayoutItem;
     cxLabel3: TcxLabel;
@@ -84,6 +83,9 @@ type
     dxLayout1Item10: TdxLayoutItem;
     dxLayout1Item11: TdxLayoutItem;
     BtnEdit: TcxButton;
+    dxGroupLayout1Group4: TdxLayoutGroup;
+    dxGroupLayout1Group5: TdxLayoutGroup;
+    dxGroupLayout1Group6: TdxLayoutGroup;
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure BtnOKClick(Sender: TObject);
@@ -301,7 +303,6 @@ begin
 
       EditISBN.Text := FieldByName('B_ISBN').AsString;
       EditName.Text := FieldByName('B_Name').AsString;
-      EditAuthor.Text := FieldByName('B_Author').AsString;
       EditClass.Text := FieldByName('B_Class').AsString;
       EditLang.Text := FieldByName('B_Lang').AsString;
       EditMemo.Text := FieldByName('B_Memo').AsString;
@@ -408,6 +409,13 @@ begin
     ShowMsg('ÇëÌîÐ´Í¼ÊéÃû³Æ', sHint); Exit;
   end;
 
+  EditAuthor.Text := Trim(EditAuthor.Text);
+  if EditAuthor.Text = '' then
+  begin
+    ActiveControl := EditAuthor;
+    ShowMsg('ÇëÌîÐ´×÷Õß', sHint); Exit;
+  end else
+
   if (not IsNumber(EditPubPrice.Text, True)) or
      (StrToFloat(EditPubPrice.Text) < 0) then
   begin
@@ -472,6 +480,7 @@ begin
 
     FISBN        := EditDISBN.Text;
     FName        := EditDName.Text;
+    FAuthor      := EditAuthor.Text;
     FPublisher   := EditPublisher.Text;
     FProvider    := EditProvider.Text;
     FMemo        := EditDMemo.Text;
@@ -532,6 +541,7 @@ begin
   begin
     EditDISBN.Text := FISBN;
     EditDName.Text := FName;
+    EditAuthor.Text := FAuthor;
     EditPublisher.Text := FPublisher;
     EditProvider.Text := FProvider;
     EditDMemo.Text := FMemo;
@@ -598,13 +608,6 @@ begin
     nHint := 'ÇëÌîÐ´Í¼ÊéÃû³Æ';
   end else
 
-  if Sender = EditAuthor then
-  begin
-    EditAuthor.Text := Trim(EditAuthor.Text);
-    Result := EditAuthor.Text <> '';
-    nHint := 'ÇëÌîÐ´×÷Õß';
-  end else
-
   if Sender = EditClass then
   begin
     Result := EditClass.Text <> '';
@@ -641,7 +644,7 @@ begin
       SF('B_Name', EditName.Text),
       SF('B_Py', GetPinYinOfStr(EditName.Text)),
 
-      SF('B_Author', EditAuthor.Text),
+      //SF('B_Author', EditAuthor.Text),
       SF('B_Lang', EditLang.Text),
       SF('B_Class', EditClass.Text),
       SF('B_Memo', EditMemo.Text),
@@ -698,6 +701,8 @@ begin
         SF('D_ISBN', FISBN),
         SF('D_Name', FName),
         SF('D_Py', GetPinYinOfStr(FName)),
+        SF('D_Author', EditAuthor.Text),
+        SF('D_AuthorPy', GetPinYinOfStr(EditAuthor.Text)),
         SF('D_Publisher', FPublisher),
         SF('D_Provider', FProvider),
         SF('D_PubPrice', FloatToStr(FPubPrice), sfVal),
@@ -811,7 +816,7 @@ begin
 
     EditDISBN.Text := EditISBN.Text;
     EditDName.Text := EditName.Text;
-    ActiveControl := EditPublisher;
+    ActiveControl := EditAuthor;
   end;
 end;
 

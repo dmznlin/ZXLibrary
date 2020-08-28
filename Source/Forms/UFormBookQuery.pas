@@ -242,7 +242,7 @@ begin
   begin
     SetLableCaption('D_Name', FName);
     SetLableCaption('B_Name', FBookName);
-    SetLableCaption('B_Author', FAuthor);
+    SetLableCaption('D_Author', FAuthor);
     SetLableCaption('D_Publisher', FPublisher);
     SetLableCaption('D_Provider', FProvider);
     SetLableCaption('D_PubPrice', Format('%.2f Ԫ', [FPubPrice]));

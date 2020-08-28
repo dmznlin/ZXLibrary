@@ -9,17 +9,17 @@ inherited fFormIOBook: TfFormIOBook
   PixelsPerInch = 96
   TextHeight = 12
   inherited dxLayout1: TdxLayoutControl
-    Width = 590
-    Height = 566
+    Width = 582
+    Height = 554
     ParentFont = False
     inherited BtnOK: TButton
-      Left = 444
-      Top = 533
+      Left = 436
+      Top = 521
       TabOrder = 24
     end
     inherited BtnExit: TButton
-      Left = 514
-      Top = 533
+      Left = 506
+      Top = 521
       Caption = #20851#38381
       TabOrder = 25
     end
@@ -215,7 +215,7 @@ inherited fFormIOBook: TfFormIOBook
     object cxLabel15: TcxLabel [16]
       Left = 104
       Top = 120
-      Hint = 'B_Author'
+      Hint = 'D_Author'
       Caption = #22270#20070#20316#32773
       ParentFont = False
       Style.Font.Charset = GB2312_CHARSET
@@ -256,7 +256,7 @@ inherited fFormIOBook: TfFormIOBook
     end
     object ListDetail: TcxListView [19]
       Left = 23
-      Top = 413
+      Top = 406
       Width = 121
       Height = 97
       Columns = <
@@ -302,21 +302,21 @@ inherited fFormIOBook: TfFormIOBook
     end
     object cxLabel3: TcxLabel [20]
       Left = 166
-      Top = 342
+      Top = 335
       Caption = #27880': '#27599#27425#25195#30721#30340#20986#20837#24211#22686#20943#37327', '#35831#22312#25195#30721#21069#35774#32622'.'
       ParentFont = False
       Transparent = True
     end
     object cxLabel18: TcxLabel [21]
       Left = 23
-      Top = 392
+      Top = 385
       Caption = #24403#22810#26412#22270#20070#20849#29992#19968#20010#26465#30721#26102','#35831#36873#20013#19979#38754#21015#34920#20013#30340#22270#20070','#28982#21518#28857#20987'"'#20445#23384'"'#25353#38062'.'
       ParentFont = False
       Transparent = True
     end
     object EditMemo: TcxTextEdit [22]
       Left = 81
-      Top = 367
+      Top = 360
       ParentFont = False
       Properties.MaxLength = 200
       TabOrder = 21
@@ -351,7 +351,7 @@ inherited fFormIOBook: TfFormIOBook
     end
     object EditNum: TcxSpinEdit [25]
       Left = 81
-      Top = 342
+      Top = 335
       ParentFont = False
       Properties.MaxValue = 9999.000000000000000000
       Properties.MinValue = 1.000000000000000000

@@ -312,6 +312,7 @@ ResourceString
   sSQL_NewBookDtl = 'Create Table $Table(R_ID $Inc, D_ID varChar(15),' +
        'D_Book varChar(15), D_ISBN varChar(32),' +
        'D_Name varChar(100), D_Py varChar(100),' +
+       'D_Author varChar(80), D_AuthorPy varChar(80),' +
        'D_Publisher varChar(80), D_PubTime varChar(80), D_Provider varChar(80),' +
        'D_PubPrice $Float, D_GetPrice $Float, D_SalePrice $Float,' +
        'D_NumAll Integer, D_NumIn Integer, D_NumOut Integer,' +
@@ -323,6 +324,7 @@ ResourceString
    *.D_Book: 图书档案
    *.D_ISBN: isbn
    *.D_Name,D_Py: 图书名称
+   *.D_Author,D_AuthorPy:作者
    *.D_Publisher:出版商
    *.D_PubTime:版次
    *.D_Provider:供应商
