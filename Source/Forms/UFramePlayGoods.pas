@@ -29,6 +29,8 @@ type
     dxLayout1Item5: TdxLayoutItem;
     dxLayout1Item7: TdxLayoutItem;
     EditDate: TcxButtonEdit;
+    dxlytmLayout1Item1: TdxLayoutItem;
+    EditGoods: TcxButtonEdit;
     procedure EditNamePropertiesButtonClick(Sender: TObject;
       AButtonIndex: Integer);
     procedure EditDatePropertiesButtonClick(Sender: TObject;
@@ -121,7 +123,18 @@ begin
               'M_Card like ''%%$Name%%'' Or M_Phone like ''%%$Name%%''';
     FWhere := MacroValue(FWhere, [MI('$Name', EditName.Text)]);
     InitFormData(FWhere);
-  end;
+  end else
+
+  if Sender = EditGoods then
+  begin
+    EditGoods.Text := Trim(EditGoods.Text);
+    if EditGoods.Text = '' then Exit;
+    FFilteDate := False;
+
+    FWhere := 'P_GoodsName like ''%%$Name%%'' Or P_GoodsPy like ''%%$Name%%''';
+    FWhere := MacroValue(FWhere, [MI('$Name', EditGoods.Text)]);
+    InitFormData(FWhere);
+  end
 end;
 
 //Desc: ÈÕÆÚÉ¸Ñ¡

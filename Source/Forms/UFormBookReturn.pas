@@ -328,7 +328,7 @@ begin
         SubItems.Add(FloatToStr(FPubPrice));
         SubItems.Add(FLang);
         SubItems.Add(FClass);
-        SubItems.Add(IntToStr(FNumAll - FNumOut));
+        SubItems.Add(IntToStr(FBorrowNum));
       end;
   finally
     nList.Items.EndUpdate;
@@ -399,12 +399,17 @@ begin
       if not FEnabled then Continue;
       //invalid
 
+      nStr := '(case when B_NumBorrow>B_NumReturn+1 then B_Type else ''%s'' end)';
+      nStr := Format(nStr, [sFlag_In]);
+      //更新归还标记
+
       nStr := MakeSQLByStr([
-          SF('B_NumReturn', 1, sfVal),
+          SF('B_Type', nStr, sfVal),
+          SF('B_NumReturn', 'B_NumReturn+1', sfVal),
           SF('B_ManReturn', gSysParam.FUserID),
           SF('B_DateReturn', sField_SQLServer_Now, sfVal),
           SF('B_Memo', EditMemo.Text)
-        ], sTable_BookBorrow, SF('R_ID', FBorrowID), False);
+        ], sTable_BookBorrow, SF('R_ID', FBorrowID, sfVal), False);
       FDM.ExecuteSQL(nStr); //0.归还记录
 
       nStr := 'Update %s Set D_NumIn=D_NumIn+1,D_NumOut=D_NumOut-1 ' +

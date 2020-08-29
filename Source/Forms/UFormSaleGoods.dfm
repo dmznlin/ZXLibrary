@@ -11,23 +11,22 @@ inherited fFormSaleGoods: TfFormSaleGoods
   PixelsPerInch = 96
   TextHeight = 12
   inherited dxLayout1: TdxLayoutControl
-    Width = 402
-    Height = 433
+    Width = 394
+    Height = 421
     inherited BtnOK: TButton
-      Left = 256
-      Top = 400
+      Left = 248
+      Top = 388
       TabOrder = 17
     end
     inherited BtnExit: TButton
-      Left = 326
-      Top = 400
+      Left = 318
+      Top = 388
       TabOrder = 18
     end
     object EditMem: TcxLookupComboBox [2]
       Left = 81
       Top = 36
       ParentFont = False
-      Properties.DropDownWidth = 450
       Properties.ListColumns = <>
       Properties.OnEditValueChanged = EditMemPropertiesEditValueChanged
       Style.Font.Charset = GB2312_CHARSET
@@ -187,7 +186,7 @@ inherited fFormSaleGoods: TfFormSaleGoods
     end
     object EditMemo: TcxMemo [14]
       Left = 81
-      Top = 343
+      Top = 331
       ParentFont = False
       Properties.MaxLength = 200
       TabOrder = 16
@@ -247,7 +246,7 @@ inherited fFormSaleGoods: TfFormSaleGoods
       ViewStyle = vsReport
     end
     object BtnAdd: TcxButton [17]
-      Left = 270
+      Left = 262
       Top = 243
       Width = 52
       Height = 22
@@ -257,7 +256,7 @@ inherited fFormSaleGoods: TfFormSaleGoods
       SpeedButtonOptions.Flat = True
     end
     object BtnDel: TcxButton [18]
-      Left = 327
+      Left = 319
       Top = 243
       Width = 52
       Height = 22

@@ -30,7 +30,7 @@ inherited fFramePlayGoods: TfFramePlayGoods
       Top = 93
       Hint = 'T.M_Name'
       ParentFont = False
-      TabOrder = 2
+      TabOrder = 3
       Width = 125
     end
     object cxTextEdit2: TcxTextEdit [1]
@@ -38,7 +38,7 @@ inherited fFramePlayGoods: TfFramePlayGoods
       Top = 93
       Hint = 'T.P_GoodsName'
       ParentFont = False
-      TabOrder = 3
+      TabOrder = 4
       Width = 125
     end
     object EditName: TcxButtonEdit [2]
@@ -60,11 +60,11 @@ inherited fFramePlayGoods: TfFramePlayGoods
       Top = 93
       Hint = 'T.P_Memo'
       ParentFont = False
-      TabOrder = 4
+      TabOrder = 5
       Width = 185
     end
     object EditDate: TcxButtonEdit [4]
-      Left = 269
+      Left = 457
       Top = 36
       ParentFont = False
       Properties.Buttons = <
@@ -74,14 +74,33 @@ inherited fFramePlayGoods: TfFramePlayGoods
         end>
       Properties.ReadOnly = True
       Properties.OnButtonClick = EditDatePropertiesButtonClick
-      TabOrder = 1
+      TabOrder = 2
       Width = 185
+    end
+    object EditGoods: TcxButtonEdit [5]
+      Left = 269
+      Top = 36
+      ParentFont = False
+      Properties.Buttons = <
+        item
+          Default = True
+          Kind = bkEllipsis
+        end>
+      Properties.OnButtonClick = EditNamePropertiesButtonClick
+      TabOrder = 1
+      OnKeyPress = OnCtrlKeyPress
+      Width = 125
     end
     inherited dxGroup1: TdxLayoutGroup
       inherited GroupSearch1: TdxLayoutGroup
         object dxLayout1Item4: TdxLayoutItem
           Caption = #20250#21592#22995#21517':'
           Control = EditName
+          ControlOptions.ShowBorder = False
+        end
+        object dxlytmLayout1Item1: TdxLayoutItem
+          Caption = #21830#21697#21517#31216':'
+          Control = EditGoods
           ControlOptions.ShowBorder = False
         end
         object dxLayout1Item7: TdxLayoutItem
