@@ -34,6 +34,8 @@ type
     FNumAll      : Integer;    //库存
     FNumIn       : Integer;    //在库
     FNumOut      : Integer;    //借出
+    FNumSale     : Integer;    //销售
+    FNumNow      : Integer;
     FNumAfter    : Integer;
     
     FValid       : Boolean;    //允许借阅
@@ -59,6 +61,11 @@ type
     FPhone       : string;     //手机号码
     FLevel       : string;     //会员等级
     FValidDate   : TDateTime;  //有效期
+
+    FBorrowNum   : Integer;    //借阅次数
+    FBorrowBooks : Integer;    //借阅本数
+    FBuyNum      : Integer;    //购买次数
+    FBuyBooks    : Integer;    //购买本书
 
     FMonCH       : Integer;    //每月可借: 中文
     FMonEN       : Integer;    //每月可借: 英文
@@ -398,19 +405,14 @@ end;
 procedure SyncBookNumber(const nBookID: string);
 var nStr: string;
 begin
-  nStr := 'Select Sum(D_NumAll) as NumAll,Sum(D_NumIn) as NumIn,' +
-          'Sum(D_NumOut) as NumOut From %s Where D_Book=''%s''';
-  nStr := Format(nStr, [sTable_BookDetail, nBookID]);
-
-  with FDM.QueryTemp(nStr) do
-  begin
-    nStr := 'Update %s Set B_NumAll=%d,B_NumIn=%d,B_NumOut=%d Where B_ID=''%s''';
-    nStr := Format(nStr, [sTable_Books,
-            FieldByName('NumAll').AsInteger,
-            FieldByName('NumIn').AsInteger,
-            FieldByName('NumOut').AsInteger, nBookID]);
-    FDM.ExecuteSQL(nStr);
-  end;
+  nStr := 'Update %s Set B_NumAll=NumAll,B_NumIn=NumIn,B_NumOut=NumOut,' +
+    'B_NumSale=NumSale From (' +
+    '  Select D_Book,Sum(D_NumAll) as NumAll,Sum(D_NumIn) as NumIn,' +
+    '  Sum(D_NumOut) as NumOut,Sum(D_NumSale) as NumSale From %s ' +
+    '  Where D_Book=''%s'' Group By D_Book' +
+    ') t Where B_ID=D_Book';
+  nStr := Format(nStr, [sTable_Books, sTable_BookDetail, nBookID]);
+  FDM.ExecuteSQL(nStr);
 end;
 
 //Date: 2020-08-24
@@ -490,6 +492,7 @@ function LoadBooksBorrow(const nMID,nISDN: string; var nBooks: TBooks;
   var nHint: string; nWhere: string = ''): Boolean;
 var nStr: string;
     nIdx: Integer;
+    nDef: TBookItem;
 begin
   Result := False;
   SetLength(nBooks, 0);
@@ -516,12 +519,16 @@ begin
       Exit;
     end;
 
+    FillChar(nDef, SizeOf(TBooks), #0);
     SetLength(nBooks, RecordCount);
     nIdx := 0;
     First;
 
     while not Eof do
     begin
+      nBooks[nIdx] := nDef;
+      //default value
+      
       with nBooks[nIdx] do
       begin
         FEnabled     := True;
@@ -543,6 +550,7 @@ begin
         FNumAll      := FieldByName('D_NumAll').AsInteger;
         FNumIn       := FieldByName('D_NumIn').AsInteger;
         FNumOut      := FieldByName('D_NumOut').AsInteger;
+        FNumSale     := FieldByName('D_NumSale').AsInteger;
         FMemo        := FieldByName('D_Memo').AsString;
 
         FValid       := FieldByName('D_Valid').AsString = sFlag_Yes;
@@ -606,6 +614,11 @@ begin
         FPhone     := FieldByName('M_Phone').AsString;
         FLevel     := FieldByName('M_Level').AsString;
         FValidDate := FieldByName('M_ValidDate').AsDateTime;
+
+        FBorrowNum := FieldByName('M_BorrowNum').AsInteger;
+        FBorrowBooks := FieldByName('M_BorrowBooks').AsInteger;
+        FBuyNum    := FieldByName('M_BuyNum').AsInteger;
+        FBuyBooks  := FieldByName('M_BuyBooks').AsInteger;
 
         FMonCH     := FieldByName('M_MonCH').AsInteger;
         FMonEN     := FieldByName('M_MonEN').AsInteger;

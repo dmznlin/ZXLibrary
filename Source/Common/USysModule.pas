@@ -13,7 +13,8 @@ uses
   UFormPassword, UFrameBaseInfo, UFormBaseInfo, UFrameMembers, UFormMembers,
   UFormIOMoney, UFrameBooks, UFormBooks, UFrameBookInOut, UFormIOBook,
   UFrameBookBorrow, UFormBookBorrow, UFormBookReturn, UFormBookQuery,
-  UFrameIOMoney, UFramePlayGoods, UFormPlayArea, UFormSaleGoods;
+  UFrameIOMoney, UFramePlayGoods, UFormPlayArea, UFormSaleGoods,
+  UFrameBookSale, UFormBookSale;
 
 procedure InitSystemObject;
 procedure RunSystemObject;

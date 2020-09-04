@@ -656,7 +656,8 @@ begin
 
       SF_IF([SF('B_NumAll', 0), ''], nIsNew),
       SF_IF([SF('B_NumIn', 0), ''], nIsNew),
-      SF_IF([SF('B_NumOut', 0), ''], nIsNew)
+      SF_IF([SF('B_NumOut', 0), ''], nIsNew),
+      SF_IF([SF('B_NumSale', 0), ''], nIsNew)
     ], sTable_Books, SF('R_ID', FRecordID, sfVal), nIsNew);
   //xxxxx
   
@@ -713,8 +714,10 @@ begin
         SF('D_NumOut', IntToStr(FNumOut), sfVal),
         SF('D_Memo', FMemo),
 
-        SF_IF([SF('D_Valid', sFlag_Yes), SF('D_Valid', sFlag_No)], FValid),
+        SF_IF([SF('D_Valid', sFlag_Yes),
+               SF('D_Valid', sFlag_No)], FValid),
         SF_IF([SF('D_ID', nID), ''], nIsNew),
+        SF_IF([SF('D_NumSale', 0, sfVal), ''], nIsNew),
         SF_IF([SF('D_Man', gSysParam.FUserID), ''], nIsNew),
         SF_IF([SF('D_Date', sField_SQLServer_Now, sfVal), ''], nIsNew)
       ], sTable_BookDetail, SF('R_ID', FRecord), nIsNew);

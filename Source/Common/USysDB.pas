@@ -159,6 +159,7 @@ ResourceString
   sTable_BookDetail   = 'B_BookDtl';                 //图书明细(丛书)
   sTable_BookInOut    = 'B_BookInOut';               //出入库记录
   sTable_BookBorrow   = 'B_BookBorrow';              //图书借阅
+  sTable_BookSale     = 'B_BookSale';                //图书销售
 
   {*新建表*}
   sSQL_NewSysDict = 'Create Table $Table(D_ID $Inc, D_Name varChar(15),' +
@@ -290,7 +291,7 @@ ResourceString
        'B_ISBN varChar(32), B_Name varChar(100), B_Py varChar(100),' +
        'B_Author varChar(80), B_Lang varChar(80), B_Class varChar(80),' +
        'B_NumAll Integer, B_NumIn Integer, B_NumOut Integer,' +
-       'B_Valid Char(1),' +
+       'B_NumSale Integer, B_Valid Char(1),' +
        'B_Man varChar(32), B_Date DateTime, B_Memo varChar(200))';
   {-----------------------------------------------------------------------------
    图书档案: Books
@@ -303,6 +304,7 @@ ResourceString
    *.B_NumAll: 总数量
    *.B_NumIn: 未出借
    *.B_NumOut: 已出借
+   *.B_NumSale: 售出量
    *.B_Valid: 有效(Y/N)
    *.B_Date:建档日期
    *.B_Man:建档人
@@ -316,7 +318,7 @@ ResourceString
        'D_Publisher varChar(80), D_PubTime varChar(80), D_Provider varChar(80),' +
        'D_PubPrice $Float, D_GetPrice $Float, D_SalePrice $Float,' +
        'D_NumAll Integer, D_NumIn Integer, D_NumOut Integer,' +
-       'D_Valid Char(1),' +
+       'D_NumSale Integer, D_Valid Char(1),' +
        'D_Man varChar(32), D_Date DateTime, D_Memo varChar(200))';
   {-----------------------------------------------------------------------------
    图书明细: BookDtl
@@ -334,6 +336,7 @@ ResourceString
    *.D_NumAll: 总数量
    *.D_NumIn: 未出借
    *.D_NumOut: 已出借
+   *.D_NumSale: 售出量
    *.D_Valid: 有效(Y/N)
    *.D_Man:入库人
    *.D_Date:入库日期
@@ -369,6 +372,20 @@ ResourceString
    *.B_ManBorrow,B_ManReturn:操作人
    *.B_DateBorrow,B_DateReturn:日期
    *.B_Memo: 备注
+  -----------------------------------------------------------------------------}
+
+  sSQL_NewBookSale = 'Create Table $Table(R_ID $Inc, S_Member varChar(15),' +
+       'S_Book varChar(15), S_BookDtl varChar(15), S_Type Char(1),' +
+       'S_Num Integer, S_Man varChar(32), S_Date DateTime, S_Memo varChar(200))';
+  {-----------------------------------------------------------------------------
+   图书销售: BookSale
+   *.S_Member: 会员编号
+   *.S_Book,S_BookDtl: 图书编号
+   *.S_Type: 销售/退还
+   *.S_Num: 数量
+   *.S_Man:操作人
+   *.S_Date:日期
+   *.S_Memo: 备注
   -----------------------------------------------------------------------------}
 
   sSQL_NewPlayGoods = 'Create Table $Table(R_ID $Inc, P_Member varChar(15),' +
@@ -420,6 +437,7 @@ begin
   AddSysTableItem(sTable_BookDetail, sSQL_NewBookDtl);
   AddSysTableItem(sTable_BookInOut, sSQL_NewBookInOut);
   AddSysTableItem(sTable_BookBorrow, sSQL_NewBookBorrow);
+  AddSysTableItem(sTable_BookSale, sSQL_NewBookSale);
   AddSysTableItem(sTable_PlayGoods, sSQL_NewPlayGoods);
 end;
 

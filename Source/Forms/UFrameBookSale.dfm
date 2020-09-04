@@ -1,10 +1,10 @@
-inherited fFrameBookBorrow: TfFrameBookBorrow
+inherited fFrameBookSale: TfFrameBookSale
   Width = 856
   Height = 555
   inherited ToolBar1: TToolBar
     Width = 856
     inherited BtnAdd: TToolButton
-      Caption = #20511#38405
+      Caption = #38144#21806
       ImageIndex = 22
       OnClick = BtnAddClick
     end
@@ -12,7 +12,7 @@ inherited fFrameBookBorrow: TfFrameBookBorrow
       Visible = False
     end
     inherited BtnDel: TToolButton
-      Caption = #24402#36824
+      Caption = #36864#22238
       ImageIndex = 23
       OnClick = BtnDelClick
     end
@@ -148,7 +148,7 @@ inherited fFrameBookBorrow: TfFrameBookBorrow
   inherited TitlePanel1: TZnBitmapPanel
     Width = 856
     inherited TitleBar: TcxLabel
-      Caption = #22270#20070#20511#38405#31649#29702
+      Caption = #22270#20070#38144#21806#31649#29702
       Style.IsFontAssigned = True
       Width = 856
       AnchorX = 428

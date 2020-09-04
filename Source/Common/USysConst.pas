@@ -15,6 +15,8 @@ const
   cSBar_User            = 2;                         //用户面板索引
   cRecMenuMax           = 5;                         //最近使用导航区最大条目数
 
+  cPrecision            = 100;                       //计算精度,两位小数
+
 const
   {*Command*}
   cCmd_RefreshData      = $0002;                     //刷新数据
@@ -35,7 +37,7 @@ const
   cFI_FrameBooks        = $0012;                     //图书管理
   cFI_FrameBookInOut    = $0016;                     //图书入库
   cFI_FrameBookBorrow   = $0017;                     //图书借阅
-  cFI_FrameBookReturn   = $0018;                     //图书归还
+  cFI_FrameBookSale     = $0018;                     //图书销售
   cFI_FrameInOutMoney   = $0019;                     //充值查询
   cFI_FramePlayGoods    = $0020;                     //游玩零售
 
@@ -50,11 +52,15 @@ const
   cFI_FormBookDetail    = $1013;                     //图书明细
   cFI_FormInOutMoney    = $1015;                     //出入金管理
   cFI_FormBookInOut     = $1016;                     //图书入库
+
   cFI_FormBookBorrow    = $1017;                     //图书借阅
   cFI_FormBookReturn    = $1018;                     //图书归还
   cFI_FormBookQuery     = $1019;                     //图书查询
-  cFI_FormPlayArea      = $1020;                     //游玩区
-  cFI_FormSaleGoods     = $1021;                     //商品零售
+  cFI_FormBookSale      = $1020;                     //图书销售
+  cFI_FormBookSaleReturn= $1021;                     //销售退回
+
+  cFI_FormPlayArea      = $1025;                     //游玩区
+  cFI_FormSaleGoods     = $1026;                     //商品零售
 
 type
   TSysParam = record
@@ -165,7 +171,7 @@ begin
   AddMenuModuleItem('MAIN_B02', cFI_FrameMembers);
   AddMenuModuleItem('MAIN_B03', cFI_FrameBooks);
   AddMenuModuleItem('MAIN_B04', cFI_FrameBookBorrow);
-  AddMenuModuleItem('MAIN_B05', cFI_FrameBookBorrow);
+  AddMenuModuleItem('MAIN_B05', cFI_FrameBookSale);
   AddMenuModuleItem('MAIN_B06', cFI_FrameBookInOut);
   AddMenuModuleItem('MAIN_B07', cFI_FramePlayGoods);
 
