@@ -1,8 +1,8 @@
 {*******************************************************************************
-  作者: dmzn@163.com 2020-09-03
-  描述: 图书销售
+  作者: dmzn@163.com 2020-09-04
+  描述: 图书销售退回
 *******************************************************************************}
-unit UFormBookSale;
+unit UFormBookSaleReturn;
 
 interface
 
@@ -15,7 +15,7 @@ uses
   cxDBLookupEdit, cxDBLookupComboBox, ComCtrls, cxListView, ImgList;
 
 type
-  TfFormBookSale = class(TfFormNormal)
+  TfFormBookSaleReturn = class(TfFormNormal)
     dxGroup3: TdxLayoutGroup;
     EditMem: TcxLookupComboBox;
     dxlytmLayout1Item3: TdxLayoutItem;
@@ -75,12 +75,12 @@ type
     FMember: TMemberItem;
     FBookISDN: string;
     FBooks: TBooks;
-    FBooksSale: TBooks;
+    FBooksReturn: TBooks;
     {*数据相关*}
     procedure InitFormData(const nID: string);
     procedure LoadMember(const nData: PMemberItem = nil);
     procedure LoadListViewData(const nList: TcxListView; const nBooks: TBooks);
-    procedure SaleBook(const nIdx: Integer);
+    procedure ReturnBook(const nIdx: Integer);
     {*界面数据*}
     procedure SetLableCaption(const nHint,nText: string);
     procedure ClearLabelCaption(const nHint: string = '';
@@ -100,7 +100,7 @@ uses
   ULibFun, UFormCtrl, UFormBase, UMgrControl, USysDB, USysConst,
   UMgrLookupAdapter, USysGrid, UDataModule;
 
-class function TfFormBookSale.CreateForm(const nPopedom: string;
+class function TfFormBookSaleReturn.CreateForm(const nPopedom: string;
   const nParam: Pointer): TWinControl;
 var nP: PFormCommandParam;
 begin
@@ -109,9 +109,9 @@ begin
        nP := nParam
   else nP := nil;
 
-  with TfFormBookSale.Create(Application) do
+  with TfFormBookSaleReturn.Create(Application) do
   try
-    Caption := '图书 - 销售';
+    Caption := '图书 - 退回';
     LoadMember(nil);
     InitFormData('');
 
@@ -125,12 +125,12 @@ begin
   end;
 end;
 
-class function TfFormBookSale.FormID: integer;
+class function TfFormBookSaleReturn.FormID: integer;
 begin
-  Result := cFI_FormBookSale;
+  Result := cFI_FormBookSaleReturn;
 end;
 
-procedure TfFormBookSale.FormCreate(Sender: TObject);
+procedure TfFormBookSaleReturn.FormCreate(Sender: TObject);
 begin
   inherited;
   dxGroup1.AlignVert := avTop;
@@ -143,7 +143,7 @@ begin
   LoadcxListViewConfig(Name, ListDetail);
 end;
 
-procedure TfFormBookSale.FormClose(Sender: TObject; var Action: TCloseAction);
+procedure TfFormBookSaleReturn.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   gLookupComboBoxAdapter.DeleteGroup(Name);
   SaveFormConfig(Self);
@@ -154,7 +154,7 @@ begin
   inherited;
 end;
 
-procedure TfFormBookSale.InitFormData(const nID: string);
+procedure TfFormBookSaleReturn.InitFormData(const nID: string);
 var nStr,nTmp: string;
     nDStr: TDynamicStrArray;
     nItem: TLookupComboBoxItem;
@@ -184,7 +184,7 @@ begin
   end;
 end;
 
-procedure TfFormBookSale.EditMemPropertiesEditValueChanged(Sender: TObject);
+procedure TfFormBookSaleReturn.EditMemPropertiesEditValueChanged(Sender: TObject);
 var nStr: string;
     nMems: TMembers;
 begin
@@ -202,7 +202,7 @@ begin
   end;
 end;
 
-procedure TfFormBookSale.LoadMember(const nData: PMemberItem);
+procedure TfFormBookSaleReturn.LoadMember(const nData: PMemberItem);
 var nStr: string;
 begin
   BtnOK.Enabled := Assigned(nData);
@@ -226,7 +226,7 @@ begin
 end;
 
 //Desc: 根据Hint设置标题
-procedure TfFormBookSale.SetLableCaption(const nHint, nText: string);
+procedure TfFormBookSaleReturn.SetLableCaption(const nHint, nText: string);
 var nIdx: Integer;
 begin
   with dxLayout1 do
@@ -240,7 +240,7 @@ begin
 end;
 
 //Desc: 清理标签标题
-procedure TfFormBookSale.ClearLabelCaption(const nHint,nCaption: string);
+procedure TfFormBookSaleReturn.ClearLabelCaption(const nHint,nCaption: string);
 var nStr: string;
     nIdx: Integer;
 begin
@@ -256,7 +256,7 @@ begin
   end;
 end;
 
-procedure TfFormBookSale.EditISDNKeyPress(Sender: TObject;
+procedure TfFormBookSaleReturn.EditISDNKeyPress(Sender: TObject;
   var Key: Char);
 var nStr: string;
 begin
@@ -270,13 +270,13 @@ begin
       Exit;
     end;
 
-    if LoadBooks(EditISDN.Text, FBooks, nStr) then
+    if LoadBooksSale(FMember.FMID, EditISDN.Text, FBooks, nStr) then
     begin
       FBookISDN := EditISDN.Text;
       LoadListViewData(ListBooks, FBooks);
 
       if Length(FBooks) = 1 then
-        SaleBook(0);
+        ReturnBook(0);
       //xxxxx
     end else
     begin
@@ -290,7 +290,7 @@ begin
 end;
 
 //Desc: 载入列表数据
-procedure TfFormBookSale.LoadListViewData(const nList: TcxListView;
+procedure TfFormBookSaleReturn.LoadListViewData(const nList: TcxListView;
   const nBooks: TBooks);
 var nIdx: Integer;
 begin
@@ -311,8 +311,8 @@ begin
         SubItems.Add(FClass);
 
         if nList = ListDetail then
-             SubItems.Add(IntToStr(FNumNow))
-        else SubItems.Add(IntToStr(FNumIn));
+             SubItems.Add(IntToStr(FSaleReturn))
+        else SubItems.Add(IntToStr(FSaleNum - FSaleReturn));
       end;
   finally
     nList.Items.EndUpdate;
@@ -322,81 +322,68 @@ begin
   end;   
 end;
 
-//Desc: 销售索引为nIdx的图书
-procedure TfFormBookSale.SaleBook(const nIdx: Integer);
+//Desc: 退回索引为nIdx的图书
+procedure TfFormBookSaleReturn.ReturnBook(const nIdx: Integer);
 var nInt: Integer;
 
   procedure RefreshBookList;
   begin
     with FBooks[nIdx] do
     begin
-      Dec(FNumIn);
-      FEnabled := FNumIn > 0;
+      Inc(FSaleReturn);
+      FEnabled := FSaleNum > FSaleReturn;
       LoadListViewData(ListBooks, FBooks);
     end;
-  end;
-
+  end;  
 begin
-  if not (FBooks[nIdx].FValid and FBooks[nIdx].FBookValid)then
-  begin
-    EditISDN.Text := '管理员已禁止销售此书';
-    Exit;
-  end;
-
   EditISDN.Text := FBookISDN;
   EditISDN.SelectAll;
   ActiveControl := EditISDN;
 
-  if FBooks[nIdx].FNumIn < 1 then
-  begin
-    ShowMsg('库存不足', sHint);
-    Exit;
-  end;
-  
-  for nInt:=Low(FBooksSale) to High(FBooksSale) do
-   with FBooksSale[nInt] do
+  for nInt:=Low(FBooksReturn) to High(FBooksReturn) do
+   with FBooksReturn[nInt] do
     if FEnabled and (FRecord = FBooks[nIdx].FRecord) then
     begin
-      Inc(FNumNow);
-      LoadListViewData(ListDetail, FBooksSale);
+      Inc(FSaleReturn);
+      LoadListViewData(ListDetail, FBooksReturn);
       RefreshBookList;
       
-      ShowMsg('成功售出 1 本', sHint);
+      ShowMsg('成功退回 1 本', sHint);
       Exit;
     end;
 
-  nInt := Length(FBooksSale);
-  SetLength(FBooksSale, nInt + 1);
-  FBooksSale[nInt] := FBooks[nIdx];
+  nInt := Length(FBooksReturn);
+  SetLength(FBooksReturn, nInt + 1);
+  FBooksReturn[nInt] := FBooks[nIdx];
 
-  FBooksSale[nInt].FNumNow := 1;
-  LoadListViewData(ListDetail, FBooksSale);
+  FBooksReturn[nInt].FSaleReturn := 1;
+  LoadListViewData(ListDetail, FBooksReturn);
   RefreshBookList;
 end;
 
-procedure TfFormBookSale.ListBooksDblClick(Sender: TObject);
+procedure TfFormBookSaleReturn.ListBooksDblClick(Sender: TObject);
 var nIdx: Integer;
 begin
   if not Assigned(ListBooks.Selected) then Exit;
   nIdx := Integer(ListBooks.Selected.Data);
-  SaleBook(nIdx);
+  ReturnBook(nIdx);
 end;
 
-procedure TfFormBookSale.ListDetailDblClick(Sender: TObject);
+procedure TfFormBookSaleReturn.ListDetailDblClick(Sender: TObject);
 var nStr: string;
     nIdx: Integer;
 begin
   if not Assigned(ListDetail.Selected) then Exit;
   nIdx := Integer(ListDetail.Selected.Data);
   
-  with FBooksSale[nIdx] do
+  with FBooksReturn[nIdx] do
   begin
-    Dec(FNumNow);
-    if FNumNow < 1 then
+    Dec(FSaleReturn);
+    if FSaleReturn < 1 then
          FEnabled := False
-    else ShowMsg('已取消售出 1 本', sHint);
+    else ShowMsg('已取消 1 本', sHint);
 
-    LoadListViewData(ListDetail, FBooksSale);
+    LoadListViewData(ListDetail, FBooksReturn);
     nStr := FRecord;
   end;
 
@@ -404,13 +391,13 @@ begin
    with FBooks[nIdx] do
     if FRecord = nStr then
     begin
-      Inc(FNumIn);
-      FEnabled := FNumIn > 0;
+      Dec(FSaleReturn);
+      FEnabled := FSaleNum > FSaleReturn;
       LoadListViewData(ListBooks, FBooks);
     end;
 end;
 
-procedure TfFormBookSale.BtnOKClick(Sender: TObject);
+procedure TfFormBookSaleReturn.BtnOKClick(Sender: TObject);
 var nStr: string;
     nIdx,nAll: Integer;
     nMoney: Double;
@@ -426,13 +413,13 @@ begin
   nAll := 0;
   //init
 
-  for nIdx:=Low(FBooksSale) to High(FBooksSale) do
-  with FBooksSale[nIdx] do
+  for nIdx:=Low(FBooksReturn) to High(FBooksReturn) do
+  with FBooksReturn[nIdx] do
   begin
     if not FEnabled then Continue;
     //invalid
 
-     nAll := nAll + FNumNow;
+     nAll := nAll + FSaleReturn;
      //累计数量
 
      nMoney := nMoney + FPubPrice * FNumNow;
@@ -443,7 +430,7 @@ begin
   nParam.FParamA := FMember.FMID;
   nParam.FParamB := Float2Float(nMoney, cPrecision, False);
   nParam.FParamC := sFlag_Yes;
-  nParam.FParamD := Format('售出 %d 本,总金额 %.2f元', [nAll, nMoney]);
+  nParam.FParamD := Format('销售退回 %d 本,总金额 %.2f元', [nAll, nMoney]);
   CreateBaseFormItem(cFI_FormInOutMoney, PopedomItem, @nParam);
 
   if (nParam.FCommand <> cCmd_ModalResult) or (nParam.FParamA <> mrOK) then
@@ -456,8 +443,8 @@ begin
     FListA.Clear;
     //init
 
-    for nIdx:=Low(FBooksSale) to High(FBooksSale) do
-    with FBooksSale[nIdx] do
+    for nIdx:=Low(FBooksReturn) to High(FBooksReturn) do
+    with FBooksReturn[nIdx] do
     begin
       if not FEnabled then Continue;
       //invalid
@@ -465,20 +452,24 @@ begin
       nStr := MakeSQLByStr([SF('S_Member', FMember.FMID),
           SF('S_Book', FBookID),
           SF('S_BookDtl', FDetailID),
-          SF('S_Type', sFlag_Out),
-          SF('S_Num', FNumNow, sfVal),
+          SF('S_Type', sFlag_In),
+          SF('S_Num', FSaleReturn * (-1), sfVal),
           SF('S_Return', 0, sfVal),
           SF('S_Man', gSysParam.FUserID),
           SF('S_Date', sField_SQLServer_Now, sfVal),
           SF('S_Memo', EditMemo.Text)
         ], sTable_BookSale, '', True);
-      FDM.ExecuteSQL(nStr); //0.销售记录
+      FDM.ExecuteSQL(nStr); //0.退回记录
 
-      nStr := 'Update $BD Set D_NumAll=D_NumAll-$Num,D_NumIn=D_NumIn-$Num,' +
-              'D_NumSale=D_NumSale+$Num Where R_ID=$RD';
+      nStr := 'Update %s Set S_Return=S_Return+%d Where R_ID=%s';
+      nStr := Format(nStr, [sTable_BookSale, FSaleReturn, FSaleID]);
+      FDM.ExecuteSQL(nStr); //1.更新原购买记录
+
+      nStr := 'Update $BD Set D_NumAll=D_NumAll+$Num,D_NumIn=D_NumIn+$Num,' +
+              'D_NumSale=D_NumSale-$Num Where R_ID=$RD';
       nStr := MacroValue(nStr, [MI('$BD', sTable_BookDetail),
-              MI('$RD', FRecord), MI('$Num', IntToStr(FNumNow))]);
-      FDM.ExecuteSQL(nStr); //1.增加售出量
+              MI('$RD', FRecord), MI('$Num', IntToStr(FSaleReturn))]);
+      FDM.ExecuteSQL(nStr); //2.减少售出量
 
       if FListA.IndexOf(FBookID) < 0 then
         FListA.Add(FBookID);
@@ -489,10 +480,9 @@ begin
       SyncBookNumber(FListA[nIdx]);
     //2.同步库存量
 
-    nStr := 'Update %s Set M_BuyNum=M_BuyNum+1,M_BuyBooks=M_BuyBooks+%d ' +
-            'Where M_ID=''%s''';
+    nStr := 'Update %s Set M_BuyBooks=M_BuyBooks-%d Where M_ID=''%s''';
     nStr := Format(nStr, [sTable_Members, nAll, FMember.FMID]);
-    FDM.ExecuteSQL(nStr); //3.增加会员信息计数
+    FDM.ExecuteSQL(nStr); //3.减少会员信息计数
 
     FDM.ADOConn.CommitTrans;
     ModalResult := mrOk;
@@ -506,5 +496,5 @@ begin
 end;
 
 initialization
-  gControlManager.RegCtrl(TfFormBookSale, TfFormBookSale.FormID);
+  gControlManager.RegCtrl(TfFormBookSaleReturn, TfFormBookSaleReturn.FormID);
 end.

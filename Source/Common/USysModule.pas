@@ -14,7 +14,7 @@ uses
   UFormIOMoney, UFrameBooks, UFormBooks, UFrameBookInOut, UFormIOBook,
   UFrameBookBorrow, UFormBookBorrow, UFormBookReturn, UFormBookQuery,
   UFrameIOMoney, UFramePlayGoods, UFormPlayArea, UFormSaleGoods,
-  UFrameBookSale, UFormBookSale;
+  UFrameBookSale, UFormBookSale, UFormBookSaleReturn;
 
 procedure InitSystemObject;
 procedure RunSystemObject;

@@ -301,7 +301,7 @@ ResourceString
    *.B_Author:作者
    *.B_Lang:语种
    *.B_Class:分类
-   *.B_NumAll: 总数量
+   *.B_NumAll: 总库存
    *.B_NumIn: 未出借
    *.B_NumOut: 已出借
    *.B_NumSale: 售出量
@@ -333,7 +333,7 @@ ResourceString
    *.D_PubPrice:定价
    *.D_GetPrice: 采购价
    *.D_SalePrice: 销售价
-   *.D_NumAll: 总数量
+   *.D_NumAll: 总库存
    *.D_NumIn: 未出借
    *.D_NumOut: 已出借
    *.D_NumSale: 售出量
@@ -376,13 +376,15 @@ ResourceString
 
   sSQL_NewBookSale = 'Create Table $Table(R_ID $Inc, S_Member varChar(15),' +
        'S_Book varChar(15), S_BookDtl varChar(15), S_Type Char(1),' +
-       'S_Num Integer, S_Man varChar(32), S_Date DateTime, S_Memo varChar(200))';
+       'S_Num Integer, S_Return Integer,' +
+       'S_Man varChar(32), S_Date DateTime, S_Memo varChar(200))';
   {-----------------------------------------------------------------------------
    图书销售: BookSale
    *.S_Member: 会员编号
    *.S_Book,S_BookDtl: 图书编号
    *.S_Type: 销售/退还
    *.S_Num: 数量
+   *.S_Return: 退回
    *.S_Man:操作人
    *.S_Date:日期
    *.S_Memo: 备注
