@@ -21,6 +21,9 @@ inherited fFrameBookBorrow: TfFrameBookBorrow
     Top = 202
     Width = 856
     Height = 353
+    inherited cxView1: TcxGridDBTableView
+      PopupMenu = PMenu1
+    end
   end
   inherited dxLayout1: TdxLayoutControl
     Width = 856
@@ -160,5 +163,29 @@ inherited fFrameBookBorrow: TfFrameBookBorrow
   end
   inherited DataSource1: TDataSource
     Top = 298
+  end
+  object PMenu1: TPopupMenu
+    AutoHotkeys = maManual
+    Left = 63
+    Top = 298
+    object MenuAll: TMenuItem
+      Caption = #20840#37096#26410#24402#36824
+      OnClick = MenuAllClick
+    end
+    object N4: TMenuItem
+      Caption = '-'
+    end
+    object MenuWeek: TMenuItem
+      Caption = #19971#22825#21069#20511#38405
+      OnClick = MenuAllClick
+    end
+    object MenuNDays: TMenuItem
+      Caption = 'N'#22825#21069#20511#38405
+      OnClick = MenuAllClick
+    end
+    object MenuInclude: TMenuItem
+      Caption = #21253#21547#24050#24402#36824
+      OnClick = MenuAllClick
+    end
   end
 end

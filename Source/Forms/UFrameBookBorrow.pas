@@ -33,18 +33,28 @@ type
     cxTextEdit4: TcxTextEdit;
     dxlytmLayout1Item1: TdxLayoutItem;
     EditMem: TcxButtonEdit;
+    PMenu1: TPopupMenu;
+    MenuAll: TMenuItem;
+    MenuWeek: TMenuItem;
+    MenuNDays: TMenuItem;
+    N4: TMenuItem;
+    MenuInclude: TMenuItem;
     procedure EditNamePropertiesButtonClick(Sender: TObject;
       AButtonIndex: Integer);
     procedure BtnAddClick(Sender: TObject);
     procedure EditDatePropertiesButtonClick(Sender: TObject;
       AButtonIndex: Integer);
     procedure BtnDelClick(Sender: TObject);
+    procedure MenuAllClick(Sender: TObject);
   private
     { Private declarations }
     FStart,FEnd: TDate;
     //时间区间
     FFilteDate: Boolean;
     //筛选日期
+    FMenuDays: Integer;
+    FMenuLast: TObject;
+    //菜单筛选
   public
     { Public declarations }
     class function FrameID: integer; override;
@@ -62,7 +72,7 @@ implementation
 
 uses
   ULibFun, UMgrControl, USysDataDict, USysConst, USysDB, USysPopedom, USysGrid,
-  USysBusiness, UDataModule, UFormBase, UFormDateFilter;
+  USysBusiness, UDataModule, UFormBase, UFormDateFilter, UFormInputbox;
 
 class function TfFrameBookBorrow.FrameID: integer;
 begin
@@ -72,6 +82,9 @@ end;
 procedure TfFrameBookBorrow.OnCreateFrame;
 begin
   inherited;
+  FMenuDays := 14;
+  FMenuLast := nil;
+
   FFilteDate := True;
   InitDateRange(Name, FStart, FEnd);
 end;
@@ -115,6 +128,7 @@ end;
 
 procedure TfFrameBookBorrow.AfterInitFormData;
 begin
+  FMenuLast := nil;
   FFilteDate := True;
 end;
 
@@ -183,6 +197,66 @@ begin
       FFilteDate := (Date() >= FStart) and (Date() < FEnd + 1);
     InitFormData('');
   end;
+end;
+
+//Desc: 查询未归还
+procedure TfFrameBookBorrow.MenuAllClick(Sender: TObject);
+var nStr: string;
+    nLast: TObject;
+begin
+  if Sender = MenuInclude then
+  begin
+    MenuInclude.Checked := not MenuInclude.Checked;
+    MenuInclude.Tag := 10;
+    nLast := FMenuLast;
+
+    MenuAllClick(FMenuLast);
+    FMenuLast := nLast;    
+    MenuInclude.Tag := 0;
+    Exit;
+  end;
+
+  if Sender = MenuAll then
+  begin
+    FFilteDate := False;
+    FWhere := 'B_NumBorrow > B_NumReturn';
+    InitFormData(FWhere);
+  end else
+
+  if Sender = MenuWeek then
+  begin
+    FFilteDate := False;
+    FWhere := Format('B_DateBorrow < ''%s''', [Date2Str(Date() - 7 + 1)]);
+    
+    if not MenuInclude.Checked then
+      FWhere := FWhere + ' And B_NumBorrow > B_NumReturn';
+    InitFormData(FWhere);
+  end else
+
+  if Sender = MenuNDays then
+  begin
+    if MenuInclude.Tag <> 10 then
+    begin
+      nStr := IntToStr(FMenuDays);
+      while True do //loop
+      begin
+        if not ShowInputBox('请输入天数:', '', nStr, 5) then Exit;
+        if IsNumber(nStr, False) and (StrToInt(nStr) > 0) then Break;
+      end;
+      FMenuDays := StrToInt(nStr);
+    end;
+
+    FFilteDate := False;
+    nStr := Date2Str(Date() - FMenuDays + 1);
+    FWhere := Format('B_DateBorrow < ''%s''', [nStr]);
+
+    if not MenuInclude.Checked then
+      FWhere := FWhere + ' And B_NumBorrow > B_NumReturn';;
+    InitFormData(FWhere);
+  end;
+
+  FMenuLast := Sender;
+  //remember
 end;
 
 initialization
