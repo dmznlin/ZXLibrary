@@ -684,11 +684,15 @@ begin
     if FStatus = bsNone then Continue; //no change
     nIsNew := FRecord = '';
 
-    if (FStatus = bsDel) and (not nIsNew) then //delete
+    if FStatus = bsDel then //delete
     begin
-      nStr := 'Delete From %s Where R_ID=%s';
-      nStr := Format(nStr, [sTable_BookDetail, FRecord]);
-      FDM.ExecuteSQL(nStr);
+      if not nIsNew then
+      begin
+        nStr := 'Delete From %s Where R_ID=%s';
+        nStr := Format(nStr, [sTable_BookDetail, FRecord]);
+        FDM.ExecuteSQL(nStr);
+      end;
+      
       Continue;
     end;
         
