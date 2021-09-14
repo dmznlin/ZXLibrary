@@ -13,19 +13,19 @@ inherited fFormIOMoney: TfFormIOMoney
     inherited BtnOK: TButton
       Left = 306
       Top = 460
-      TabOrder = 18
+      TabOrder = 19
     end
     inherited BtnExit: TButton
       Left = 376
       Top = 460
-      TabOrder = 19
+      TabOrder = 20
     end
     object EditMemo: TcxMemo [2]
       Left = 81
       Top = 408
       ParentFont = False
       Properties.MaxLength = 200
-      TabOrder = 17
+      TabOrder = 18
       Height = 89
       Width = 185
     end
@@ -38,7 +38,7 @@ inherited fFormIOMoney: TfFormIOMoney
       Properties.IncrementalSearch = False
       Properties.ItemHeight = 20
       Properties.MaxLength = 100
-      TabOrder = 14
+      TabOrder = 15
       Width = 121
     end
     object EditCard: TcxTextEdit [4]
@@ -77,7 +77,7 @@ inherited fFormIOMoney: TfFormIOMoney
       Left = 81
       Top = 383
       ParentFont = False
-      TabOrder = 15
+      TabOrder = 16
       Text = '0'
       Width = 121
     end
@@ -89,7 +89,7 @@ inherited fFormIOMoney: TfFormIOMoney
       Caption = #20184#27454
       Checked = True
       ParentColor = False
-      TabOrder = 12
+      TabOrder = 13
       TabStop = True
       OnClick = RadioPayClick
     end
@@ -100,7 +100,7 @@ inherited fFormIOMoney: TfFormIOMoney
       Height = 17
       Caption = #36864#27454
       ParentColor = False
-      TabOrder = 13
+      TabOrder = 14
       OnClick = RadioPayClick
     end
     object cxLabel1: TcxLabel [11]
@@ -198,11 +198,19 @@ inherited fFormIOMoney: TfFormIOMoney
       Width = 121
     end
     object EditPlay: TcxTextEdit [19]
+      Left = 265
+      Top = 301
+      ParentFont = False
+      TabOrder = 10
+      Text = '0'
+      Width = 121
+    end
+    object EditNoReturn: TcxTextEdit [20]
       Left = 81
       Top = 301
       ParentFont = False
       TabOrder = 9
-      Text = '0'
+      Text = '4'
       Width = 121
     end
     inherited dxLayout1Group_Root: TdxLayoutGroup
@@ -276,10 +284,21 @@ inherited fFormIOMoney: TfFormIOMoney
                 ControlOptions.ShowBorder = False
               end
             end
-            object dxlytmLayout1Item20: TdxLayoutItem
-              Caption = #28216' '#29609' '#21306':'
-              Control = EditPlay
-              ControlOptions.ShowBorder = False
+            object dxLayout1Group7: TdxLayoutGroup
+              ShowCaption = False
+              Hidden = True
+              LayoutDirection = ldHorizontal
+              ShowBorder = False
+              object dxLayout1Item17: TdxLayoutItem
+                Caption = #25345#26377#19978#38480':'
+                Control = EditNoReturn
+                ControlOptions.ShowBorder = False
+              end
+              object dxlytmLayout1Item20: TdxLayoutItem
+                Caption = #28216' '#29609' '#21306':'
+                Control = EditPlay
+                ControlOptions.ShowBorder = False
+              end
             end
             object dxlytmLayout1Item17: TdxLayoutItem
               ShowCaption = False

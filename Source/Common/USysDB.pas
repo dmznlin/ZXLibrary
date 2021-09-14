@@ -244,6 +244,7 @@ ResourceString
        'M_JoinDate DateTime, M_ValidDate DateTime, ' +
        'M_BorrowNum Integer, M_BorrowBooks Integer,' +
        'M_BuyNum Integer, M_BuyBooks Integer,' +
+       'M_NoReturnAllowed Integer,' +
        'M_MonCH Integer, M_MonCHHas Integer,' +
        'M_MonEN Integer, M_MonENHas Integer, M_Month varChar(10),' +
        'M_PlayArea Integer, M_Memo varChar(50))';
@@ -262,6 +263,7 @@ ResourceString
    *.M_BorrowBooks: 书本数
    *.M_BuyNum: 购买次数
    *.M_BuyBooks: 购买本数
+   *.M_NoReturnAllowed: 允许借出未还的本数
    *.M_MonCH: 可借阅中文本数
    *.M_MonCHHas: 当月中文已借
    *.M_MonEN: 可借阅外文本数

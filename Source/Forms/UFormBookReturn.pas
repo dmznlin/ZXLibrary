@@ -232,8 +232,7 @@ begin
     nStr := '中文 %d 本,英文 %d 本';
     SetLableCaption('M_Quanyi', Format(nStr, [FMonCH, FMonEN]));
 
-    BtnOK.Enabled := Now() < FValidDate;
-    if BtnOK.Enabled then
+    if Now() < FValidDate then
     begin
       nStr := Format(nStr, [FMonCH-FMonCHHas, FMonEN-FMonENHas]);
       SetLableCaption('M_CanBorrow', nStr)

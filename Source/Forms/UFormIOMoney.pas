@@ -59,6 +59,9 @@ type
     dxGroupLayout1Group8: TdxLayoutGroup;
     EditPlay: TcxTextEdit;
     dxlytmLayout1Item20: TdxLayoutItem;
+    dxLayout1Item17: TdxLayoutItem;
+    EditNoReturn: TcxTextEdit;
+    dxLayout1Group7: TdxLayoutGroup;
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure BtnOKClick(Sender: TObject);
@@ -142,6 +145,7 @@ begin
   GroupDate.Enabled := not nOnMoney;
   EditCN.Enabled := not nOnMoney;
   EditEN.Enabled := not nOnMoney;
+  EditNoReturn.Enabled := not nOnMoney;
   EditPlay.Enabled := not nOnMoney;
 
   if EditPayment.Properties.Items.Count < 1 then
@@ -166,6 +170,7 @@ begin
 
     EditCN.Text := IntToStr(FMonCH);
     EditEN.Text := IntToStr(FMonEN);
+    EditNoReturn.Text := IntToStr(FNoReturnAllowed);
     EditPlay.Text := IntToStr(FPlayArea);
     EditValid.Date := FValidDate;
   end;
@@ -218,6 +223,12 @@ begin
     nHint := '请填写英文可借阅数量';
   end else
 
+  if Sender = EditNoReturn then
+  begin
+    Result := IsNumber(EditNoReturn.Text, False) and (StrToInt(EditNoReturn.Text) > 0);
+    nHint := '请填写可持有的本数';
+  end else
+
   if Sender = EditPlay then
   begin
     Result := IsNumber(EditPlay.Text, False) and (StrToInt(EditPlay.Text) >= 0);
@@ -262,6 +273,7 @@ begin
       nStr := MakeSQLByStr([SF('M_ValidDate', DateTime2Str(EditValid.Date)),
         SF('M_MonCH', EditCN.Text, sfVal),
         SF('M_MonEN', EditEN.Text, sfVal),
+        SF('M_NoReturnAllowed', EditNoReturn.Text, sfVal),
         SF('M_PlayArea', EditPlay.Text, sfVal)
         ], sTable_Members, SF('M_ID', FMember.FMID), False);
       FDM.ExecuteSQL(nStr);
@@ -273,6 +285,8 @@ begin
         nStr := nStr + Format(' 可借中文:[ %d→%s]', [FMember.FMonCH, EditCN.Text]);
       if StrToInt(EditEN.Text) <> FMember.FMonEN then
         nStr := nStr + Format(' 可借英文:[ %d→%s]', [FMember.FMonEN, EditEN.Text]);
+      if StrToInt(EditNoReturn.Text) <> FMember.FNoReturnAllowed then
+        nStr := nStr + Format(' 持有上限:[ %d→%s]', [FMember.FNoReturnAllowed, EditNoReturn.Text]);
       if StrToInt(EditPlay.Text) <> FMember.FPlayArea then
         nStr := nStr + Format(' 游玩区:[ %d→%s ]', [FMember.FPlayArea, EditPlay.Text]);
       FDM.WriteSysLog(sFlag_Member, FMember.FMID, nStr);

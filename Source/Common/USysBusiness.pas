@@ -77,6 +77,9 @@ type
     FMonCHHas    : Integer;    //当月已借: 中文
     FMonENHas    : Integer;    //当月已借: 英文
     FPlayArea    : Integer;    //游玩区次数
+
+    FHasBorrow   : Integer;    //已借未归还本数
+    FNoReturnAllowed: Integer; //允许借出未还本数
   end;
   TMembers = array of TMemberItem;
 
@@ -119,6 +122,8 @@ function LoadBooksSale(const nMID,nISDN: string; var nBooks: TBooks;
 function LoadMembers(const nMID: string; var nMembers: TMembers;
   var nHint: string; nWhere: string = ''): Boolean;
 {*加载会员列表*}
+function GetMemberHasBorrow(const nMID: string): Integer;
+{*会员未归还本数*}
 
 implementation
 
@@ -717,6 +722,7 @@ begin
         FBuyNum    := FieldByName('M_BuyNum').AsInteger;
         FBuyBooks  := FieldByName('M_BuyBooks').AsInteger;
 
+        FNoReturnAllowed := FieldByName('M_NoReturnAllowed').AsInteger;
         FMonCH     := FieldByName('M_MonCH').AsInteger;
         FMonEN     := FieldByName('M_MonEN').AsInteger;
         FMonth     := FieldByName('M_Month').AsString;
@@ -744,6 +750,24 @@ begin
   end;
 
   Result := True;
+end;
+
+//Date: 2021-07-08
+//Parm: 会员编号
+//Desc: 获取nMID未归还的本数
+function GetMemberHasBorrow(const nMID: string): Integer;
+var nStr: string;
+begin
+  Result := 0;
+  nStr := 'Select Sum(B_NumBorrow-B_NumReturn) From %s Where B_Member=''%s''';
+  nStr := Format(nStr, [sTable_BookBorrow, nMID]);
+
+  with FDM.QueryTemp(nStr) do
+  begin
+    if RecordCount > 0 then
+      Result := Fields[0].AsInteger;
+    //xxxxx
+  end;
 end;
 
 end.

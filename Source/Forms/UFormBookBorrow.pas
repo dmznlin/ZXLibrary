@@ -227,13 +227,25 @@ begin
     SetLableCaption('M_Level', FLevel);
     SetLableCaption('M_ValidDate', DateTime2Str(FValidDate));
 
-    nStr := '中文 %d 本,英文 %d 本';
-    SetLableCaption('M_Quanyi', Format(nStr, [FMonCH, FMonEN]));
+    nStr := '中文 %d 本,英文 %d 本,可持有 %d 本';
+    SetLableCaption('M_Quanyi', Format(nStr, [FMonCH, FMonEN, FNoReturnAllowed]));
 
     BtnOK.Enabled := Now() < FValidDate;
     if BtnOK.Enabled then
     begin
-      nStr := Format(nStr, [FMonCH-FMonCHHas, FMonEN-FMonENHas]);
+      FHasBorrow := GetMemberHasBorrow(FMID);
+      //已借未还
+
+      if FHasBorrow >= FNoReturnAllowed then
+      begin
+        BtnOK.Enabled := False;
+        nStr := Format('未归还的书籍有 %d 本,已达到上限', [FHasBorrow]);
+        SetLableCaption('M_CanBorrow', nStr);
+        Exit;
+      end;
+
+      nStr := '中文 %d 本,英文 %d 本,已持有 %d 本';
+      nStr := Format(nStr, [FMonCH-FMonCHHas, FMonEN-FMonENHas, FHasBorrow]);
       SetLableCaption('M_CanBorrow', nStr)
     end else
     begin
@@ -416,6 +428,16 @@ begin
 
   with FMember do
   begin
+    nInt := nAll - (FNoReturnAllowed - FHasBorrow);
+    if nInt > 0 then
+    begin
+      nStr := '已超出可借阅上限,请先归还以前借阅的书籍.';
+      nStr := Format(nStr, [nInt]);
+
+      ShowDlg(nStr, sWarn);
+      Exit;
+    end;
+
     nInt := nCN + FMonCHHas - FMonCH;
     if nInt > 0 then
     begin

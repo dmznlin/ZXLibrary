@@ -9,16 +9,16 @@ inherited fFormBookBorrow: TfFormBookBorrow
   PixelsPerInch = 96
   TextHeight = 12
   inherited dxLayout1: TdxLayoutControl
-    Width = 651
-    Height = 647
+    Width = 643
+    Height = 635
     inherited BtnOK: TButton
-      Left = 505
-      Top = 614
+      Left = 497
+      Top = 602
       TabOrder = 19
     end
     inherited BtnExit: TButton
-      Left = 575
-      Top = 614
+      Left = 567
+      Top = 602
       TabOrder = 20
     end
     object EditMem: TcxLookupComboBox [2]
@@ -242,8 +242,8 @@ inherited fFormBookBorrow: TfFormBookBorrow
     object ListBooks: TcxListView [18]
       Left = 23
       Top = 302
-      Width = 544
-      Height = 108
+      Width = 597
+      Height = 150
       Columns = <
         item
           Caption = #22270#20070#21517#31216
@@ -289,7 +289,7 @@ inherited fFormBookBorrow: TfFormBookBorrow
     end
     object ListDetail: TcxListView [19]
       Left = 23
-      Top = 447
+      Top = 489
       Width = 544
       Height = 108
       Columns = <
@@ -337,7 +337,7 @@ inherited fFormBookBorrow: TfFormBookBorrow
     end
     object EditMemo: TcxMemo [20]
       Left = 81
-      Top = 557
+      Top = 545
       ParentFont = False
       Properties.MaxLength = 200
       TabOrder = 18
